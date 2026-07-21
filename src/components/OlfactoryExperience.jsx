@@ -110,22 +110,22 @@ export default function OlfactoryExperience({ onScrollToTop }) {
         ))}
       </div>
 
-      {/* Responsive Grid: 1 column on Mobile (grid-cols-1), 2 on Tablet (sm), 4 on Desktop (lg) */}
-      <div className="w-full max-w-7xl mx-auto py-2 sm:py-4 md:py-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 md:gap-6 lg:gap-8">
+      {/* 2x2 Grid on Mobile (grid-cols-2), 4 columns on Desktop (lg) */}
+      <div className="w-full max-w-7xl mx-auto py-2 sm:py-4 md:py-6 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 md:gap-6 lg:gap-8">
         {filteredProducts.map((product) => (
           <div
             key={product.id}
-            className="flex flex-col bg-white border border-black/10 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 relative"
+            className="flex flex-col bg-white border border-black/10 rounded-xl sm:rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 relative"
           >
             {/* Top Badge */}
-            <div className="absolute top-3 left-3 sm:top-3.5 sm:left-3.5 z-10">
-              <span className="px-2.5 py-1 sm:px-3 sm:py-1 bg-black/80 backdrop-blur-md text-[9px] sm:text-[9px] font-sans tracking-[0.18em] text-white uppercase rounded-full font-semibold">
+            <div className="absolute top-2 left-2 sm:top-3.5 sm:left-3.5 z-10">
+              <span className="px-2 py-0.5 sm:px-3 sm:py-1 bg-black/80 backdrop-blur-md text-[8px] sm:text-[9px] font-sans tracking-[0.12em] sm:tracking-[0.18em] text-white uppercase rounded-full font-semibold">
                 {product.badge}
               </span>
             </div>
 
             {/* Studio Product Image Viewport */}
-            <div className="w-full h-56 sm:h-60 md:h-64 lg:h-72 bg-[#F6F6F6] relative overflow-hidden flex items-center justify-center p-6 border-b border-black/5">
+            <div className="w-full h-40 xs:h-48 sm:h-60 md:h-64 lg:h-72 bg-[#F6F6F6] relative overflow-hidden flex items-center justify-center p-3 sm:p-6 border-b border-black/5">
               <div className="absolute inset-0 bg-radial from-white/70 via-transparent to-transparent pointer-events-none" />
               <img
                 src={product.image}
@@ -135,25 +135,25 @@ export default function OlfactoryExperience({ onScrollToTop }) {
             </div>
 
             {/* Bottom Content Area */}
-            <div className="p-4 sm:p-5 flex flex-col justify-between flex-1 bg-white gap-3">
+            <div className="p-3 sm:p-5 flex flex-col justify-between flex-1 bg-white gap-2">
               <div>
-                <p className="font-sans text-[10px] sm:text-[10px] text-[#737373] font-semibold tracking-wider uppercase mb-1">
+                <p className="font-sans text-[8.5px] xs:text-[9.5px] sm:text-[10px] text-[#737373] font-semibold tracking-wider uppercase mb-0.5 line-clamp-1">
                   {product.subtitle}
                 </p>
-                <h3 className="font-sans font-bold text-sm sm:text-base text-[#1A1A1A] uppercase tracking-wide leading-snug">
+                <h3 className="font-sans font-bold text-xs sm:text-sm md:text-base text-[#1A1A1A] uppercase tracking-wide leading-tight line-clamp-2">
                   {product.name}
                 </h3>
               </div>
 
               {/* Bottom Row: Price & Shop CTA Button */}
-              <div className="flex items-center justify-between pt-3 border-t border-black/10 mt-1">
-                <span className="font-sans font-extrabold text-base sm:text-lg text-[#1A1A1A]">
+              <div className="flex items-center justify-between pt-2 border-t border-black/10 mt-0.5">
+                <span className="font-sans font-extrabold text-xs xs:text-sm sm:text-base md:text-lg text-[#1A1A1A]">
                   {product.priceFormatted}
                 </span>
 
                 <button
                   onClick={() => setSelectedProduct(product)}
-                  className="px-5 sm:px-5 py-2 sm:py-2.5 text-xs font-sans font-bold tracking-[0.2em] uppercase text-white bg-[#1A1A1A] hover:bg-black rounded-md transition-all duration-200 shadow-xs cursor-pointer active:scale-95 shrink-0"
+                  className="px-2.5 xs:px-3.5 sm:px-5 py-1.5 sm:py-2.5 text-[9px] xs:text-[10px] sm:text-xs font-sans font-bold tracking-[0.12em] sm:tracking-[0.2em] uppercase text-white bg-[#1A1A1A] hover:bg-black rounded-md transition-all duration-200 shadow-xs cursor-pointer active:scale-95 shrink-0"
                 >
                   SHOP
                 </button>
