@@ -224,10 +224,10 @@ export default function HeroSlider({ onReplayLoader, loaderState }) {
         <div className="relative z-10 w-full flex-1 max-w-7xl mx-auto px-5 sm:px-8 md:px-10 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 md:gap-6 pt-3 sm:pt-6 md:pt-16 pb-6 md:pb-12 pointer-events-none">
 
           {/* Dynamic 3D Model Spacer Area on Mobile (order-first), Right Panel on iPad/Desktop (order-last) */}
-          <div className="w-full md:w-[45%] lg:w-[58%] h-[32vh] min-h-[190px] max-h-[260px] sm:h-[240px] md:h-full pointer-events-none order-first md:order-last shrink-0" />
+          <div className="w-full md:w-[48%] lg:w-[54%] h-[32vh] min-h-[190px] max-h-[260px] sm:h-[240px] md:h-full pointer-events-none order-first md:order-last shrink-0" />
 
           {/* Editorial Content Panel (order-last on mobile centered under 3D model, order-first on desktop/iPad) */}
-          <div className="w-full md:w-[55%] lg:w-[42%] flex flex-col items-center md:items-start text-center md:text-left justify-center gap-3.5 sm:gap-5 md:gap-6 pointer-events-auto order-last md:order-first px-1 md:px-0">
+          <div className="w-full md:w-[52%] lg:w-[46%] flex flex-col items-center md:items-start text-center md:text-left justify-center gap-3.5 sm:gap-5 md:gap-6 pointer-events-auto order-last md:order-first px-1 md:px-0">
 
             <div ref={textGroupRef} className="flex flex-col items-center md:items-start gap-1.5 sm:gap-3">
               {/* Step Label / Category */}

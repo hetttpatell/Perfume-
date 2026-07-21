@@ -35,8 +35,8 @@ function getResponsiveCoords() {
 
     return { x: 0, y: targetY, scale: targetScale, isMobile: true };
   } else if (w < 1024) {
-    // iPad / Tablet Viewport (768px - 1024px): Shifted to balanced left position (x = -0.32)
-    return { x: -0.32, y: 0.02, scale: 10.8, isMobile: false };
+    // iPad / Tablet Viewport (768px - 1024px e.g. iPad Air 820x1180): Right panel positioning (x = 0.38)
+    return { x: 0.38, y: 0.02, scale: 11.2, isMobile: false };
   } else if (w < 1280) {
     // Small Desktop / Laptop
     return { x: 0.85, y: 0, scale: 13.5, isMobile: false };
