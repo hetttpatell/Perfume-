@@ -206,10 +206,10 @@ export default function HeroSlider({ onReplayLoader, loaderState }) {
         aria-label="Chanel N°19 Interactive Fragrance Showcase"
       >
         {/* Large Background Watermark Text (Optimized positioning for Mobile, iPad & Desktop) */}
-        <div className="absolute inset-0 pointer-events-none z-0 flex items-start pt-16 justify-center md:items-center md:pt-0 md:justify-center lg:justify-end md:pl-[30vw] lg:pl-0 md:pr-4 overflow-hidden select-none">
+        <div className="absolute inset-0 pointer-events-none z-0 flex items-start pt-6 sm:pt-8 md:items-center md:pt-0 justify-center lg:justify-end md:pl-[20vw] lg:pl-0 md:pr-12 overflow-hidden select-none">
           <h1
             ref={watermarkRef}
-            className="font-serif font-extrabold text-[16vw] sm:text-[20vw] md:text-[22vw] lg:text-[25vw] leading-none text-black/20 md:text-black/35 tracking-tighter uppercase whitespace-nowrap will-change-transform drop-shadow-xs"
+            className="font-serif font-extrabold text-[12vw] sm:text-[14vw] md:text-[13vw] lg:text-[15vw] leading-none text-black/10 md:text-black/18 tracking-tighter uppercase whitespace-nowrap will-change-transform"
           >
             {activeSlideData.shortTitle}
           </h1>

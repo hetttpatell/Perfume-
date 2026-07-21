@@ -13,8 +13,8 @@ function getResponsiveCoords() {
   if (typeof window === 'undefined') return { x: 1.2, y: 0, scale: 15.0, isMobile: false };
   const w = window.innerWidth;
   if (w < 768) {
-    // Mobile: model positioned higher up (y = 1.05) so it floats above text
-    return { x: 0, y: 1.05, scale: 9.5, isMobile: true };
+    // Mobile: model positioned slightly lower (y = 0.65) and larger (scale = 11.8)
+    return { x: 0, y: 0.65, scale: 11.8, isMobile: true };
   } else if (w < 1024) {
     // iPad / Tablet (768px - 1024px): x = 0.35, scale = 11.5 for 100% full visibility without clipping
     return { x: 0.35, y: 0, scale: 11.5, isMobile: false };
@@ -27,23 +27,36 @@ function getResponsiveCoords() {
   }
 }
 
-// Helper to calculate South-East starting coordinates for smooth entrance
+// Helper to calculate South-East starting coordinates for smooth entrance across all viewports
 function getSouthEastCoords(coords) {
-  const isMobile = coords.isMobile;
-  if (isMobile) {
+  const w = typeof window !== 'undefined' ? window.innerWidth : 1200;
+  if (w < 768) {
+    // Mobile View: start slightly south-east relative to mobile center (x: 0, y: 0.65)
     return {
-      x: 1.8,
-      y: -0.6,
-      z: -1.2,
-      scale: coords.scale * 0.6,
-      rotY: -Math.PI * 0.4,
-      rotZ: -0.2,
-      rotX: 0.1,
+      x: coords.x + 0.9,
+      y: coords.y - 0.65,
+      z: -0.8,
+      scale: coords.scale * 0.7,
+      rotY: -Math.PI * 0.35,
+      rotZ: -0.15,
+      rotX: 0.08,
+    };
+  } else if (w < 1024) {
+    // iPad / Tablet View: start south-east relative to tablet center (x: 0.35, y: 0)
+    return {
+      x: coords.x + 1.2,
+      y: coords.y - 0.9,
+      z: -0.9,
+      scale: coords.scale * 0.7,
+      rotY: -Math.PI * 0.35,
+      rotZ: -0.15,
+      rotX: 0.08,
     };
   } else {
+    // Desktop View: start south-east relative to desktop center
     return {
-      x: coords.x + 2.2,
-      y: coords.y - 1.4,
+      x: coords.x + 1.8,
+      y: coords.y - 1.2,
       z: -1.0,
       scale: coords.scale * 0.7,
       rotY: -Math.PI * 0.35,
@@ -53,22 +66,31 @@ function getSouthEastCoords(coords) {
   }
 }
 
-// 3D Perfume Bottle Mesh Component
-function BottleMesh({ scene }) {
-  useEffect(() => {
-    if (!scene) return;
-    scene.traverse((child) => {
-      if (!child.isMesh) return;
-      if (child.material) {
-        if (child.material.map) child.material.map.colorSpace = THREE.SRGBColorSpace;
-        if (child.material.envMapIntensity !== undefined) {
-          child.material.envMapIntensity = Math.max(child.material.envMapIntensity, 1.2);
-        }
-        child.material.needsUpdate = true;
+// Helper to hide and purge unwanted GLTF nodes (like the internal straw line)
+function sanitizeScene(scene) {
+  if (!scene) return;
+  const toRemove = [];
+  scene.traverse((child) => {
+    if (child.name && (child.name.toLowerCase().includes('straw') || child.name === 's')) {
+      child.visible = false;
+      toRemove.push(child);
+    } else if (child.isMesh && child.material) {
+      if (child.material.map) child.material.map.colorSpace = THREE.SRGBColorSpace;
+      if (child.material.envMapIntensity !== undefined) {
+        child.material.envMapIntensity = Math.max(child.material.envMapIntensity, 1.2);
       }
+      child.material.needsUpdate = true;
       child.castShadow = true;
       child.receiveShadow = true;
-    });
+    }
+  });
+  toRemove.forEach((node) => node.removeFromParent?.());
+}
+
+// 3D Perfume Bottle Mesh Component
+function BottleMesh({ scene }) {
+  useMemo(() => {
+    sanitizeScene(scene);
   }, [scene]);
 
   return <primitive object={scene} />;
@@ -80,6 +102,7 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
   const groupBRef = useRef(null);
   const activeGroupRef = useRef('A'); // Tracks which group is currently active at center
   const hasEnteredRef = useRef(false);
+  const [isMobile, setIsMobile] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < 768 : false));
 
   const { scene: sceneA } = useGLTF(MODEL_PATH);
   const { scene: sceneB } = useGLTF(MODEL_PATH);
@@ -150,6 +173,7 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
   useEffect(() => {
     const handleResize = () => {
       const coords = getResponsiveCoords();
+      setIsMobile(coords.isMobile);
       const activeState = activeGroupRef.current === 'A' ? posA.current : posB.current;
       activeState.x = coords.x;
       activeState.y = coords.y;
@@ -351,18 +375,20 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
   return (
     <>
       {/* Group A */}
-      <group ref={groupARef} position={[initialCoords.x, initialCoords.y, 0]}>
+      <group ref={groupARef} position={[posA.current.x, posA.current.y, posA.current.z]}>
         <Center>
           <BottleMesh scene={sceneA} />
         </Center>
-        <ContactShadows
-          position={[0, -0.11, 0]}
-          opacity={0.14}
-          scale={0.3}
-          blur={2.0}
-          far={2}
-          color="#1A1A1A"
-        />
+        {!isMobile && (
+          <ContactShadows
+            position={[0, -0.06, 0]}
+            opacity={0.10}
+            scale={0.12}
+            blur={1.2}
+            far={0.4}
+            color="#1A1A1A"
+          />
+        )}
       </group>
 
       {/* Group B (Simultaneous Entry/Exit Model Instance) */}
@@ -370,14 +396,16 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
         <Center>
           <BottleMesh scene={sceneBCloned} />
         </Center>
-        <ContactShadows
-          position={[0, -0.11, 0]}
-          opacity={0.14}
-          scale={0.3}
-          blur={2.0}
-          far={2}
-          color="#1A1A1A"
-        />
+        {!isMobile && (
+          <ContactShadows
+            position={[0, -0.06, 0]}
+            opacity={0.10}
+            scale={0.12}
+            blur={1.2}
+            far={0.4}
+            color="#1A1A1A"
+          />
+        )}
       </group>
     </>
   );
@@ -387,10 +415,10 @@ export default function Scene({ currentSlide, slideData, loaderState }) {
   const prevSlideRef = useRef(currentSlide);
 
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none">
+    <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
-        style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', pointerEvents: 'none' }}
+        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
         gl={{
           antialias: true,
           alpha: true,
