@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { BOUTIQUE_PRODUCTS } from '../data/boutiqueProducts';
 import { QuickBuyModal, CartDrawer } from './ShopCartModal';
+import BrandLocationsMap from './BrandLocationsMap';
 
 export default function OlfactoryExperience({ onScrollToTop }) {
   const [activeCategory, setActiveCategory] = useState('ALL');
@@ -181,6 +182,9 @@ export default function OlfactoryExperience({ onScrollToTop }) {
           <span>COMPLIMENTARY FLACON ENGRAVING</span>
         </div>
       </div>
+
+      {/* Brand Locations & Interactive Google Maps Section */}
+      <BrandLocationsMap />
 
       {/* Interactive Quick-Buy Modal */}
       {selectedProduct && (
