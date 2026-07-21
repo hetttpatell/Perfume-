@@ -1,15 +1,16 @@
-import { useRef, useEffect, useMemo, useState } from 'react';
+import { Suspense, useRef, useEffect, useMemo, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, Center, Environment, ContactShadows, AdaptiveDpr } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
 
-// Ultra-Lightweight Optimized Models (375 KB Mobile / 397 KB Desktop vs original 3.17 MB)
+// Master Plan: Draco Geometry Compression & Optimized Model Loader Paths
+const DRACO_DECODER_PATH = 'https://www.gstatic.com/draco/versioned/decoders/1.5.6/';
 const MODEL_DESKTOP = '/models/perfume-desktop.glb';
 const MODEL_MOBILE = '/models/perfume-mobile.glb';
 
-useGLTF.preload(MODEL_DESKTOP);
-useGLTF.preload(MODEL_MOBILE);
+useGLTF.preload(MODEL_DESKTOP, DRACO_DECODER_PATH);
+useGLTF.preload(MODEL_MOBILE, DRACO_DECODER_PATH);
 
 // Helper function to get responsive 3D coordinates & scale based on viewport width
 function getResponsiveCoords() {
@@ -69,8 +70,8 @@ function getSouthEastCoords(coords) {
   }
 }
 
-// Helper to hide and purge unwanted GLTF nodes (like internal straw line)
-function sanitizeScene(scene) {
+// Master Plan B: The "Smart Glass" Mobile Shader Fallback
+function sanitizeScene(scene, isMobile) {
   if (!scene) return;
   const toRemove = [];
   scene.traverse((child) => {
@@ -79,10 +80,28 @@ function sanitizeScene(scene) {
       toRemove.push(child);
     } else if (child.isMesh && child.material) {
       if (child.material.map) child.material.map.colorSpace = THREE.SRGBColorSpace;
-      if (child.material.envMapIntensity !== undefined) {
-        child.material.envMapIntensity = 1.1;
+      
+      if (isMobile) {
+        // Mobile Fallback: Disable heavy transmission refraction (transmission: 0), set opacity & boost env map reflections
+        if (child.material.transmission !== undefined && child.material.transmission > 0) {
+          child.material.transmission = 0;
+          child.material.transparent = true;
+          child.material.opacity = 0.75;
+          child.material.envMapIntensity = 2.5;
+        } else {
+          child.material.envMapIntensity = 2.0;
+        }
+      } else {
+        // Desktop: Maintain true glass physical refraction
+        if (child.material.transmission !== undefined) {
+          child.material.transmission = 0.98;
+          child.material.roughness = 0.03;
+          child.material.ior = 1.5;
+        }
+        child.material.envMapIntensity = 1.5;
       }
-      child.material.needsUpdate = false;
+
+      child.material.needsUpdate = true;
       child.castShadow = false;
       child.receiveShadow = false;
     }
@@ -90,16 +109,16 @@ function sanitizeScene(scene) {
   toRemove.forEach((node) => node.removeFromParent?.());
 }
 
-// 3D Perfume Bottle Mesh Component
-function BottleMesh({ scene }) {
+// 3D Perfume Bottle Mesh Component with Smart Glass Fallback
+function BottleMesh({ scene, isMobile }) {
   useMemo(() => {
-    sanitizeScene(scene);
-  }, [scene]);
+    sanitizeScene(scene, isMobile);
+  }, [scene, isMobile]);
 
   return <primitive object={scene} />;
 }
 
-// 3D Perfume Carousel — Dual Group Motion using Lightweight Single-Clone Model Parsing
+// 3D Perfume Carousel — Dual Group Motion using Lightweight Single-Clone Model Parsing & Draco Decoding
 function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) {
   const groupARef = useRef(null);
   const groupBRef = useRef(null);
@@ -108,7 +127,7 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
   const [isMobile, setIsMobile] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < 768 : false));
 
   const modelPath = isMobile ? MODEL_MOBILE : MODEL_DESKTOP;
-  const { scene: sceneA } = useGLTF(modelPath);
+  const { scene: sceneA } = useGLTF(modelPath, DRACO_DECODER_PATH);
 
   // Efficient memory clone of primary scene instance
   const sceneBCloned = useMemo(() => sceneA.clone(true), [sceneA]);
@@ -376,7 +395,7 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
       {/* Group A */}
       <group ref={groupARef} position={[posA.current.x, posA.current.y, posA.current.z]}>
         <Center>
-          <BottleMesh scene={sceneA} />
+          <BottleMesh scene={sceneA} isMobile={isMobile} />
         </Center>
         {!isMobile && (
           <ContactShadows
@@ -394,7 +413,7 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
       {/* Group B (Simultaneous Entry/Exit Instance) */}
       <group ref={groupBRef} position={[initialCoords.x + 5.5, initialCoords.y - 4.5, -3]}>
         <Center>
-          <BottleMesh scene={sceneBCloned} />
+          <BottleMesh scene={sceneBCloned} isMobile={isMobile} />
         </Center>
         {!isMobile && (
           <ContactShadows
@@ -426,7 +445,7 @@ export default function Scene({ currentSlide, slideData, loaderState }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Viewport Intersection Observer — Pause 3D frame loop when scrolled out of view
+  // Master Plan D: DOM Lifecycle & Viewport Intersection Observer — Pause 3D frame loop when scrolled out of view
   useEffect(() => {
     if (!containerRef.current) return;
     const observer = new IntersectionObserver(
@@ -441,42 +460,45 @@ export default function Scene({ currentSlide, slideData, loaderState }) {
 
   return (
     <div ref={containerRef} className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-      <Canvas
-        camera={{ position: [0, 0, 5], fov: 45 }}
-        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
-        frameloop={isIntersecting ? 'always' : 'never'}
-        dpr={isMobile ? [1, 1] : [1, 1.25]}
-        performance={{ min: 0.5 }}
-        gl={{
-          antialias: false,
-          alpha: true,
-          powerPreference: 'high-performance',
-          precision: 'mediump',
-          stencil: false,
-          depth: true,
-          toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.3,
-        }}
-        onCreated={({ gl }) => {
-          gl.setClearColor(0x000000, 0);
-        }}
-      >
-        <AdaptiveDpr pixelated />
+      {/* Master Plan E: React Suspense Boundary to Unblock Main UI Thread */}
+      <Suspense fallback={null}>
+        <Canvas
+          camera={{ position: [0, 0, 5], fov: 45 }}
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+          frameloop={isIntersecting ? 'always' : 'never'}
+          dpr={[1, 1.5]}
+          performance={{ min: 0.5 }}
+          gl={{
+            antialias: false,
+            alpha: true,
+            powerPreference: 'high-performance',
+            precision: isMobile ? 'mediump' : 'highp',
+            stencil: false,
+            depth: true,
+            toneMapping: THREE.ACESFilmicToneMapping,
+            toneMappingExposure: 1.3,
+          }}
+          onCreated={({ gl }) => {
+            gl.setClearColor(0x000000, 0);
+          }}
+        >
+          <AdaptiveDpr pixelated />
 
-        {/* ── Studio Lighting Rig (Zero Dynamic Shadow Map Passes) ── */}
-        <ambientLight intensity={0.8} color="#FFF8E8" />
-        <directionalLight position={[5, 8, 5]} intensity={2.5} color="#FFFAF0" castShadow={false} />
-        <directionalLight position={[-5, 3, 4]} intensity={1.5} color="#F0F0FF" />
-        <directionalLight position={[0, 4, -6]} intensity={1.8} color="#FFFFFF" />
-        <directionalLight position={[0, 2, 8]} intensity={1.2} color="#FFFFFF" />
-        <spotLight position={[1.4, 10, 3]} intensity={2.0} angle={0.4} penumbra={0.6} color="#FFFFFF" castShadow={false} />
-        <pointLight position={[1.4, -4, 2]} intensity={0.6} color="#FFF0C0" />
-        <pointLight position={[4, 0, 0]} intensity={0.4} color="#FFE8B0" />
+          {/* ── Studio Lighting Rig ── */}
+          <ambientLight intensity={0.8} color="#FFF8E8" />
+          <directionalLight position={[5, 8, 5]} intensity={2.5} color="#FFFAF0" castShadow={false} />
+          <directionalLight position={[-5, 3, 4]} intensity={1.5} color="#F0F0FF" />
+          <directionalLight position={[0, 4, -6]} intensity={1.8} color="#FFFFFF" />
+          <directionalLight position={[0, 2, 8]} intensity={1.2} color="#FFFFFF" />
+          <spotLight position={[1.4, 10, 3]} intensity={2.0} angle={0.4} penumbra={0.6} color="#FFFFFF" castShadow={false} />
+          <pointLight position={[1.4, -4, 2]} intensity={0.6} color="#FFF0C0" />
+          <pointLight position={[4, 0, 0]} intensity={0.4} color="#FFE8B0" />
 
-        <Environment preset="studio" resolution={128} />
+          <Environment preset="studio" resolution={128} />
 
-        <BottleCarousel currentSlide={currentSlide} slideData={slideData} prevSlideRef={prevSlideRef} loaderState={loaderState} />
-      </Canvas>
+          <BottleCarousel currentSlide={currentSlide} slideData={slideData} prevSlideRef={prevSlideRef} loaderState={loaderState} />
+        </Canvas>
+      </Suspense>
     </div>
   );
 }
