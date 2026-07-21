@@ -14,23 +14,23 @@ function getResponsiveCoords() {
   const w = window.innerWidth;
   const h = window.innerHeight;
   if (w < 768) {
-    // Dynamic aspect-ratio math for mobile view: position bottle slightly lower
+    // Dynamic aspect-ratio math for mobile view: position bottle lower in mobile showcase
     const aspectRatio = h / w;
-    let targetY = 0.76;
-    let targetScale = 10.2;
+    let targetY = 0.50;
+    let targetScale = 11.2;
 
     if (aspectRatio > 2.05) {
       // Very tall modern phones (iPhone 14/15/16 Pro Max, Galaxy S23 Ultra)
-      targetY = 0.70;
-      targetScale = 10.6;
+      targetY = 0.45;
+      targetScale = 11.6;
     } else if (aspectRatio > 1.85) {
       // Standard mobile screens (iPhone 12/13/14, Pixel)
-      targetY = 0.78;
-      targetScale = 10.0;
+      targetY = 0.52;
+      targetScale = 11.0;
     } else {
       // Short mobile screens (iPhone SE, budget phones)
-      targetY = 0.86;
-      targetScale = 9.4;
+      targetY = 0.58;
+      targetScale = 10.2;
     }
 
     return { x: 0, y: targetY, scale: targetScale, isMobile: true };
