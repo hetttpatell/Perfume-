@@ -35,8 +35,8 @@ function getResponsiveCoords() {
 
     return { x: 0, y: targetY, scale: targetScale, isMobile: true };
   } else if (w < 1024) {
-    // iPad / Tablet (768px - 1024px)
-    return { x: 0.35, y: 0.1, scale: 11.2, isMobile: false };
+    // iPad / Tablet Viewport (768px - 1024px): Shifted slightly to the left (x = 0.08)
+    return { x: 0.08, y: 0.05, scale: 11.2, isMobile: false };
   } else if (w < 1280) {
     // Small Desktop / Laptop
     return { x: 0.85, y: 0, scale: 13.5, isMobile: false };
