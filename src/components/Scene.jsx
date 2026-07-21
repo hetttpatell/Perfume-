@@ -4,13 +4,11 @@ import { useGLTF, Center, Environment, ContactShadows, AdaptiveDpr } from '@reac
 import * as THREE from 'three';
 import gsap from 'gsap';
 
-// Master Plan: Draco Geometry Compression & Optimized Model Loader Paths
+// Master Plan: Specified Model Path & Draco Geometry Compression
 const DRACO_DECODER_PATH = 'https://www.gstatic.com/draco/versioned/decoders/1.5.6/';
-const MODEL_DESKTOP = '/models/perfume-desktop.glb';
-const MODEL_MOBILE = '/models/perfume-mobile.glb';
+const MODEL_PATH = '/models/n22879414a_-_perfume.glb';
 
-useGLTF.preload(MODEL_DESKTOP, DRACO_DECODER_PATH);
-useGLTF.preload(MODEL_MOBILE, DRACO_DECODER_PATH);
+useGLTF.preload(MODEL_PATH, DRACO_DECODER_PATH);
 
 // Helper function to get responsive 3D coordinates & scale based on viewport width
 function getResponsiveCoords() {
@@ -118,7 +116,7 @@ function BottleMesh({ scene, isMobile }) {
   return <primitive object={scene} />;
 }
 
-// 3D Perfume Carousel — Dual Group Motion using Lightweight Single-Clone Model Parsing & Draco Decoding
+// 3D Perfume Carousel — Dual Group Motion using Single-Clone Model Parsing & Draco Decoding
 function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) {
   const groupARef = useRef(null);
   const groupBRef = useRef(null);
@@ -126,8 +124,7 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
   const hasEnteredRef = useRef(false);
   const [isMobile, setIsMobile] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < 768 : false));
 
-  const modelPath = isMobile ? MODEL_MOBILE : MODEL_DESKTOP;
-  const { scene: sceneA } = useGLTF(modelPath, DRACO_DECODER_PATH);
+  const { scene: sceneA } = useGLTF(MODEL_PATH, DRACO_DECODER_PATH);
 
   // Efficient memory clone of primary scene instance
   const sceneBCloned = useMemo(() => sceneA.clone(true), [sceneA]);
