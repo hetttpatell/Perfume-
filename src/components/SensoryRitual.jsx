@@ -68,7 +68,7 @@ export default function SensoryRitual() {
   return (
     <div
       ref={pinnedWrapperRef}
-      className="relative w-full h-[260vh] bg-[#FAFAFA]"
+      className="relative w-full h-[170vh] sm:h-[220vh] md:h-[260vh] bg-[#FAFAFA]"
       aria-label="The Sensory Ritual Pinned Showcase"
     >
       {/* Sticky Viewport Container */}
@@ -100,7 +100,7 @@ export default function SensoryRitual() {
           </div>
         </div>
 
-        {/* Layer 2: WHITE SECTION OVERLAY - SHOPPING BOUTIQUE (Mixed Screenshot 2 & 3 style) */}
+        {/* Layer 2: WHITE SECTION OVERLAY - SHOPPING BOUTIQUE */}
         <div
           ref={whiteScreenRef}
           className="absolute inset-0 w-full h-full bg-[#FAFAFA] text-[#1A1A1A] z-20 shadow-2xl border-t border-black/10 select-auto will-change-transform overflow-y-auto"
