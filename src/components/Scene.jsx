@@ -4,12 +4,12 @@ import { useGLTF, Center, Environment, ContactShadows, AdaptiveDpr } from '@reac
 import * as THREE from 'three';
 import gsap from 'gsap';
 
-// Master Plan: Specified Model Path & Draco Geometry Compression
-const DRACO_DECODER_PATH = 'https://www.gstatic.com/draco/versioned/decoders/1.5.6/';
+// Reliable Direct Model Path
 const MODEL_PATH = '/models/n22879414a_-_perfume.glb';
 
-useGLTF.preload(MODEL_PATH, DRACO_DECODER_PATH);
+useGLTF.preload(MODEL_PATH);
 
+// Responsive 3D positioning tuned to fit all viewports perfectly
 function getResponsiveCoords() {
   if (typeof window === 'undefined') return { x: 1.2, y: 0, scale: 15.0, isMobile: false };
   const w = window.innerWidth;
@@ -17,9 +17,9 @@ function getResponsiveCoords() {
   if (w < 768) {
     // Mobile Viewports: Position 3D model higher in upper hero area above text
     if (h < 720 || w < 390) {
-      return { x: 0, y: 1.18, scale: 9.4, isMobile: true };
+      return { x: 0, y: 1.15, scale: 9.6, isMobile: true };
     }
-    return { x: 0, y: 1.08, scale: 10.0, isMobile: true };
+    return { x: 0, y: 1.05, scale: 10.2, isMobile: true };
   } else if (w < 1024) {
     // iPad / Tablet (768px - 1024px): x = 0.35, scale = 11.2
     return { x: 0.35, y: 0.1, scale: 11.2, isMobile: false };
@@ -36,7 +36,6 @@ function getResponsiveCoords() {
 function getSouthEastCoords(coords) {
   const w = typeof window !== 'undefined' ? window.innerWidth : 1200;
   if (w < 768) {
-    // Mobile View: start slightly south-east relative to mobile center (x: 0, y: 0.65)
     return {
       x: coords.x + 0.9,
       y: coords.y - 0.65,
@@ -47,7 +46,6 @@ function getSouthEastCoords(coords) {
       rotX: 0.08,
     };
   } else if (w < 1024) {
-    // iPad / Tablet View: start south-east relative to tablet center (x: 0.35, y: 0)
     return {
       x: coords.x + 1.2,
       y: coords.y - 0.9,
@@ -58,7 +56,6 @@ function getSouthEastCoords(coords) {
       rotX: 0.08,
     };
   } else {
-    // Desktop View: start south-east relative to desktop center
     return {
       x: coords.x + 1.8,
       y: coords.y - 1.2,
@@ -83,7 +80,7 @@ function sanitizeScene(scene, isMobile) {
       if (child.material.map) child.material.map.colorSpace = THREE.SRGBColorSpace;
       
       if (isMobile) {
-        // Mobile Fallback: Disable heavy transmission refraction (transmission: 0), set opacity & boost env map reflections
+        // Mobile Fallback: Disable heavy transmission refraction, set opacity & boost env map reflections
         if (child.material.transmission !== undefined && child.material.transmission > 0) {
           child.material.transmission = 0;
           child.material.transparent = true;
@@ -119,7 +116,7 @@ function BottleMesh({ scene, isMobile }) {
   return <primitive object={scene} />;
 }
 
-// 3D Perfume Carousel — Dual Group Motion using Single-Clone Model Parsing & Draco Decoding
+// 3D Perfume Carousel — Dual Group Motion using Single-Clone Model Parsing
 function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) {
   const groupARef = useRef(null);
   const groupBRef = useRef(null);
@@ -127,7 +124,7 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
   const hasEnteredRef = useRef(false);
   const [isMobile, setIsMobile] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < 768 : false));
 
-  const { scene: sceneA } = useGLTF(MODEL_PATH, DRACO_DECODER_PATH);
+  const { scene: sceneA } = useGLTF(MODEL_PATH);
 
   // Efficient memory clone of primary scene instance
   const sceneBCloned = useMemo(() => sceneA.clone(true), [sceneA]);
@@ -445,7 +442,7 @@ export default function Scene({ currentSlide, slideData, loaderState }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Master Plan D: DOM Lifecycle & Viewport Intersection Observer — Pause 3D frame loop when scrolled out of view
+  // Viewport Intersection Observer — Pause 3D frame loop when scrolled out of view
   useEffect(() => {
     if (!containerRef.current) return;
     const observer = new IntersectionObserver(
@@ -460,7 +457,6 @@ export default function Scene({ currentSlide, slideData, loaderState }) {
 
   return (
     <div ref={containerRef} className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-      {/* Master Plan E: React Suspense Boundary to Unblock Main UI Thread */}
       <Suspense fallback={null}>
         <Canvas
           camera={{ position: [0, 0, 5], fov: 45 }}
