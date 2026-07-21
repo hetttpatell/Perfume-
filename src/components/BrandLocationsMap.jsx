@@ -126,12 +126,12 @@ export default function BrandLocationsMap() {
             </a>
           </div>
 
-          {/* Embedded Google Map iframe styled with website grayscale filter */}
+          {/* Embedded Google Map iframe in full vivid color */}
           <div className="flex-1 w-full h-full min-h-[300px] relative">
             <iframe
               title="Google Map of Chanel Paris Flagship Boutique"
               src={primaryLocation.mapUrl}
-              className="w-full h-full min-h-[300px] border-0 filter grayscale contrast-[1.1] brightness-[0.96]"
+              className="w-full h-full min-h-[300px] border-0"
               allowFullScreen=""
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
