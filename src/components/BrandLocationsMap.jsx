@@ -17,7 +17,7 @@ export default function BrandLocationsMap() {
       {/* Section Title matching website design theme */}
       <div className="mb-6 sm:mb-8 text-center sm:text-left">
         <span className="font-sans text-[10px] sm:text-xs uppercase tracking-[0.35em] text-[#737373] font-semibold block mb-1">
-          06 // HAUTE BOUTIQUE LOCATION
+          07 // HAUTE BOUTIQUE LOCATION
         </span>
         <h2 className="font-serif font-light text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-[#1A1A1A] tracking-tight uppercase">
           VISIT OUR PARISIAN ATELIER

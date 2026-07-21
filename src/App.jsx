@@ -5,7 +5,14 @@ import './App.css';
 
 function App() {
   const [loaderKey, setLoaderKey] = useState(0);
-  const [loaderState, setLoaderState] = useState('loading'); // 'loading' | 'exiting' | 'completed'
+  const [loaderState, setLoaderState] = useState(() => {
+    // Only play smooth loader on initial website visit, skip on page refresh
+    try {
+      return sessionStorage.getItem('perfume_has_visited') ? 'completed' : 'loading';
+    } catch {
+      return 'loading';
+    }
+  });
 
   const handleReplayLoader = useCallback(() => {
     setLoaderState('loading');
@@ -13,10 +20,20 @@ function App() {
   }, []);
 
   const handleLoaderStartExit = useCallback(() => {
+    try {
+      sessionStorage.setItem('perfume_has_visited', 'true');
+    } catch (e) {
+      // ignore storage errors
+    }
     setLoaderState('exiting');
   }, []);
 
   const handleLoaderComplete = useCallback(() => {
+    try {
+      sessionStorage.setItem('perfume_has_visited', 'true');
+    } catch (e) {
+      // ignore storage errors
+    }
     setLoaderState('completed');
   }, []);
 

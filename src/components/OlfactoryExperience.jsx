@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { BOUTIQUE_PRODUCTS } from '../data/boutiqueProducts';
 import { QuickBuyModal, CartDrawer } from './ShopCartModal';
+import Testimonials from './Testimonials';
 import BrandLocationsMap from './BrandLocationsMap';
+import Footer from './Footer';
 
 export default function OlfactoryExperience({ onScrollToTop }) {
   const [activeCategory, setActiveCategory] = useState('ALL');
@@ -183,8 +185,14 @@ export default function OlfactoryExperience({ onScrollToTop }) {
         </div>
       </div>
 
+      {/* Haute Testimonials & Critiques Section */}
+      <Testimonials />
+
       {/* Brand Locations & Interactive Google Maps Section */}
       <BrandLocationsMap />
+
+      {/* Luxury Haute Footer Section */}
+      <Footer onScrollToTop={onScrollToTop} />
 
       {/* Interactive Quick-Buy Modal */}
       {selectedProduct && (
