@@ -10,16 +10,19 @@ const MODEL_PATH = '/models/n22879414a_-_perfume.glb';
 
 useGLTF.preload(MODEL_PATH, DRACO_DECODER_PATH);
 
-// Helper function to get responsive 3D coordinates & scale based on viewport width
 function getResponsiveCoords() {
   if (typeof window === 'undefined') return { x: 1.2, y: 0, scale: 15.0, isMobile: false };
   const w = window.innerWidth;
+  const h = window.innerHeight;
   if (w < 768) {
-    // Mobile: model positioned slightly lower (y = 0.65) and larger (scale = 11.8)
-    return { x: 0, y: 0.65, scale: 11.8, isMobile: true };
+    // Mobile Viewports: Position 3D model higher in upper hero area above text
+    if (h < 720 || w < 390) {
+      return { x: 0, y: 1.18, scale: 9.4, isMobile: true };
+    }
+    return { x: 0, y: 1.08, scale: 10.0, isMobile: true };
   } else if (w < 1024) {
-    // iPad / Tablet (768px - 1024px): x = 0.35, scale = 11.5 for 100% full visibility without clipping
-    return { x: 0.35, y: 0, scale: 11.5, isMobile: false };
+    // iPad / Tablet (768px - 1024px): x = 0.35, scale = 11.2
+    return { x: 0.35, y: 0.1, scale: 11.2, isMobile: false };
   } else if (w < 1280) {
     // Small Desktop / Laptop (1024px - 1280px): x = 0.85, scale = 13.5
     return { x: 0.85, y: 0, scale: 13.5, isMobile: false };
