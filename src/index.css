@@ -1,0 +1,49 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@theme {
+  --color-surface-base: #FAFAFA;
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #737373;
+  --color-text-inverse: #FAFAFA;
+  --color-action-base: #1A1A1A;
+  --color-action-hover: #000000;
+
+  --font-serif: "Cormorant Garamond", serif;
+  --font-sans: "Manrope", sans-serif;
+}
+
+:root {
+  color-scheme: light;
+  background-color: #FAFAFA;
+  color: #1A1A1A;
+  font-family: "Manrope", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #FAFAFA;
+  color: #1A1A1A;
+  overflow-x: hidden;
+}
+
+/* Keyboard accessibility focus ring */
+*:focus-visible {
+  outline: 2px solid #1A1A1A !important;
+  outline-offset: 2px !important;
+}
+
+#root {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
