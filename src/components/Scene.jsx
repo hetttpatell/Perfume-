@@ -1,6 +1,6 @@
 import { useRef, useEffect, useMemo, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useGLTF, Center, Environment, ContactShadows } from '@react-three/drei';
+import { useGLTF, Center, Environment, ContactShadows, AdaptiveDpr } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
 
@@ -413,16 +413,44 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
 
 export default function Scene({ currentSlide, slideData, loaderState }) {
   const prevSlideRef = useRef(currentSlide);
+  const containerRef = useRef(null);
+  const [isIntersecting, setIsIntersecting] = useState(true);
+  const [isMobile, setIsMobile] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < 768 : false));
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Viewport Intersection Observer — Pause 3D frame loop when scrolled out of view
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsIntersecting(entry.isIntersecting);
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+    <div ref={containerRef} className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
         style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+        frameloop={isIntersecting ? 'always' : 'never'}
+        dpr={isMobile ? [1, 1.25] : [1, 1.75]}
+        performance={{ min: 0.5 }}
         gl={{
-          antialias: true,
+          antialias: !isMobile,
           alpha: true,
           powerPreference: 'high-performance',
+          precision: isMobile ? 'mediump' : 'highp',
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.3,
         }}
@@ -431,13 +459,15 @@ export default function Scene({ currentSlide, slideData, loaderState }) {
           gl.physicallyCorrectLights = true;
         }}
       >
+        <AdaptiveDpr pixelated />
+
         {/* ── Studio Lighting Rig ── */}
         <ambientLight intensity={0.6} color="#FFF8E8" />
-        <directionalLight position={[5, 8, 5]} intensity={3.5} color="#FFFAF0" castShadow />
+        <directionalLight position={[5, 8, 5]} intensity={3.5} color="#FFFAF0" castShadow={!isMobile} />
         <directionalLight position={[-5, 3, 4]} intensity={2.0} color="#F0F0FF" />
         <directionalLight position={[0, 4, -6]} intensity={2.5} color="#FFFFFF" />
         <directionalLight position={[0, 2, 8]} intensity={1.5} color="#FFFFFF" />
-        <spotLight position={[1.4, 10, 3]} intensity={3.0} angle={0.3} penumbra={0.5} color="#FFFFFF" castShadow />
+        <spotLight position={[1.4, 10, 3]} intensity={3.0} angle={0.3} penumbra={0.5} color="#FFFFFF" castShadow={!isMobile} />
         <pointLight position={[1.4, -4, 2]} intensity={0.8} color="#FFF0C0" />
         <pointLight position={[4, 0, 0]} intensity={0.6} color="#FFE8B0" />
 
@@ -448,4 +478,5 @@ export default function Scene({ currentSlide, slideData, loaderState }) {
     </div>
   );
 }
+
 
