@@ -206,11 +206,11 @@ export default function HeroSlider({ onReplayLoader, loaderState }) {
         style={{ backgroundColor: SLIDES[0].bg, color: SLIDES[0].text }}
         aria-label="Chanel N°19 Interactive Fragrance Showcase"
       >
-        {/* Large Background Watermark Text (Optimized positioning for Mobile, iPad & Desktop) */}
+        {/* Large Background Watermark Text (Darker opacity in Mobile & iPad for high legibility) */}
         <div className="absolute inset-0 pointer-events-none z-0 flex items-start pt-6 sm:pt-8 md:items-center md:pt-0 justify-center lg:justify-end md:pl-[20vw] lg:pl-0 md:pr-12 overflow-hidden select-none">
           <h1
             ref={watermarkRef}
-            className="font-serif font-extrabold text-[12vw] sm:text-[14vw] md:text-[13vw] lg:text-[15vw] leading-none text-black/10 md:text-black/18 tracking-tighter uppercase whitespace-nowrap will-change-transform"
+            className="font-serif font-extrabold text-[12vw] sm:text-[14vw] md:text-[13vw] lg:text-[15vw] leading-none text-black/28 sm:text-black/32 md:text-black/28 lg:text-black/18 tracking-tighter uppercase whitespace-nowrap will-change-transform"
           >
             {activeSlideData.shortTitle}
           </h1>
@@ -223,7 +223,7 @@ export default function HeroSlider({ onReplayLoader, loaderState }) {
         <div className="relative z-10 w-full flex-1 max-w-7xl mx-auto px-5 sm:px-8 md:px-10 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 md:gap-6 pt-3 sm:pt-6 md:pt-16 pb-6 md:pb-12 pointer-events-none">
 
           {/* Top 3D Model Spacer Area on Mobile (order-first), Right Panel on iPad/Desktop (order-last) */}
-          <div className="w-full md:w-[45%] lg:w-[58%] h-[190px] sm:h-[230px] md:h-full pointer-events-none order-first md:order-last shrink-0" />
+          <div className="w-full md:w-[45%] lg:w-[58%] h-[210px] sm:h-[240px] md:h-full pointer-events-none order-first md:order-last shrink-0" />
 
           {/* Editorial Content Panel (order-last on mobile centered under 3D model, order-first on desktop/iPad) */}
           <div className="w-full md:w-[55%] lg:w-[42%] flex flex-col items-center md:items-start text-center md:text-left justify-center gap-3.5 sm:gap-5 md:gap-6 pointer-events-auto order-last md:order-first px-1 md:px-0">
