@@ -207,8 +207,8 @@ export default function HeroSlider({ onReplayLoader, loaderState }) {
         style={{ backgroundColor: SLIDES[0].bg, color: SLIDES[0].text }}
         aria-label="Chanel N°19 Interactive Fragrance Showcase"
       >
-        {/* Large Background Watermark Text (Darker opacity for high legibility across mobile, iPad & desktop) */}
-        <div className="absolute inset-0 pointer-events-none z-0 flex items-start pt-6 sm:pt-8 md:items-center md:pt-0 justify-center lg:justify-end md:pl-[20vw] lg:pl-0 md:pr-12 overflow-hidden select-none">
+        {/* Large Background Watermark Text (Shifted slightly right in iPad view for framing) */}
+        <div className="absolute inset-0 pointer-events-none z-0 flex items-start pt-6 sm:pt-8 md:items-center md:pt-0 justify-center md:justify-end md:pl-0 md:pr-10 lg:pr-12 overflow-hidden select-none">
           <h1
             ref={watermarkRef}
             className="font-serif font-extrabold text-[12vw] sm:text-[14vw] md:text-[13vw] lg:text-[15vw] leading-none text-black/45 sm:text-black/50 md:text-black/40 lg:text-black/22 tracking-tighter uppercase whitespace-nowrap will-change-transform"
