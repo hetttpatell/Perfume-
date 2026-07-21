@@ -4,6 +4,7 @@ import Scene from './Scene';
 import FragranceDetails from './FragranceDetails';
 import SensoryRitual from './SensoryRitual';
 import BrandStory from './BrandStory';
+import OlfactoryExperience from './OlfactoryExperience';
 import { SLIDES } from '../utils/slidesData';
 
 export default function HeroSlider({ onReplayLoader, loaderState }) {
@@ -347,6 +348,9 @@ export default function HeroSlider({ onReplayLoader, loaderState }) {
 
       {/* The Sensory Ritual (Lifestyle & Usage) */}
       <SensoryRitual />
+
+      {/* Haute Parfumerie Boutique (Products, Testimonials, Map & Footer) */}
+      <OlfactoryExperience onScrollToTop={() => window.scrollTo({ top: 0, behavior: 'smooth' })} />
 
       {/* Separate Details Page Overlay */}
       {showDetailsPage && (
