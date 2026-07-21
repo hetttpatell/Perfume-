@@ -5,7 +5,7 @@ import FragranceDetails from './FragranceDetails';
 import OlfactoryExperience from './OlfactoryExperience';
 import { SLIDES } from '../utils/slidesData';
 
-export default function HeroSlider({ onReplayLoader }) {
+export default function HeroSlider({ onReplayLoader, loaderState }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [displayedSlideIndex, setDisplayedSlideIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -23,6 +23,48 @@ export default function HeroSlider({ onReplayLoader }) {
   const stepperBarRef = useRef(null);
 
   const activeSlideData = SLIDES[displayedSlideIndex];
+
+  // Handshake entrance animation for Hero editorial content
+  useEffect(() => {
+    const textElements = [
+      stepLabelRef.current,
+      titleRef.current,
+      subtitleRef.current,
+      descriptionRef.current,
+      notesBadgeRef.current,
+      actionBtnRef.current,
+      stepperBarRef.current,
+    ].filter(Boolean);
+
+    if (loaderState === 'loading') {
+      gsap.set(textElements, { opacity: 0, y: 40 });
+      if (watermarkRef.current) {
+        gsap.set(watermarkRef.current, { opacity: 0, scale: 0.92, y: 20 });
+      }
+    } else if (loaderState === 'exiting' || loaderState === 'completed') {
+      gsap.killTweensOf(textElements);
+      gsap.to(textElements, {
+        opacity: 1,
+        y: 0,
+        duration: 0.9,
+        stagger: 0.07,
+        ease: 'power3.out',
+        delay: 0.25,
+      });
+
+      if (watermarkRef.current) {
+        gsap.killTweensOf(watermarkRef.current);
+        gsap.to(watermarkRef.current, {
+          opacity: 0.35,
+          scale: 1,
+          y: 0,
+          duration: 1.2,
+          ease: 'power3.out',
+          delay: 0.15,
+        });
+      }
+    }
+  }, [loaderState]);
 
   // Function to switch slides safely with GSAP timeline
   const goToSlide = useCallback(
@@ -174,7 +216,7 @@ export default function HeroSlider({ onReplayLoader }) {
         </div>
 
         {/* 3D WebGL Canvas Layer */}
-        <Scene currentSlide={currentSlide} slideData={SLIDES[currentSlide]} />
+        <Scene currentSlide={currentSlide} slideData={SLIDES[currentSlide]} loaderState={loaderState} />
 
         {/* Main Split Screen Content Area */}
         <div className="relative z-10 w-full flex-1 max-w-7xl mx-auto px-5 sm:px-8 md:px-10 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 md:gap-6 pt-3 sm:pt-6 md:pt-16 pb-6 md:pb-12 pointer-events-none">

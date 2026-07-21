@@ -3,10 +3,18 @@ import gsap from 'gsap';
 
 const BRAND = ['P', 'E', 'R', 'F', 'U', 'M', 'E'];
 
-const Loader = ({ onComplete }) => {
+const Loader = ({ onStartExit, onComplete }) => {
   const containerRef = useRef(null);
   const counterRef = useRef(null);
   const letterRefs = useRef([]);
+
+  const onStartExitRef = useRef(onStartExit);
+  const onCompleteRef = useRef(onComplete);
+
+  useEffect(() => {
+    onStartExitRef.current = onStartExit;
+    onCompleteRef.current = onComplete;
+  }, [onStartExit, onComplete]);
 
   const setLetterRef = useCallback((el, i) => {
     letterRefs.current[i] = el;
@@ -48,36 +56,35 @@ const Loader = ({ onComplete }) => {
 
     const mainTl = gsap.timeline({
       onComplete: () => {
+        // Signal start of curtain exit & model entrance handshake
+        if (onStartExitRef.current) onStartExitRef.current();
+
         // Luxurious, ultra-smooth curtain exit phase
         const exitTl = gsap.timeline({
           onComplete: () => {
             document.body.style.overflow = '';
-            if (onComplete) onComplete();
+            if (onCompleteRef.current) onCompleteRef.current();
           },
         });
 
+        // 1. Counter fades out quickly
         exitTl.to(counterRef.current, {
           opacity: 0,
-          y: -15,
-          duration: 0.35,
+          duration: 0.2,
           ease: 'power2.in',
           force3D: true,
         });
 
+        // 2. Curtain slides up smoothly, carrying the full intact PERFUME word
         exitTl.to(
           containerRef.current,
           {
             yPercent: -100,
-            duration: 1.2,
+            duration: 1.0,
             ease: 'power3.inOut',
             force3D: true,
-            onComplete: () => {
-              if (containerRef.current) {
-                containerRef.current.style.pointerEvents = 'none';
-              }
-            },
           },
-          '-=0.2'
+          0.1
         );
       },
     });
@@ -88,7 +95,7 @@ const Loader = ({ onComplete }) => {
       {
         opacity: 1,
         y: 0,
-        duration: 0.5,
+        duration: 0.4,
         ease: 'power2.out',
         force3D: true,
       },
@@ -100,7 +107,7 @@ const Loader = ({ onComplete }) => {
       progressObj,
       {
         value: 100,
-        duration: 2.6,
+        duration: 2.2,
         ease: 'power1.inOut',
         onUpdate: () => {
           const currentVal = Math.round(progressObj.value);
@@ -121,22 +128,22 @@ const Loader = ({ onComplete }) => {
       {
         yPercent: 0,
         opacity: 1,
-        duration: 1.1,
-        stagger: 0.1,
+        duration: 1.0,
+        stagger: 0.08,
         ease: 'power3.out',
         force3D: true,
       },
-      0.2
+      0.15
     );
 
     // 4. Elegant pause at 100% so user can absorb the complete brand typography
-    mainTl.to({}, { duration: 0.4 });
+    mainTl.to({}, { duration: 0.3 });
 
     return () => {
       mainTl.kill();
       document.body.style.overflow = '';
     };
-  }, [onComplete]);
+  }, []);
 
   return (
     <div

@@ -27,6 +27,32 @@ function getResponsiveCoords() {
   }
 }
 
+// Helper to calculate South-East starting coordinates for smooth entrance
+function getSouthEastCoords(coords) {
+  const isMobile = coords.isMobile;
+  if (isMobile) {
+    return {
+      x: 1.8,
+      y: -0.6,
+      z: -1.2,
+      scale: coords.scale * 0.6,
+      rotY: -Math.PI * 0.4,
+      rotZ: -0.2,
+      rotX: 0.1,
+    };
+  } else {
+    return {
+      x: coords.x + 2.2,
+      y: coords.y - 1.4,
+      z: -1.0,
+      scale: coords.scale * 0.7,
+      rotY: -Math.PI * 0.35,
+      rotZ: -0.18,
+      rotX: 0.1,
+    };
+  }
+}
+
 // 3D Perfume Bottle Mesh Component
 function BottleMesh({ scene }) {
   useEffect(() => {
@@ -49,10 +75,11 @@ function BottleMesh({ scene }) {
 }
 
 // 3D Perfume Carousel — Responsive Dual Group Motion with Group-Bound Shadows (No Center Ghost Shadow Artifacts)
-function BottleCarousel({ currentSlide, slideData, prevSlideRef }) {
+function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) {
   const groupARef = useRef(null);
   const groupBRef = useRef(null);
   const activeGroupRef = useRef('A'); // Tracks which group is currently active at center
+  const hasEnteredRef = useRef(false);
 
   const { scene: sceneA } = useGLTF(MODEL_PATH);
   const { scene: sceneB } = useGLTF(MODEL_PATH);
@@ -61,16 +88,18 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef }) {
   const sceneBCloned = useMemo(() => sceneB.clone(true), [sceneB]);
 
   const initialCoords = getResponsiveCoords();
+  const initialSECoords = getSouthEastCoords(initialCoords);
+  const isAlreadyCompleted = loaderState === 'completed';
 
   // Position & rotation state for Group A & Group B (unscaled raw units)
   const posA = useRef({
-    x: initialCoords.x,
-    y: initialCoords.y,
-    z: 0,
-    scale: initialCoords.scale,
-    rotY: 0,
-    rotZ: 0,
-    rotX: 0,
+    x: isAlreadyCompleted ? initialCoords.x : initialSECoords.x,
+    y: isAlreadyCompleted ? initialCoords.y : initialSECoords.y,
+    z: isAlreadyCompleted ? 0 : initialSECoords.z,
+    scale: isAlreadyCompleted ? initialCoords.scale : initialSECoords.scale,
+    rotY: isAlreadyCompleted ? 0 : initialSECoords.rotY,
+    rotZ: isAlreadyCompleted ? 0 : initialSECoords.rotZ,
+    rotX: isAlreadyCompleted ? 0 : initialSECoords.rotX,
   });
 
   const posB = useRef({
@@ -82,6 +111,40 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef }) {
     rotZ: 0,
     rotX: 0,
   });
+
+  // Handle Loader Exit -> Hero Handshake Entrance Animation from South-East
+  useEffect(() => {
+    const coords = getResponsiveCoords();
+
+    if (loaderState === 'loading') {
+      hasEnteredRef.current = false;
+      const seCoords = getSouthEastCoords(coords);
+      posA.current.x = seCoords.x;
+      posA.current.y = seCoords.y;
+      posA.current.z = seCoords.z;
+      posA.current.scale = seCoords.scale;
+      posA.current.rotY = seCoords.rotY;
+      posA.current.rotZ = seCoords.rotZ;
+      posA.current.rotX = seCoords.rotX;
+      activeGroupRef.current = 'A';
+    } else if ((loaderState === 'exiting' || loaderState === 'completed') && !hasEnteredRef.current) {
+      hasEnteredRef.current = true;
+
+      // Animate Group A model gracefully from South-East into home center position
+      gsap.killTweensOf(posA.current);
+      gsap.to(posA.current, {
+        x: coords.x,
+        y: coords.y,
+        z: 0,
+        scale: coords.scale,
+        rotY: Math.PI * 2,
+        rotZ: 0,
+        rotX: 0,
+        duration: 1.25,
+        ease: 'power3.out',
+      });
+    }
+  }, [loaderState]);
 
   // Update base coordinates on window resize
   useEffect(() => {
@@ -320,7 +383,7 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef }) {
   );
 }
 
-export default function Scene({ currentSlide, slideData }) {
+export default function Scene({ currentSlide, slideData, loaderState }) {
   const prevSlideRef = useRef(currentSlide);
 
   return (
@@ -352,8 +415,9 @@ export default function Scene({ currentSlide, slideData }) {
 
         <Environment preset="studio" />
 
-        <BottleCarousel currentSlide={currentSlide} slideData={slideData} prevSlideRef={prevSlideRef} />
+        <BottleCarousel currentSlide={currentSlide} slideData={slideData} prevSlideRef={prevSlideRef} loaderState={loaderState} />
       </Canvas>
     </div>
   );
 }
+
