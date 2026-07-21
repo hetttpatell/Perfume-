@@ -2,7 +2,8 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import gsap from 'gsap';
 import Scene from './Scene';
 import FragranceDetails from './FragranceDetails';
-import OlfactoryExperience from './OlfactoryExperience';
+import SensoryRitual from './SensoryRitual';
+import BrandStory from './BrandStory';
 import { SLIDES } from '../utils/slidesData';
 
 export default function HeroSlider({ onReplayLoader, loaderState }) {
@@ -334,14 +335,18 @@ export default function HeroSlider({ onReplayLoader, loaderState }) {
         </footer>
       </section>
 
-      {/* Olfactory Experience Full Page Extension */}
-      <OlfactoryExperience
+      {/* Brand Heritage & Story Section (Right after Hero) */}
+      <BrandStory
         onSelectNote={(idx) => {
           goToSlide(idx);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
-        onOpenDetails={() => setShowDetailsPage(true)}
       />
+
+
+
+      {/* The Sensory Ritual (Lifestyle & Usage) */}
+      <SensoryRitual />
 
       {/* Separate Details Page Overlay */}
       {showDetailsPage && (
