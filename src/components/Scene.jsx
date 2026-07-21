@@ -4,9 +4,12 @@ import { useGLTF, Center, Environment, ContactShadows, AdaptiveDpr } from '@reac
 import * as THREE from 'three';
 import gsap from 'gsap';
 
-const MODEL_PATH = '/models/n22879414a_-_perfume.glb';
+// Ultra-Lightweight Optimized Models (375 KB Mobile / 397 KB Desktop vs original 3.17 MB)
+const MODEL_DESKTOP = '/models/perfume-desktop.glb';
+const MODEL_MOBILE = '/models/perfume-mobile.glb';
 
-useGLTF.preload(MODEL_PATH);
+useGLTF.preload(MODEL_DESKTOP);
+useGLTF.preload(MODEL_MOBILE);
 
 // Helper function to get responsive 3D coordinates & scale based on viewport width
 function getResponsiveCoords() {
@@ -66,7 +69,7 @@ function getSouthEastCoords(coords) {
   }
 }
 
-// Helper to hide and purge unwanted GLTF nodes (like the internal straw line)
+// Helper to hide and purge unwanted GLTF nodes (like internal straw line)
 function sanitizeScene(scene) {
   if (!scene) return;
   const toRemove = [];
@@ -77,11 +80,11 @@ function sanitizeScene(scene) {
     } else if (child.isMesh && child.material) {
       if (child.material.map) child.material.map.colorSpace = THREE.SRGBColorSpace;
       if (child.material.envMapIntensity !== undefined) {
-        child.material.envMapIntensity = Math.max(child.material.envMapIntensity, 1.2);
+        child.material.envMapIntensity = 1.1;
       }
-      child.material.needsUpdate = true;
-      child.castShadow = true;
-      child.receiveShadow = true;
+      child.material.needsUpdate = false;
+      child.castShadow = false;
+      child.receiveShadow = false;
     }
   });
   toRemove.forEach((node) => node.removeFromParent?.());
@@ -96,7 +99,7 @@ function BottleMesh({ scene }) {
   return <primitive object={scene} />;
 }
 
-// 3D Perfume Carousel — Responsive Dual Group Motion with Group-Bound Shadows (No Center Ghost Shadow Artifacts)
+// 3D Perfume Carousel — Dual Group Motion using Lightweight Single-Clone Model Parsing
 function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) {
   const groupARef = useRef(null);
   const groupBRef = useRef(null);
@@ -104,11 +107,11 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
   const hasEnteredRef = useRef(false);
   const [isMobile, setIsMobile] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < 768 : false));
 
-  const { scene: sceneA } = useGLTF(MODEL_PATH);
-  const { scene: sceneB } = useGLTF(MODEL_PATH);
+  const modelPath = isMobile ? MODEL_MOBILE : MODEL_DESKTOP;
+  const { scene: sceneA } = useGLTF(modelPath);
 
-  // Clone scene for groupB so both instances render independently
-  const sceneBCloned = useMemo(() => sceneB.clone(true), [sceneB]);
+  // Efficient memory clone of primary scene instance
+  const sceneBCloned = useMemo(() => sceneA.clone(true), [sceneA]);
 
   const initialCoords = getResponsiveCoords();
   const initialSECoords = getSouthEastCoords(initialCoords);
@@ -163,7 +166,7 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
         rotY: Math.PI * 2,
         rotZ: 0,
         rotX: 0,
-        duration: 1.25,
+        duration: 1.1,
         ease: 'power3.out',
       });
     }
@@ -199,9 +202,8 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
     const enteringState = activeGroupRef.current === 'A' ? posB.current : posA.current;
 
     if (isMobile) {
-      // ─── MOBILE VIEW: Simple Smooth Left & Right Motion ───
+      // ─── MOBILE VIEW: Lightweight Smooth Motion ───
       if (isNext) {
-        // NEXT: Exits to LEFT (-3.2); Enters from RIGHT (+3.2)
         enteringState.x = baseCenterX + 3.2;
         enteringState.y = baseCenterY;
         enteringState.z = 0;
@@ -214,7 +216,7 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
           y: baseCenterY,
           scale: baseScale * 0.4,
           rotZ: 0.15,
-          duration: 0.55,
+          duration: 0.5,
           ease: 'power2.inOut',
         }, 0);
 
@@ -225,12 +227,11 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
           scale: baseScale,
           rotZ: 0,
           rotY: targetY,
-          duration: 0.55,
+          duration: 0.5,
           ease: 'power2.inOut',
         }, 0);
 
       } else {
-        // PREV: Exits to RIGHT (+3.2); Enters from LEFT (-3.2)
         enteringState.x = baseCenterX - 3.2;
         enteringState.y = baseCenterY;
         enteringState.z = 0;
@@ -243,7 +244,7 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
           y: baseCenterY,
           scale: baseScale * 0.4,
           rotZ: -0.15,
-          duration: 0.55,
+          duration: 0.5,
           ease: 'power2.inOut',
         }, 0);
 
@@ -254,15 +255,14 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
           scale: baseScale,
           rotZ: 0,
           rotY: targetY,
-          duration: 0.55,
+          duration: 0.5,
           ease: 'power2.inOut',
         }, 0);
       }
 
     } else {
-      // ─── DESKTOP & IPAD VIEW: Full Luxury Orbital Arc Motion (NE / SE) ───
+      // ─── DESKTOP & IPAD VIEW: Luxury Orbital Motion ───
       if (isNext) {
-        // NEXT: Exits North-East (Up+Right); Enters from South-East (Bottom+Right)
         enteringState.x = baseCenterX + 5.5;
         enteringState.y = baseCenterY - 4.5;
         enteringState.z = -3;
@@ -277,7 +277,7 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
           scale: baseScale * 0.3,
           rotZ: -0.4,
           rotX: 0.25,
-          duration: 0.8,
+          duration: 0.75,
           ease: 'power2.inOut',
         }, 0);
 
@@ -290,12 +290,11 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
           rotZ: 0,
           rotX: 0,
           rotY: targetY,
-          duration: 0.8,
+          duration: 0.75,
           ease: 'power2.inOut',
         }, 0);
 
       } else {
-        // PREV: Exits South-East (Down+Right); Enters from North-East (Top+Right)
         enteringState.x = baseCenterX + 5.5;
         enteringState.y = baseCenterY + 4.5;
         enteringState.z = -3;
@@ -310,7 +309,7 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
           scale: baseScale * 0.3,
           rotZ: 0.4,
           rotX: -0.25,
-          duration: 0.8,
+          duration: 0.75,
           ease: 'power2.inOut',
         }, 0);
 
@@ -323,7 +322,7 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
           rotZ: 0,
           rotX: 0,
           rotY: targetY,
-          duration: 0.8,
+          duration: 0.75,
           ease: 'power2.inOut',
         }, 0);
       }
@@ -333,13 +332,13 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
     activeGroupRef.current = activeGroupRef.current === 'A' ? 'B' : 'A';
   }, [currentSlide]);
 
-  // Frame Loop: Update 3D transforms & layer subtle float breathing
+  // Frame Loop: Update 3D transforms with lightweight subtle float breathing
   useFrame(() => {
     const t = performance.now() * 0.001;
-    const floatY = Math.sin(t * 1.2) * 0.015;
-    const swayZ = Math.cos(t * 0.8) * 0.003;
+    const floatY = Math.sin(t * 1.2) * 0.012;
+    const swayZ = Math.cos(t * 0.8) * 0.002;
 
-    // Apply Group A Transform
+    // Group A Transform
     if (groupARef.current) {
       const isCenter = activeGroupRef.current === 'A';
       groupARef.current.position.set(
@@ -355,7 +354,7 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
       );
     }
 
-    // Apply Group B Transform
+    // Group B Transform
     if (groupBRef.current) {
       const isCenter = activeGroupRef.current === 'B';
       groupBRef.current.position.set(
@@ -381,6 +380,7 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
         </Center>
         {!isMobile && (
           <ContactShadows
+            frames={1}
             position={[0, -0.06, 0]}
             opacity={0.10}
             scale={0.12}
@@ -391,13 +391,14 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
         )}
       </group>
 
-      {/* Group B (Simultaneous Entry/Exit Model Instance) */}
+      {/* Group B (Simultaneous Entry/Exit Instance) */}
       <group ref={groupBRef} position={[initialCoords.x + 5.5, initialCoords.y - 4.5, -3]}>
         <Center>
           <BottleMesh scene={sceneBCloned} />
         </Center>
         {!isMobile && (
           <ContactShadows
+            frames={1}
             position={[0, -0.06, 0]}
             opacity={0.10}
             scale={0.12}
@@ -444,39 +445,38 @@ export default function Scene({ currentSlide, slideData, loaderState }) {
         camera={{ position: [0, 0, 5], fov: 45 }}
         style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
         frameloop={isIntersecting ? 'always' : 'never'}
-        dpr={isMobile ? [1, 1.25] : [1, 1.75]}
+        dpr={isMobile ? [1, 1] : [1, 1.25]}
         performance={{ min: 0.5 }}
         gl={{
-          antialias: !isMobile,
+          antialias: false,
           alpha: true,
           powerPreference: 'high-performance',
-          precision: isMobile ? 'mediump' : 'highp',
+          precision: 'mediump',
+          stencil: false,
+          depth: true,
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.3,
         }}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
-          gl.physicallyCorrectLights = true;
         }}
       >
         <AdaptiveDpr pixelated />
 
-        {/* ── Studio Lighting Rig ── */}
-        <ambientLight intensity={0.6} color="#FFF8E8" />
-        <directionalLight position={[5, 8, 5]} intensity={3.5} color="#FFFAF0" castShadow={!isMobile} />
-        <directionalLight position={[-5, 3, 4]} intensity={2.0} color="#F0F0FF" />
-        <directionalLight position={[0, 4, -6]} intensity={2.5} color="#FFFFFF" />
-        <directionalLight position={[0, 2, 8]} intensity={1.5} color="#FFFFFF" />
-        <spotLight position={[1.4, 10, 3]} intensity={3.0} angle={0.3} penumbra={0.5} color="#FFFFFF" castShadow={!isMobile} />
-        <pointLight position={[1.4, -4, 2]} intensity={0.8} color="#FFF0C0" />
-        <pointLight position={[4, 0, 0]} intensity={0.6} color="#FFE8B0" />
+        {/* ── Studio Lighting Rig (Zero Dynamic Shadow Map Passes) ── */}
+        <ambientLight intensity={0.8} color="#FFF8E8" />
+        <directionalLight position={[5, 8, 5]} intensity={2.5} color="#FFFAF0" castShadow={false} />
+        <directionalLight position={[-5, 3, 4]} intensity={1.5} color="#F0F0FF" />
+        <directionalLight position={[0, 4, -6]} intensity={1.8} color="#FFFFFF" />
+        <directionalLight position={[0, 2, 8]} intensity={1.2} color="#FFFFFF" />
+        <spotLight position={[1.4, 10, 3]} intensity={2.0} angle={0.4} penumbra={0.6} color="#FFFFFF" castShadow={false} />
+        <pointLight position={[1.4, -4, 2]} intensity={0.6} color="#FFF0C0" />
+        <pointLight position={[4, 0, 0]} intensity={0.4} color="#FFE8B0" />
 
-        <Environment preset="studio" />
+        <Environment preset="studio" resolution={128} />
 
         <BottleCarousel currentSlide={currentSlide} slideData={slideData} prevSlideRef={prevSlideRef} loaderState={loaderState} />
       </Canvas>
     </div>
   );
 }
-
-
