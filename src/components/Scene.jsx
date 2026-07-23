@@ -17,26 +17,33 @@ function getResponsiveCoords() {
     // Dynamic aspect-ratio math for mobile view: balanced middle positioning
     const aspectRatio = h / w;
     let targetY = 0.66;
-    let targetScale = 10.6;
+    let targetScale = 10.4;
 
-    if (aspectRatio > 2.05) {
-      // Very tall modern phones (iPhone 14/15/16 Pro Max, Galaxy S23 Ultra)
-      targetY = 0.62;
+    if (w < 360) {
+      // Compact phones (iPhone SE, Galaxy A series compact)
+      targetY = 0.72;
+      targetScale = 9.2;
+    } else if (aspectRatio > 2.05) {
+      // Tall modern phones (iPhone 14/15/16 Pro Max, Galaxy Ultra)
+      targetY = 0.60;
       targetScale = 10.8;
     } else if (aspectRatio > 1.85) {
       // Standard mobile screens (iPhone 12/13/14, Pixel)
-      targetY = 0.68;
-      targetScale = 10.4;
+      targetY = 0.65;
+      targetScale = 10.2;
     } else {
-      // Short mobile screens (iPhone SE, budget phones)
-      targetY = 0.74;
-      targetScale = 9.8;
+      // Shorter mobile viewports
+      targetY = 0.70;
+      targetScale = 9.6;
     }
 
     return { x: 0, y: targetY, scale: targetScale, isMobile: true };
+  } else if (w < 900) {
+    // iPad / Tablet Portrait Viewport (768px - 899px e.g. iPad Air / Mini portrait)
+    return { x: 0.35, y: 0.08, scale: 10.5, isMobile: false };
   } else if (w < 1024) {
-    // iPad / Tablet Viewport (768px - 1024px e.g. iPad Air 820x1180): Right panel positioning (x = 0.38)
-    return { x: 0.38, y: 0.02, scale: 11.2, isMobile: false };
+    // iPad / Tablet Landscape Viewport (900px - 1023px)
+    return { x: 0.55, y: 0.04, scale: 11.8, isMobile: false };
   } else if (w < 1280) {
     // Small Desktop / Laptop
     return { x: 0.85, y: 0, scale: 13.5, isMobile: false };
@@ -46,13 +53,13 @@ function getResponsiveCoords() {
   }
 }
 
-// Helper to calculate South-East starting coordinates for smooth entrance across all viewports
+// Helper to calculate off-screen starting coordinates for smooth entrance across all viewports
 function getSouthEastCoords(coords) {
   const w = typeof window !== 'undefined' ? window.innerWidth : 1200;
   if (w < 768) {
     return {
-      x: coords.x + 0.9,
-      y: coords.y - 0.65,
+      x: coords.x + 2.5,
+      y: coords.y - 2.5,
       z: -0.8,
       scale: coords.scale * 0.7,
       rotY: -Math.PI * 0.35,
@@ -61,23 +68,23 @@ function getSouthEastCoords(coords) {
     };
   } else if (w < 1024) {
     return {
-      x: coords.x + 1.2,
-      y: coords.y - 0.9,
-      z: -0.9,
-      scale: coords.scale * 0.7,
+      x: coords.x + 3.0,
+      y: coords.y - 2.8,
+      z: -0.8,
+      scale: coords.scale * 0.65,
       rotY: -Math.PI * 0.35,
       rotZ: -0.15,
       rotX: 0.08,
     };
   } else {
     return {
-      x: coords.x + 1.8,
-      y: coords.y - 1.2,
-      z: -1.0,
-      scale: coords.scale * 0.7,
+      x: coords.x + 3.5,
+      y: coords.y - 3.2,
+      z: -0.8,
+      scale: coords.scale * 0.65,
       rotY: -Math.PI * 0.35,
-      rotZ: -0.18,
-      rotX: 0.1,
+      rotZ: -0.15,
+      rotX: 0.08,
     };
   }
 }
@@ -178,8 +185,9 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
         rotY: Math.PI * 2,
         rotZ: 0,
         rotX: 0,
-        duration: 1.25,
-        ease: 'power3.out',
+        duration: 1.4,
+        ease: 'power2.out',
+        delay: 0.1,
       });
     }
   }, [loaderState]);
@@ -385,13 +393,14 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
         <Center>
           <BottleMesh scene={sceneA} />
         </Center>
-        {!isMobile && (
+        {!isMobile && activeGroupRef.current === 'A' && (
           <ContactShadows
             position={[0, -0.06, 0]}
             opacity={0.10}
             scale={0.12}
-            blur={1.2}
+            blur={1.0}
             far={0.4}
+            resolution={256}
             color="#1A1A1A"
           />
         )}
@@ -402,13 +411,14 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
         <Center>
           <BottleMesh scene={sceneBCloned} />
         </Center>
-        {!isMobile && (
+        {!isMobile && activeGroupRef.current === 'B' && (
           <ContactShadows
             position={[0, -0.06, 0]}
             opacity={0.10}
             scale={0.12}
-            blur={1.2}
+            blur={1.0}
             far={0.4}
+            resolution={256}
             color="#1A1A1A"
           />
         )}

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Loader from './components/Loader';
 import HeroSlider from './components/HeroSlider';
 import './App.css';
@@ -14,7 +14,26 @@ function App() {
     }
   });
 
+  // Separate flag to control when Loader is actually unmounted from the DOM.
+  // The Loader stays mounted (but invisible at yPercent:-100) for 500ms after 'completed'
+  // to avoid a synchronous DOM teardown that freezes the main thread during hero entrance.
+  const [loaderMounted, setLoaderMounted] = useState(() => {
+    try {
+      return !sessionStorage.getItem('perfume_has_visited');
+    } catch {
+      return true;
+    }
+  });
+
+  useEffect(() => {
+    if (loaderState === 'completed' && loaderMounted) {
+      const timer = setTimeout(() => setLoaderMounted(false), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [loaderState, loaderMounted]);
+
   const handleReplayLoader = useCallback(() => {
+    setLoaderMounted(true);
     setLoaderState('loading');
     setLoaderKey((prev) => prev + 1);
   }, []);
@@ -34,12 +53,16 @@ function App() {
     } catch (e) {
       // ignore storage errors
     }
-    setLoaderState('completed');
+    // Defer the state change to the next animation frame so the React re-render
+    // (and its useEffect cascade) doesn't block the current GSAP animation frame.
+    requestAnimationFrame(() => {
+      setLoaderState('completed');
+    });
   }, []);
 
   return (
     <main className="relative min-h-screen w-full bg-[#FAFAFA] flex flex-col justify-between overflow-hidden">
-      {loaderState !== 'completed' && (
+      {loaderMounted && (
         <Loader
           key={loaderKey}
           onStartExit={handleLoaderStartExit}
@@ -58,4 +81,3 @@ function App() {
 }
 
 export default App;
-

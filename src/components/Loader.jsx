@@ -47,6 +47,8 @@ const Loader = ({ onStartExit, onComplete }) => {
     if (containerRef.current) {
       gsap.set(containerRef.current, {
         force3D: true,
+        z: 0.01,
+        yPercent: 0,
         willChange: 'transform',
       });
     }
@@ -54,40 +56,7 @@ const Loader = ({ onStartExit, onComplete }) => {
     const progressObj = { value: 0 };
     let lastValue = -1;
 
-    const mainTl = gsap.timeline({
-      onComplete: () => {
-        // Signal start of curtain exit & model entrance handshake
-        if (onStartExitRef.current) onStartExitRef.current();
-
-        // Luxurious, ultra-smooth curtain exit phase
-        const exitTl = gsap.timeline({
-          onComplete: () => {
-            document.body.style.overflow = '';
-            if (onCompleteRef.current) onCompleteRef.current();
-          },
-        });
-
-        // 1. Counter fades out quickly
-        exitTl.to(counterRef.current, {
-          opacity: 0,
-          duration: 0.2,
-          ease: 'power2.in',
-          force3D: true,
-        });
-
-        // 2. Curtain slides up smoothly, carrying the full intact PERFUME word
-        exitTl.to(
-          containerRef.current,
-          {
-            yPercent: -100,
-            duration: 1.0,
-            ease: 'power3.inOut',
-            force3D: true,
-          },
-          0.1
-        );
-      },
-    });
+    const mainTl = gsap.timeline();
 
     // 1. Counter fade in gracefully
     mainTl.to(
@@ -95,20 +64,34 @@ const Loader = ({ onStartExit, onComplete }) => {
       {
         opacity: 1,
         y: 0,
-        duration: 0.4,
+        duration: 0.35,
         ease: 'power2.out',
         force3D: true,
       },
       0
     );
 
-    // 2. Smooth, unhurried numerical progression (0% to 100%)
+    // 2. Staggered reveal of letter typography
+    mainTl.to(
+      letterRefs.current,
+      {
+        yPercent: 0,
+        opacity: 1,
+        duration: 0.75,
+        stagger: 0.04,
+        ease: 'power3.out',
+        force3D: true,
+      },
+      0.08
+    );
+
+    // 3. Smooth numerical progression (0% to 100%) over 1.8 seconds
     mainTl.to(
       progressObj,
       {
         value: 100,
-        duration: 2.2,
-        ease: 'power1.inOut',
+        duration: 1.8,
+        ease: 'power1.out',
         onUpdate: () => {
           const currentVal = Math.round(progressObj.value);
           if (currentVal !== lastValue) {
@@ -122,22 +105,58 @@ const Loader = ({ onStartExit, onComplete }) => {
       0
     );
 
-    // 3. Staggered reveal of letter typography with hardware acceleration
+    // 4. Counter gentle fade out at 100%
+    mainTl.to(
+      counterRef.current,
+      {
+        opacity: 0,
+        y: -15,
+        duration: 0.35,
+        ease: 'power2.out',
+        force3D: true,
+      },
+      1.80
+    );
+
+    // 5. Typography brand letters float upward gracefully
     mainTl.to(
       letterRefs.current,
       {
-        yPercent: 0,
-        opacity: 1,
-        duration: 1.0,
-        stagger: 0.08,
-        ease: 'power3.out',
+        yPercent: -35,
+        opacity: 0,
+        duration: 0.7,
+        stagger: 0.02,
+        ease: 'power2.inOut',
         force3D: true,
       },
-      0.15
+      1.80
     );
 
-    // 4. Elegant pause at 100% so user can absorb the complete brand typography
-    mainTl.to({}, { duration: 0.3 });
+    // 6. Frame-locked Handshake callback to initialize hero entrance & 3D scene
+    mainTl.call(
+      () => {
+        if (onStartExitRef.current) onStartExitRef.current();
+      },
+      [],
+      1.80
+    );
+
+    // 7. Curtain lifts UP with a luxurious, silky-smooth 1.2s ease
+    mainTl.to(
+      containerRef.current,
+      {
+        yPercent: -100,
+        duration: 1.2,
+        ease: 'power3.inOut',
+        force3D: true,
+        onComplete: () => {
+          document.body.style.overflow = '';
+          gsap.set(containerRef.current, { clearProps: 'willChange' });
+          if (onCompleteRef.current) onCompleteRef.current();
+        },
+      },
+      1.80
+    );
 
     return () => {
       mainTl.kill();
@@ -193,6 +212,3 @@ const Loader = ({ onStartExit, onComplete }) => {
 };
 
 export default Loader;
-
-
-
