@@ -4,19 +4,8 @@ import { useGLTF, Center, Environment, ContactShadows, useProgress } from '@reac
 import * as THREE from 'three';
 import gsap from 'gsap';
 
-// Device-adaptive model path selection
-// Mobile: 375 KB | Tablet: 383 KB | Desktop: 3.1 MB
-function getModelPath() {
-  if (typeof window === 'undefined') return '/models/n22879414a_-_perfume.glb';
-  const w = window.innerWidth;
-  if (w < 768)  return '/3D model/n19_chanel_paris_eau_de_parfum.glb';
-  if (w < 1024) return '/models/perfume-tablet.glb';
-  return '/models/n22879414a_-_perfume.glb';
-}
+const MODEL_PATH = '/models/n22879414a_-_perfume.glb';
 
-const MODEL_PATH = getModelPath();
-
-// Preload only the device-appropriate model (not the 3.1 MB desktop one on mobile)
 useGLTF.preload(MODEL_PATH);
 
 // Detect mobile at module level for Canvas config (before React renders)
