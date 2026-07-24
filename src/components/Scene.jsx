@@ -9,7 +9,7 @@ import gsap from 'gsap';
 function getModelPath() {
   if (typeof window === 'undefined') return '/models/n22879414a_-_perfume.glb';
   const w = window.innerWidth;
-  if (w < 768)  return '/models/perfume-mobile.glb';
+  if (w < 768)  return '/3D model/n19_chanel_paris_eau_de_parfum.glb';
   if (w < 1024) return '/models/perfume-tablet.glb';
   return '/models/n22879414a_-_perfume.glb';
 }
