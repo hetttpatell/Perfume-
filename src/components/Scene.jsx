@@ -4,9 +4,23 @@ import { useGLTF, Center, Environment, ContactShadows, useProgress } from '@reac
 import * as THREE from 'three';
 import gsap from 'gsap';
 
-const MODEL_PATH = '/models/n22879414a_-_perfume.glb';
+// Device-adaptive model path selection
+// Mobile: 375 KB | Tablet: 383 KB | Desktop: 3.1 MB
+function getModelPath() {
+  if (typeof window === 'undefined') return '/models/n22879414a_-_perfume.glb';
+  const w = window.innerWidth;
+  if (w < 768)  return '/models/perfume-mobile.glb';
+  if (w < 1024) return '/models/perfume-tablet.glb';
+  return '/models/n22879414a_-_perfume.glb';
+}
 
+const MODEL_PATH = getModelPath();
+
+// Preload only the device-appropriate model (not the 3.1 MB desktop one on mobile)
 useGLTF.preload(MODEL_PATH);
+
+// Detect mobile at module level for Canvas config (before React renders)
+const IS_MOBILE = typeof window !== 'undefined' && window.innerWidth < 768;
 
 // Helper function to get responsive 3D coordinates & scale based on viewport width
 function getResponsiveCoords() {
@@ -119,8 +133,144 @@ function BottleMesh({ scene }) {
   return <primitive object={scene} />;
 }
 
-// 3D Perfume Carousel — Dual Group Motion
-function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState, onModelLoaded }) {
+// ─────────────────────────────────────────────────────────────
+// MOBILE: Single-instance carousel — halves vertex count
+// ─────────────────────────────────────────────────────────────
+function MobileBottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState, onModelLoaded }) {
+  const groupRef = useRef(null);
+  const hasEnteredRef = useRef(false);
+
+  const { scene } = useGLTF(MODEL_PATH);
+
+  useEffect(() => {
+    if (scene && onModelLoaded) {
+      onModelLoaded();
+    }
+  }, [scene, onModelLoaded]);
+
+  const initialCoords = getResponsiveCoords();
+  const initialSECoords = getSouthEastCoords(initialCoords);
+  const isAlreadyCompleted = loaderState === 'completed';
+
+  const pos = useRef({
+    x: isAlreadyCompleted ? initialCoords.x : initialSECoords.x,
+    y: isAlreadyCompleted ? initialCoords.y : initialSECoords.y,
+    z: isAlreadyCompleted ? 0 : initialSECoords.z,
+    scale: isAlreadyCompleted ? initialCoords.scale : initialSECoords.scale,
+    rotY: isAlreadyCompleted ? 0 : initialSECoords.rotY,
+    rotZ: isAlreadyCompleted ? 0 : initialSECoords.rotZ,
+    rotX: isAlreadyCompleted ? 0 : initialSECoords.rotX,
+  });
+
+  // Handle Loader Exit -> Hero Handshake Entrance Animation
+  useEffect(() => {
+    const coords = getResponsiveCoords();
+
+    if (loaderState === 'loading') {
+      hasEnteredRef.current = false;
+      const seCoords = getSouthEastCoords(coords);
+      pos.current.x = seCoords.x;
+      pos.current.y = seCoords.y;
+      pos.current.z = seCoords.z;
+      pos.current.scale = seCoords.scale;
+      pos.current.rotY = seCoords.rotY;
+      pos.current.rotZ = seCoords.rotZ;
+      pos.current.rotX = seCoords.rotX;
+    } else if ((loaderState === 'exiting' || loaderState === 'completed') && !hasEnteredRef.current) {
+      hasEnteredRef.current = true;
+
+      gsap.killTweensOf(pos.current);
+      gsap.to(pos.current, {
+        x: coords.x,
+        y: coords.y,
+        z: 0,
+        scale: coords.scale,
+        rotY: Math.PI * 2,
+        rotZ: 0,
+        rotX: 0,
+        duration: 1.4,
+        ease: 'power2.out',
+        delay: 0.1,
+      });
+    }
+  }, [loaderState]);
+
+  // Update base coordinates on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      const coords = getResponsiveCoords();
+      pos.current.x = coords.x;
+      pos.current.y = coords.y;
+      pos.current.scale = coords.scale;
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Slide Change Animation — single model spin-in-place transition
+  useEffect(() => {
+    if (!groupRef.current) return;
+    if (prevSlideRef.current === currentSlide) return;
+
+    const isNext = currentSlide > prevSlideRef.current || (prevSlideRef.current === 5 && currentSlide === 0);
+    const direction = isNext ? 1 : -1;
+    prevSlideRef.current = currentSlide;
+
+    const { x: baseCenterX, y: baseCenterY, scale: baseScale } = getResponsiveCoords();
+
+    // Quick scale-down + spin + scale-back for a snappy single-instance transition
+    gsap.timeline()
+      .to(pos.current, {
+        scale: baseScale * 0.7,
+        rotZ: direction * 0.12,
+        duration: 0.25,
+        ease: 'power2.in',
+      })
+      .to(pos.current, {
+        x: baseCenterX,
+        y: baseCenterY,
+        scale: baseScale,
+        rotZ: 0,
+        rotY: pos.current.rotY + Math.PI * 2 * direction,
+        duration: 0.45,
+        ease: 'power2.out',
+      });
+  }, [currentSlide]);
+
+  // Frame Loop: Update 3D transforms & subtle float breathing
+  useFrame(() => {
+    const t = performance.now() * 0.001;
+    const floatY = Math.sin(t * 1.2) * 0.015;
+    const swayZ = Math.cos(t * 0.8) * 0.003;
+
+    if (groupRef.current) {
+      groupRef.current.position.set(
+        pos.current.x,
+        pos.current.y + floatY,
+        pos.current.z
+      );
+      groupRef.current.scale.setScalar(pos.current.scale);
+      groupRef.current.rotation.set(
+        pos.current.rotX,
+        pos.current.rotY,
+        pos.current.rotZ + swayZ
+      );
+    }
+  });
+
+  return (
+    <group ref={groupRef} position={[pos.current.x, pos.current.y, pos.current.z]}>
+      <Center>
+        <BottleMesh scene={scene} />
+      </Center>
+    </group>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// DESKTOP/TABLET: Dual-instance carousel (original behavior)
+// ─────────────────────────────────────────────────────────────
+function DesktopBottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState, onModelLoaded }) {
   const groupARef = useRef(null);
   const groupBRef = useRef(null);
   const activeGroupRef = useRef('A');
@@ -447,17 +597,45 @@ function ProgressNotifier({ onModelLoaded }) {
 
 export default function Scene({ currentSlide, slideData, loaderState, onModelLoaded }) {
   const prevSlideRef = useRef(currentSlide);
+  const [modelReady, setModelReady] = useState(false);
+
+  // Wrap the original callback to also track model readiness for poster crossfade
+  const handleModelLoaded = useMemo(() => {
+    return () => {
+      setModelReady(true);
+      if (onModelLoaded) onModelLoaded();
+    };
+  }, [onModelLoaded]);
+
+  // Select the right carousel based on device
+  const CarouselComponent = IS_MOBILE ? MobileBottleCarousel : DesktopBottleCarousel;
 
   return (
     <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+      {/* Poster fallback — shows instantly while WebGL canvas loads the 3D model */}
+      {IS_MOBILE && !modelReady && (
+        <img
+          src="/models/perfume-poster.png"
+          alt="Perfume preview"
+          className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none z-[1]"
+          style={{
+            opacity: 0.55,
+            filter: 'blur(1px)',
+            transition: 'opacity 0.6s ease-out',
+            // Vertically offset to roughly match 3D model position
+            objectPosition: 'center 30%',
+          }}
+        />
+      )}
+
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
-        dpr={[1, 1.5]}
+        dpr={IS_MOBILE ? [1, 1] : [1, 1.5]}
         style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
         gl={{
-          antialias: true,
+          antialias: !IS_MOBILE,
           alpha: true,
-          powerPreference: 'high-performance',
+          powerPreference: IS_MOBILE ? 'low-power' : 'high-performance',
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.3,
         }}
@@ -466,27 +644,34 @@ export default function Scene({ currentSlide, slideData, loaderState, onModelLoa
           gl.physicallyCorrectLights = true;
         }}
       >
-        <ProgressNotifier onModelLoaded={onModelLoaded} />
+        <ProgressNotifier onModelLoaded={handleModelLoaded} />
 
-        {/* Studio Lighting Rig */}
-        <ambientLight intensity={0.6} color="#FFF8E8" />
-        <directionalLight position={[5, 8, 5]} intensity={3.5} color="#FFFAF0" castShadow />
-        <directionalLight position={[-5, 3, 4]} intensity={2.0} color="#F0F0FF" />
+        {/* Lighting Rig — stripped down on mobile for GPU savings */}
+        <ambientLight intensity={IS_MOBILE ? 0.8 : 0.6} color="#FFF8E8" />
+        <directionalLight position={[5, 8, 5]} intensity={3.5} color="#FFFAF0" castShadow={!IS_MOBILE} />
         <directionalLight position={[0, 4, -6]} intensity={2.5} color="#FFFFFF" />
-        <directionalLight position={[0, 2, 8]} intensity={1.5} color="#FFFFFF" />
-        <spotLight position={[1.4, 10, 3]} intensity={3.0} angle={0.3} penumbra={0.5} color="#FFFFFF" castShadow />
-        <pointLight position={[1.4, -4, 2]} intensity={0.8} color="#FFF0C0" />
-        <pointLight position={[4, 0, 0]} intensity={0.6} color="#FFE8B0" />
 
-        <Environment preset="studio" />
+        {/* Desktop-only supplementary lights */}
+        {!IS_MOBILE && (
+          <>
+            <directionalLight position={[-5, 3, 4]} intensity={2.0} color="#F0F0FF" />
+            <directionalLight position={[0, 2, 8]} intensity={1.5} color="#FFFFFF" />
+            <spotLight position={[1.4, 10, 3]} intensity={3.0} angle={0.3} penumbra={0.5} color="#FFFFFF" castShadow />
+            <pointLight position={[1.4, -4, 2]} intensity={0.8} color="#FFF0C0" />
+            <pointLight position={[4, 0, 0]} intensity={0.6} color="#FFE8B0" />
+          </>
+        )}
+
+        {/* Lighter env map on mobile ("city" is ~3× smaller than "studio") */}
+        <Environment preset={IS_MOBILE ? "city" : "studio"} />
 
         <Suspense fallback={null}>
-          <BottleCarousel
+          <CarouselComponent
             currentSlide={currentSlide}
             slideData={slideData}
             prevSlideRef={prevSlideRef}
             loaderState={loaderState}
-            onModelLoaded={onModelLoaded}
+            onModelLoaded={handleModelLoaded}
           />
         </Suspense>
       </Canvas>
