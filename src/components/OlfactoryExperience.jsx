@@ -5,11 +5,24 @@ import Testimonials from './Testimonials';
 import BrandLocationsMap from './BrandLocationsMap';
 import Footer from './Footer';
 
-export default function OlfactoryExperience({ onScrollToTop }) {
+export default function OlfactoryExperience({
+  onScrollToTop,
+  cartItems: parentCartItems,
+  setCartItems: parentSetCartItems,
+  isCartOpen: parentIsCartOpen,
+  setIsCartOpen: parentSetIsCartOpen,
+}) {
   const [activeCategory, setActiveCategory] = useState('ALL');
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [cartItems, setCartItems] = useState([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  
+  // Local fallbacks if parent state is not supplied
+  const [localCartItems, setLocalCartItems] = useState([]);
+  const [localIsCartOpen, setLocalIsCartOpen] = useState(false);
+
+  const cartItems = parentCartItems !== undefined ? parentCartItems : localCartItems;
+  const setCartItems = parentSetCartItems || setLocalCartItems;
+  const isCartOpen = parentIsCartOpen !== undefined ? parentIsCartOpen : localIsCartOpen;
+  const setIsCartOpen = parentSetIsCartOpen || setLocalIsCartOpen;
 
   const categories = [
     { id: 'ALL', label: 'TOUT' },
@@ -52,10 +65,8 @@ export default function OlfactoryExperience({ onScrollToTop }) {
     setCartItems(prev => prev.filter((_, i) => i !== index));
   };
 
-  const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-
   return (
-    <div className="w-full min-h-full bg-[#FAFAFA] text-[#1A1A1A] flex flex-col justify-start gap-4 sm:gap-6 md:gap-8 p-4 sm:p-8 md:p-10 lg:p-12 overflow-y-auto font-sans">
+    <div id="products" className="w-full min-h-full bg-[#FAFAFA] text-[#1A1A1A] flex flex-col justify-start gap-4 sm:gap-6 md:gap-8 p-4 sm:p-8 md:p-10 lg:p-12 overflow-y-auto font-sans scroll-mt-24">
       {/* Header Bar */}
       <div className="w-full max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-end justify-between border-b border-black/10 pb-4 sm:pb-6 gap-4">
         <div>
@@ -68,17 +79,7 @@ export default function OlfactoryExperience({ onScrollToTop }) {
         </div>
 
         <div className="flex items-center gap-2.5 sm:gap-4 self-end sm:self-auto shrink-0">
-          {/* Cart Bag Drawer Trigger */}
-          <button
-            onClick={() => setIsCartOpen(true)}
-            className="px-4 sm:px-6 py-2.5 sm:py-3 text-[10px] sm:text-[11px] font-sans font-semibold tracking-[0.2em] uppercase text-white bg-[#1A1A1A] hover:bg-black rounded-full transition-all duration-300 cursor-pointer flex items-center gap-2 shadow-sm active:scale-95"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-            </svg>
-            <span>BAG ({totalCartCount})</span>
-          </button>
-
+          {/* Note: BAG functionality removed from shop header as requested by user & moved to main top Navbar */}
           {onScrollToTop && (
             <button
               onClick={onScrollToTop}
@@ -186,10 +187,14 @@ export default function OlfactoryExperience({ onScrollToTop }) {
       </div>
 
       {/* Haute Testimonials & Critiques Section */}
-      <Testimonials />
+      <div id="gallery" className="w-full scroll-mt-24">
+        <Testimonials />
+      </div>
 
       {/* Brand Locations & Interactive Google Maps Section */}
-      <BrandLocationsMap />
+      <div id="contact" className="w-full scroll-mt-24">
+        <BrandLocationsMap />
+      </div>
 
       {/* Luxury Haute Footer Section */}
       <Footer onScrollToTop={onScrollToTop} />

@@ -5,6 +5,8 @@ import FragranceDetails from './FragranceDetails';
 import SensoryRitual from './SensoryRitual';
 import BrandStory from './BrandStory';
 import OlfactoryExperience from './OlfactoryExperience';
+import Navbar from './Navbar';
+import AccountModal from './AccountModal';
 import { SLIDES } from '../utils/slidesData';
 
 export default function HeroSlider({ onReplayLoader, loaderState, onModelLoaded }) {
@@ -12,6 +14,13 @@ export default function HeroSlider({ onReplayLoader, loaderState, onModelLoaded 
   const [displayedSlideIndex, setDisplayedSlideIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showDetailsPage, setShowDetailsPage] = useState(false);
+
+  // E-commerce state shared across top Navbar and Boutique
+  const [cartItems, setCartItems] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+
+  const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const containerRef = useRef(null);
   const watermarkRef = useRef(null);
@@ -323,8 +332,23 @@ export default function HeroSlider({ onReplayLoader, loaderState, onModelLoaded 
 
   return (
     <div className="w-full flex flex-col">
+      {/* Top Floating Luxury Navbar */}
+      <Navbar
+        cartCount={totalCartCount}
+        onOpenCart={() => setIsCartOpen(true)}
+        onOpenAccount={() => setIsAccountOpen(true)}
+      />
+
+      {/* Account VIP Drawer Modal */}
+      <AccountModal
+        isOpen={isAccountOpen}
+        onClose={() => setIsAccountOpen(false)}
+        onOpenCart={() => setIsCartOpen(true)}
+      />
+
       {/* Hero Showcase Section */}
       <section
+        id="hero"
         ref={containerRef}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
@@ -462,20 +486,28 @@ export default function HeroSlider({ onReplayLoader, loaderState, onModelLoaded 
       </section>
 
       {/* Brand Heritage & Story Section (Right after Hero) */}
-      <BrandStory
-        onSelectNote={(idx) => {
-          goToSlide(idx);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-      />
-
-
+      <div id="about" className="scroll-mt-24">
+        <BrandStory
+          onSelectNote={(idx) => {
+            goToSlide(idx);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        />
+      </div>
 
       {/* The Sensory Ritual (Lifestyle & Usage) */}
-      <SensoryRitual />
+      <div id="services" className="scroll-mt-24">
+        <SensoryRitual />
+      </div>
 
       {/* Haute Parfumerie Boutique (Products, Testimonials, Map & Footer) */}
-      <OlfactoryExperience onScrollToTop={() => window.scrollTo({ top: 0, behavior: 'smooth' })} />
+      <OlfactoryExperience
+        onScrollToTop={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        cartItems={cartItems}
+        setCartItems={setCartItems}
+        isCartOpen={isCartOpen}
+        setIsCartOpen={setIsCartOpen}
+      />
 
       {/* Separate Details Page Overlay */}
       {showDetailsPage && (
