@@ -430,25 +430,8 @@ export default function HeroSlider({ onReplayLoader, loaderState, onModelLoaded 
         {/* Minimal High-Fashion Bottom Navigation Bar */}
         <footer
           ref={stepperBarRef}
-          className="relative z-20 w-full px-4 sm:px-8 md:px-12 py-3 sm:py-4 bg-gradient-to-t from-white/95 via-white/70 to-transparent flex items-center justify-between md:justify-end border-t border-black/5"
+          className="relative z-20 w-full px-4 sm:px-8 md:px-12 py-3 sm:py-4 bg-gradient-to-t from-white/95 via-white/70 to-transparent flex items-center justify-center md:justify-end border-t border-black/5"
         >
-          {/* Mobile Quick Note Stepper Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar max-w-[55%] md:hidden pr-1">
-            {SLIDES.map((slide, idx) => (
-              <button
-                key={slide.id}
-                onClick={() => goToSlide(idx)}
-                aria-label={`Jump to note ${slide.id}`}
-                className={`px-2.5 py-1 text-[10px] font-sans font-semibold tracking-wider rounded-full transition-all duration-300 shrink-0 ${currentSlide === idx
-                  ? 'bg-[#1A1A1A] text-white shadow-xs'
-                  : 'bg-black/5 text-[#737373] hover:bg-black/10'
-                  }`}
-              >
-                {slide.id}
-              </button>
-            ))}
-          </div>
-
           {/* Directional Controls & Counter */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button

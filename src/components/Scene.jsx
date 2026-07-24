@@ -619,12 +619,12 @@ export default function Scene({ currentSlide, slideData, loaderState, onModelLoa
 
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
-        dpr={IS_MOBILE ? [1, 1] : [1, 1.5]}
+        dpr={IS_MOBILE ? [1, 1.5] : [1, 1.5]}
         style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
         gl={{
-          antialias: !IS_MOBILE,
+          antialias: true,
           alpha: true,
-          powerPreference: IS_MOBILE ? 'low-power' : 'high-performance',
+          powerPreference: 'high-performance',
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.3,
         }}
@@ -636,8 +636,9 @@ export default function Scene({ currentSlide, slideData, loaderState, onModelLoa
         <ProgressNotifier onModelLoaded={handleModelLoaded} />
 
         {/* Lighting Rig — stripped down on mobile for GPU savings */}
-        <ambientLight intensity={IS_MOBILE ? 0.8 : 0.6} color="#FFF8E8" />
+        <ambientLight intensity={0.6} color="#FFF8E8" />
         <directionalLight position={[5, 8, 5]} intensity={3.5} color="#FFFAF0" castShadow={!IS_MOBILE} />
+        <directionalLight position={[-5, 3, 4]} intensity={1.6} color="#F0F0FF" />
         <directionalLight position={[0, 4, -6]} intensity={2.5} color="#FFFFFF" />
 
         {/* Desktop-only supplementary lights */}
@@ -651,8 +652,7 @@ export default function Scene({ currentSlide, slideData, loaderState, onModelLoa
           </>
         )}
 
-        {/* Lighter env map on mobile ("city" is ~3× smaller than "studio") */}
-        <Environment preset={IS_MOBILE ? "city" : "studio"} />
+        <Environment preset="studio" />
 
         <Suspense fallback={null}>
           <CarouselComponent
