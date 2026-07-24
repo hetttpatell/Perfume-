@@ -5,6 +5,7 @@ import './App.css';
 
 function App() {
   const [loaderKey, setLoaderKey] = useState(0);
+  const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [loaderState, setLoaderState] = useState(() => {
     // Only play smooth loader on initial website visit, skip on page refresh
     try {
@@ -32,7 +33,12 @@ function App() {
     }
   }, [loaderState, loaderMounted]);
 
+  const handleModelLoaded = useCallback(() => {
+    setIsModelLoaded(true);
+  }, []);
+
   const handleReplayLoader = useCallback(() => {
+    setIsModelLoaded(false);
     setLoaderMounted(true);
     setLoaderState('loading');
     setLoaderKey((prev) => prev + 1);
@@ -65,6 +71,7 @@ function App() {
       {loaderMounted && (
         <Loader
           key={loaderKey}
+          isModelLoaded={isModelLoaded}
           onStartExit={handleLoaderStartExit}
           onComplete={handleLoaderComplete}
         />
@@ -74,6 +81,7 @@ function App() {
         <HeroSlider
           onReplayLoader={handleReplayLoader}
           loaderState={loaderState}
+          onModelLoaded={handleModelLoaded}
         />
       </div>
     </main>

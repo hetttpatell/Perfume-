@@ -3,18 +3,27 @@ import gsap from 'gsap';
 
 const BRAND = ['P', 'E', 'R', 'F', 'U', 'M', 'E'];
 
-const Loader = ({ onStartExit, onComplete }) => {
+const Loader = ({ onStartExit, onComplete, isModelLoaded = false }) => {
   const containerRef = useRef(null);
   const counterRef = useRef(null);
   const letterRefs = useRef([]);
+  const mainTlRef = useRef(null);
 
   const onStartExitRef = useRef(onStartExit);
   const onCompleteRef = useRef(onComplete);
+  const isModelLoadedRef = useRef(isModelLoaded);
 
   useEffect(() => {
     onStartExitRef.current = onStartExit;
     onCompleteRef.current = onComplete;
   }, [onStartExit, onComplete]);
+
+  useEffect(() => {
+    isModelLoadedRef.current = isModelLoaded;
+    if (isModelLoaded && mainTlRef.current && mainTlRef.current.paused()) {
+      mainTlRef.current.play();
+    }
+  }, [isModelLoaded]);
 
   const setLetterRef = useCallback((el, i) => {
     letterRefs.current[i] = el;
@@ -57,6 +66,7 @@ const Loader = ({ onStartExit, onComplete }) => {
     let lastValue = -1;
 
     const mainTl = gsap.timeline();
+    mainTlRef.current = mainTl;
 
     // 1. Counter fade in gracefully
     mainTl.to(
@@ -64,33 +74,33 @@ const Loader = ({ onStartExit, onComplete }) => {
       {
         opacity: 1,
         y: 0,
-        duration: 0.35,
+        duration: 0.6,
         ease: 'power2.out',
         force3D: true,
       },
       0
     );
 
-    // 2. Staggered reveal of letter typography
+    // 2. Grand staggered reveal of letter typography ("P E R F U M E")
     mainTl.to(
       letterRefs.current,
       {
         yPercent: 0,
         opacity: 1,
-        duration: 0.75,
-        stagger: 0.04,
-        ease: 'power3.out',
+        duration: 1.4,
+        stagger: 0.08,
+        ease: 'power4.out',
         force3D: true,
       },
-      0.08
+      0.1
     );
 
-    // 3. Smooth numerical progression (0% to 100%) over 1.8 seconds
+    // 3. Smooth numerical progression (0% to 100%) over 2.5 seconds
     mainTl.to(
       progressObj,
       {
         value: 100,
-        duration: 1.8,
+        duration: 2.5,
         ease: 'power1.out',
         onUpdate: () => {
           const currentVal = Math.round(progressObj.value);
@@ -105,31 +115,28 @@ const Loader = ({ onStartExit, onComplete }) => {
       0
     );
 
-    // 4. Counter gentle fade out at 100%
+    // 4. Handshake Pause Check: hold at 2.5s if 3D model is not ready yet
+    mainTl.call(
+      () => {
+        if (!isModelLoadedRef.current) {
+          mainTl.pause();
+        }
+      },
+      [],
+      2.5
+    );
+
+    // 5. Counter gentle fade out at 100%
     mainTl.to(
       counterRef.current,
       {
         opacity: 0,
         y: -15,
-        duration: 0.35,
+        duration: 0.5,
         ease: 'power2.out',
         force3D: true,
       },
-      1.80
-    );
-
-    // 5. Typography brand letters float upward gracefully
-    mainTl.to(
-      letterRefs.current,
-      {
-        yPercent: -35,
-        opacity: 0,
-        duration: 0.7,
-        stagger: 0.02,
-        ease: 'power2.inOut',
-        force3D: true,
-      },
-      1.80
+      2.5
     );
 
     // 6. Frame-locked Handshake callback to initialize hero entrance & 3D scene
@@ -138,28 +145,38 @@ const Loader = ({ onStartExit, onComplete }) => {
         if (onStartExitRef.current) onStartExitRef.current();
       },
       [],
-      1.80
+      2.7
     );
 
-    // 7. Curtain lifts UP with a luxurious, silky-smooth 1.2s ease
+    // 7. Grand Curtain lifts UP with a luxurious, silky-smooth 2.0s ease (keeping text intact)
     mainTl.to(
       containerRef.current,
       {
         yPercent: -100,
-        duration: 1.2,
+        duration: 2.0,
         ease: 'power3.inOut',
         force3D: true,
         onComplete: () => {
           document.body.style.overflow = '';
-          gsap.set(containerRef.current, { clearProps: 'willChange' });
+          if (containerRef.current) {
+            gsap.set(containerRef.current, { clearProps: 'willChange' });
+          }
           if (onCompleteRef.current) onCompleteRef.current();
         },
       },
-      1.80
+      2.7
     );
+
+    // Safety fallback (10s max) to guarantee exit if model fails to load
+    const safetyTimeout = setTimeout(() => {
+      if (mainTlRef.current && mainTlRef.current.paused()) {
+        mainTlRef.current.play();
+      }
+    }, 10000);
 
     return () => {
       mainTl.kill();
+      clearTimeout(safetyTimeout);
       document.body.style.overflow = '';
     };
   }, []);

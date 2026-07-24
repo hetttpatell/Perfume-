@@ -1,6 +1,6 @@
-import { useRef, useEffect, useMemo, useState } from 'react';
+import { useRef, useEffect, useMemo, useState, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useGLTF, Center, Environment, ContactShadows } from '@react-three/drei';
+import { useGLTF, Center, Environment, ContactShadows, useProgress } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
 
@@ -120,7 +120,7 @@ function BottleMesh({ scene }) {
 }
 
 // 3D Perfume Carousel — Dual Group Motion
-function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) {
+function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState, onModelLoaded }) {
   const groupARef = useRef(null);
   const groupBRef = useRef(null);
   const activeGroupRef = useRef('A');
@@ -129,6 +129,12 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
 
   const { scene: sceneA } = useGLTF(MODEL_PATH);
   const { scene: sceneB } = useGLTF(MODEL_PATH);
+
+  useEffect(() => {
+    if (sceneA && onModelLoaded) {
+      onModelLoaded();
+    }
+  }, [sceneA, onModelLoaded]);
 
   // Clone scene for groupB so both instances render independently
   const sceneBCloned = useMemo(() => sceneB.clone(true), [sceneB]);
@@ -427,7 +433,19 @@ function BottleCarousel({ currentSlide, slideData, prevSlideRef, loaderState }) 
   );
 }
 
-export default function Scene({ currentSlide, slideData, loaderState }) {
+function ProgressNotifier({ onModelLoaded }) {
+  const { active, progress, loaded, total } = useProgress();
+
+  useEffect(() => {
+    if (!active && loaded > 0 && loaded === total) {
+      if (onModelLoaded) onModelLoaded();
+    }
+  }, [active, progress, loaded, total, onModelLoaded]);
+
+  return null;
+}
+
+export default function Scene({ currentSlide, slideData, loaderState, onModelLoaded }) {
   const prevSlideRef = useRef(currentSlide);
 
   return (
@@ -448,6 +466,8 @@ export default function Scene({ currentSlide, slideData, loaderState }) {
           gl.physicallyCorrectLights = true;
         }}
       >
+        <ProgressNotifier onModelLoaded={onModelLoaded} />
+
         {/* Studio Lighting Rig */}
         <ambientLight intensity={0.6} color="#FFF8E8" />
         <directionalLight position={[5, 8, 5]} intensity={3.5} color="#FFFAF0" castShadow />
@@ -460,7 +480,15 @@ export default function Scene({ currentSlide, slideData, loaderState }) {
 
         <Environment preset="studio" />
 
-        <BottleCarousel currentSlide={currentSlide} slideData={slideData} prevSlideRef={prevSlideRef} loaderState={loaderState} />
+        <Suspense fallback={null}>
+          <BottleCarousel
+            currentSlide={currentSlide}
+            slideData={slideData}
+            prevSlideRef={prevSlideRef}
+            loaderState={loaderState}
+            onModelLoaded={onModelLoaded}
+          />
+        </Suspense>
       </Canvas>
     </div>
   );

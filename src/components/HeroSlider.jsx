@@ -7,7 +7,7 @@ import BrandStory from './BrandStory';
 import OlfactoryExperience from './OlfactoryExperience';
 import { SLIDES } from '../utils/slidesData';
 
-export default function HeroSlider({ onReplayLoader, loaderState }) {
+export default function HeroSlider({ onReplayLoader, loaderState, onModelLoaded }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [displayedSlideIndex, setDisplayedSlideIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -343,7 +343,7 @@ export default function HeroSlider({ onReplayLoader, loaderState }) {
         </div>
 
         {/* 3D WebGL Canvas Layer */}
-        <Scene currentSlide={currentSlide} slideData={SLIDES[currentSlide]} loaderState={loaderState} />
+        <Scene currentSlide={currentSlide} slideData={SLIDES[currentSlide]} loaderState={loaderState} onModelLoaded={onModelLoaded} />
 
         {/* Main Split Screen Content Area */}
         <div className="relative z-10 w-full flex-1 max-w-7xl mx-auto px-4 sm:px-8 md:px-10 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-6 md:gap-6 pt-3 sm:pt-6 md:pt-16 pb-4 sm:pb-6 md:pb-12 pointer-events-none">
