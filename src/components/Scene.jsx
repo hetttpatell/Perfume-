@@ -196,31 +196,44 @@ function MobileBottleCarousel({ currentSlide, slideData, prevSlideRef, loaderSta
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Slide Change Animation — single model spin-in-place transition
+  // Slide Change Animation — horizontal swipe transition
   useEffect(() => {
     if (!groupRef.current) return;
     if (prevSlideRef.current === currentSlide) return;
 
     const isNext = currentSlide > prevSlideRef.current || (prevSlideRef.current === 5 && currentSlide === 0);
-    const direction = isNext ? 1 : -1;
+    const isPrev = !isNext;
     prevSlideRef.current = currentSlide;
 
     const { x: baseCenterX, y: baseCenterY, scale: baseScale } = getResponsiveCoords();
 
-    // Quick scale-down + spin + scale-back for a snappy single-instance transition
+    // Exit direction: next = slide out left, prev = slide out right
+    const exitX = isNext ? baseCenterX - 3.5 : baseCenterX + 3.5;
+    // Enter direction: next = slide in from right, prev = slide in from left
+    const enterX = isNext ? baseCenterX + 3.5 : baseCenterX - 3.5;
+
+    gsap.killTweensOf(pos.current);
+
     gsap.timeline()
+      // Phase 1: Slide current model off-screen
       .to(pos.current, {
-        scale: baseScale * 0.7,
-        rotZ: direction * 0.12,
-        duration: 0.25,
+        x: exitX,
+        scale: baseScale * 0.6,
+        rotY: pos.current.rotY + (isNext ? -Math.PI * 0.5 : Math.PI * 0.5),
+        duration: 0.3,
         ease: 'power2.in',
+        onComplete: () => {
+          // Instantly reposition to the opposite side (off-screen)
+          pos.current.x = enterX;
+          pos.current.scale = baseScale * 0.6;
+        },
       })
+      // Phase 2: Slide new model in from the opposite side
       .to(pos.current, {
         x: baseCenterX,
         y: baseCenterY,
         scale: baseScale,
-        rotZ: 0,
-        rotY: pos.current.rotY + Math.PI * 2 * direction,
+        rotY: pos.current.rotY + Math.PI * 2 * (isNext ? 1 : -1),
         duration: 0.45,
         ease: 'power2.out',
       });
