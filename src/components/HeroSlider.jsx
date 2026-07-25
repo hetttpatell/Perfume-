@@ -4,7 +4,7 @@ import FragranceDetails from './FragranceDetails';
 import SensoryRitual from './SensoryRitual';
 import BrandStory from './BrandStory';
 import OlfactoryExperience from './OlfactoryExperience';
-import Navbar from './Navbar';
+import NavbarLoader from './navbarloader';
 import AccountModal from './AccountModal';
 import { SLIDES } from '../utils/slidesData';
 
@@ -226,7 +226,15 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
   );
 }
 
-export default function HeroSlider({ onReplayLoader, loaderState, onModelLoaded }) {
+export default function HeroSlider({
+  loaderKey,
+  loaderState,
+  isModelLoaded,
+  onModelLoaded,
+  onLoaderStartExit,
+  onLoaderComplete,
+  onReplayLoader,
+}) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slideDirection, setSlideDirection] = useState('next');
   const [displayedSlideIndex, setDisplayedSlideIndex] = useState(0);
@@ -556,11 +564,17 @@ export default function HeroSlider({ onReplayLoader, loaderState, onModelLoaded 
 
   return (
     <div className="w-full flex flex-col">
-      {/* Top Floating Luxury Navbar */}
-      <Navbar
+      {/* Top Floating Luxury Navbar & Smooth Loader */}
+      <NavbarLoader
+        key={loaderKey}
+        loaderState={loaderState}
+        isModelLoaded={isModelLoaded}
+        onStartExit={onLoaderStartExit}
+        onComplete={onLoaderComplete}
         cartCount={totalCartCount}
         onOpenCart={() => setIsCartOpen(true)}
         onOpenAccount={() => setIsAccountOpen(true)}
+        onReplayLoader={onReplayLoader}
       />
 
       {/* Account VIP Drawer Modal */}
