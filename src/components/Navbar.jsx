@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function Navbar({ cartCount = 0, onOpenCart, onOpenAccount }) {
+export default function Navbar({ loaderState, cartCount = 0, onOpenCart, onOpenAccount }) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isNavHidden, setIsNavHidden] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState('hero');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -15,11 +16,23 @@ export default function Navbar({ cartCount = 0, onOpenCart, onOpenAccount }) {
     { id: 'gallery', label: 'Gallery/FAQ', targetId: 'gallery' },
   ];
 
-  // Scroll listener for morphing pill & progress bar & active section observer
+  // Scroll listener for morphing pill, progress bar, active section observer & smart hide/show header
   useEffect(() => {
+    let lastScrollY = window.scrollY;
+
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       setIsScrolled(currentScrollY > 40);
+
+      // Smart header hide on scroll down, reveal on scroll up
+      if (currentScrollY <= 20) {
+        setIsNavHidden(false);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 60) {
+        setIsNavHidden(true);
+      } else if (currentScrollY < lastScrollY) {
+        setIsNavHidden(false);
+      }
+      lastScrollY = currentScrollY;
 
       // Total page scroll progress percentage
       const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
@@ -61,12 +74,20 @@ export default function Navbar({ cartCount = 0, onOpenCart, onOpenAccount }) {
     }
   };
 
+  const isNavVisible = loaderState === 'completed' || !loaderState;
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 flex justify-center pointer-events-none transition-all duration-300">
+    <header
+      className={`fixed top-0 left-0 right-0 z-40 flex justify-center pointer-events-none transition-all duration-500 ease-in-out ${
+        isNavHidden && !mobileMenuOpen
+          ? '-translate-y-full opacity-0'
+          : 'translate-y-0 opacity-100'
+      }`}
+    >
       <motion.nav
-        initial={{ y: -60, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        initial={{ opacity: 0 }}
+        animate={isNavVisible ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 0.1 }}
         className={`pointer-events-auto transition-all duration-500 relative flex items-center justify-between ${
           isScrolled
             ? 'mt-3 sm:mt-4 w-[94%] sm:w-[90%] max-w-6xl px-4 sm:px-6 py-2.5 sm:py-3 rounded-full bg-white/85 backdrop-blur-2xl shadow-[0_12px_40px_rgba(0,0,0,0.12)] border border-black/10 hover:border-[#C08A3E]/40'
@@ -113,7 +134,7 @@ export default function Navbar({ cartCount = 0, onOpenCart, onOpenAccount }) {
         {/* Mobile Hamburger Menu Toggle Button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="lg:hidden p-2 rounded-full bg-black/5 hover:bg-black/10 text-[#1A1A1A] transition-colors cursor-pointer"
+          className="lg:hidden p-1.5 sm:p-2 rounded-full text-[#1A1A1A] hover:bg-black/5 transition-colors cursor-pointer shrink-0"
           aria-label="Toggle Navigation Menu"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,35 +146,29 @@ export default function Navbar({ cartCount = 0, onOpenCart, onOpenAccount }) {
           </svg>
         </button>
 
-        {/* MIDDLE SECTION: Brand Logo & Title */}
+        {/* MIDDLE SECTION: Pure Luxury Typography */}
         <div
+          id="navbar-brand-title"
           onClick={() => scrollToSection('hero')}
-          className="flex items-center gap-2 sm:gap-2.5 cursor-pointer group select-none px-2"
+          className="flex flex-col items-center justify-center leading-none cursor-pointer group select-none px-1 sm:px-3 text-center shrink-0"
         >
-          {/* PERFUME Brand Monogram Emblem */}
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#1A1A1A] text-[#C08A3E] flex items-center justify-center font-serif text-sm font-bold shadow-sm group-hover:scale-105 group-hover:bg-black transition-all duration-300 border border-[#C08A3E]/40">
-            P
-          </div>
-
-          <div className="flex flex-col items-start leading-none">
-            <span className="font-serif font-light text-base sm:text-lg md:text-xl tracking-[0.25em] uppercase text-[#1A1A1A] group-hover:text-[#C08A3E] transition-colors duration-300 font-medium">
-              PERFUME
-            </span>
-            <span className="font-sans text-[8px] sm:text-[9px] uppercase tracking-[0.3em] text-[#737373] font-semibold -mt-0.5">
-              HAUTE PARFUMERIE
-            </span>
-          </div>
+          <span className="font-serif font-light text-base sm:text-xl md:text-2xl tracking-[0.22em] sm:tracking-[0.3em] uppercase text-[#1A1A1A] group-hover:text-[#C08A3E] transition-colors duration-300 font-medium">
+            PERFUME
+          </span>
+          <span className="font-sans text-[6.5px] sm:text-[8.5px] uppercase tracking-[0.3em] text-[#737373] font-semibold mt-0.5">
+            HAUTE PARFUMERIE
+          </span>
         </div>
 
         {/* RIGHT SECTION: E-Commerce Functionality (Account & Cart Bag) */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           {/* Account Button */}
           <button
             onClick={onOpenAccount}
-            className="px-3.5 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-[11px] font-sans font-semibold tracking-[0.18em] uppercase text-[#1A1A1A] bg-black/5 hover:bg-black hover:text-white rounded-full border border-black/15 transition-all duration-300 cursor-pointer flex items-center gap-1.5 shadow-xs active:scale-95"
+            className="p-1.5 sm:px-3.5 sm:py-2 text-[10px] sm:text-[11px] font-sans font-semibold tracking-[0.15em] uppercase text-[#1A1A1A] hover:text-[#C08A3E] sm:bg-black/5 sm:hover:bg-black sm:hover:text-white rounded-full sm:border sm:border-black/15 transition-all duration-300 cursor-pointer flex items-center gap-1.5 active:scale-95"
             aria-label="User Account"
           >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -161,13 +176,13 @@ export default function Navbar({ cartCount = 0, onOpenCart, onOpenAccount }) {
                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
               />
             </svg>
-            <span className="hidden xs:inline">ACCOUNT</span>
+            <span className="hidden sm:inline">ACCOUNT</span>
           </button>
 
           {/* Cart Bag Drawer Trigger */}
           <button
             onClick={onOpenCart}
-            className="px-4 sm:px-5 py-1.5 sm:py-2 text-[10px] sm:text-[11px] font-sans font-bold tracking-[0.2em] uppercase text-white bg-[#1A1A1A] hover:bg-black rounded-full transition-all duration-300 cursor-pointer flex items-center gap-2 shadow-md hover:shadow-lg active:scale-95 relative"
+            className="px-2.5 sm:px-4.5 py-1.5 sm:py-2 text-[9px] sm:text-[11px] font-sans font-bold tracking-[0.15em] sm:tracking-[0.2em] uppercase text-white bg-[#1A1A1A] hover:bg-black rounded-full transition-all duration-300 cursor-pointer flex items-center gap-1 sm:gap-2 shadow-xs active:scale-95 relative"
             aria-label="Open Shopping Cart Bag"
           >
             <svg className="w-3.5 h-3.5 text-[#C08A3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">

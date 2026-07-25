@@ -73,7 +73,7 @@ export default function BrandStory() {
         {/* ROW 1 — BLOCK 2: Editorial Text Block (Top Right) */}
         <div
           ref={block2Ref}
-          className="p-8 sm:p-12 md:p-14 lg:p-20 flex flex-col justify-center bg-[#FAFAFA] border-b border-black/10"
+          className="p-6 sm:p-8 md:p-10 lg:p-16 flex flex-col justify-center bg-[#FAFAFA] border-b border-black/10"
         >
           <div className="max-w-xl">
             <span className="font-sans text-xs uppercase tracking-[0.35em] text-[#737373] mb-4 block font-semibold">
@@ -112,7 +112,7 @@ export default function BrandStory() {
         {/* ROW 2 — BLOCK 3: Editorial Text Block (Bottom Left) */}
         <div
           ref={block3Ref}
-          className="p-8 sm:p-12 md:p-14 lg:p-20 flex flex-col justify-center bg-[#FAFAFA] border-b md:border-b-0 md:border-r border-black/10 order-2 md:order-1"
+          className="p-6 sm:p-8 md:p-10 lg:p-16 flex flex-col justify-center bg-[#FAFAFA] border-b md:border-b-0 md:border-r border-black/10 order-2 md:order-1"
         >
           <div className="max-w-xl">
             <span className="font-sans text-xs uppercase tracking-[0.35em] text-[#737373] mb-4 block font-semibold">

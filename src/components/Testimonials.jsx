@@ -276,14 +276,14 @@ export default function Testimonials() {
       {filteredTestimonials.length > 0 && activeTestimonial && (
         <div className="w-full">
           {/* Mobile & iPad (md) Adaptive Container */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 sm:gap-6 items-stretch mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 items-stretch mb-6">
             
-            {/* Main Featured Hero Testimonial Card (Full width on Mobile, 1-col on iPad, 8-cols on Desktop) */}
+            {/* Main Featured Hero Testimonial Card (Full width on Mobile, 7-cols on iPad, 8-cols on Desktop) */}
             <div
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
-              className="md:col-span-1 lg:col-span-8 bg-white border border-black/10 rounded-xl sm:rounded-2xl p-5 sm:p-7 md:p-8 lg:p-10 flex flex-col justify-between relative overflow-hidden shadow-xs select-none"
+              className="md:col-span-7 lg:col-span-8 bg-white border border-black/10 rounded-xl sm:rounded-2xl p-5 sm:p-7 md:p-8 lg:p-10 flex flex-col justify-between relative overflow-hidden shadow-xs select-none"
             >
               {/* Elegant Background Watermark Quote Symbol */}
               <span className="absolute -top-3 right-3 sm:-top-4 sm:right-4 text-[90px] sm:text-[120px] font-serif leading-none text-black/4 pointer-events-none">
@@ -358,7 +358,7 @@ export default function Testimonials() {
             </div>
 
             {/* Second Spotlight Preview Card on iPad (md) & Desktop (lg) */}
-            <div className="hidden md:flex lg:col-span-4 bg-white border border-black/10 rounded-xl sm:rounded-2xl p-6 sm:p-7 flex-col justify-between shadow-2xs">
+            <div className="hidden md:flex md:col-span-5 lg:col-span-4 bg-white border border-black/10 rounded-xl sm:rounded-2xl p-6 sm:p-7 flex-col justify-between shadow-2xs">
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-sans font-semibold tracking-[0.25em] text-[#C08A3E] uppercase">

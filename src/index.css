@@ -47,3 +47,31 @@ body {
   box-sizing: border-box;
   overflow-x: hidden;
 }
+
+/* Floating Fragrance Note Badges Animations */
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes floatReverse {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(10px); }
+}
+
+@keyframes floatDelayed {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+.animate-float-slow {
+  animation: floatSlow 4.2s ease-in-out infinite;
+}
+
+.animate-float-reverse {
+  animation: floatReverse 3.6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: floatDelayed 4.8s ease-in-out infinite;
+}

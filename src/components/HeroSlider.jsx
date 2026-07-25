@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import gsap from 'gsap';
-import Scene from './Scene';
 import FragranceDetails from './FragranceDetails';
 import SensoryRitual from './SensoryRitual';
 import BrandStory from './BrandStory';
@@ -9,8 +8,227 @@ import Navbar from './Navbar';
 import AccountModal from './AccountModal';
 import { SLIDES } from '../utils/slidesData';
 
+const HERO_SVG = '/SVGs/Perfume-SVG.png';
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Floating Fragrance Notes Badges Subcomponent
+// ──────────────────────────────────────────────────────────────────────────────
+function FloatingNotes({ slideData }) {
+  if (!slideData || !slideData.keyNotes) return null;
+  const notes = slideData.keyNotes;
+  const accent = slideData.accent || '#8A9A86';
+
+  return (
+    <>
+      {/* Floating Note 1 - Top Left (Lowered clear of watermark text) */}
+      {notes[0] && (
+        <div className="absolute top-[26%] -left-6 sm:-left-8 md:-left-12 lg:-left-16 z-20 animate-float-slow pointer-events-auto">
+          <div className="px-2 py-0.5 sm:px-3.5 sm:py-1.5 bg-white/85 backdrop-blur-md border border-white/90 rounded-full shadow-md shadow-black/5 flex items-center gap-1 sm:gap-2 transition-all duration-300 hover:scale-105 hover:bg-white/95">
+            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full animate-pulse shrink-0" style={{ backgroundColor: accent }} />
+            <span className="font-sans font-semibold text-[8px] sm:text-[10px] md:text-[11px] tracking-[0.12em] sm:tracking-[0.18em] uppercase text-[#1A1A1A] whitespace-nowrap">
+              {notes[0]}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Note 2 - Middle Right (Pushed out into wide right margin) */}
+      {notes[1] && (
+        <div className="absolute top-[42%] -right-6 sm:-right-8 md:-right-12 lg:-right-16 z-20 animate-float-reverse pointer-events-auto">
+          <div className="px-2 py-0.5 sm:px-3.5 sm:py-1.5 bg-white/85 backdrop-blur-md border border-white/90 rounded-full shadow-md shadow-black/5 flex items-center gap-1 sm:gap-2 transition-all duration-300 hover:scale-105 hover:bg-white/95">
+            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full animate-pulse shrink-0" style={{ backgroundColor: accent }} />
+            <span className="font-sans font-semibold text-[8px] sm:text-[10px] md:text-[11px] tracking-[0.12em] sm:tracking-[0.18em] uppercase text-[#1A1A1A] whitespace-nowrap">
+              {notes[1]}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Note 3 - Bottom Left (Pushed out into wide left margin) */}
+      {notes[2] && (
+        <div className="absolute bottom-[6%] -left-5 sm:-left-7 md:-left-10 lg:-left-14 z-20 animate-float-delayed pointer-events-auto">
+          <div className="px-2 py-0.5 sm:px-3.5 sm:py-1.5 bg-white/85 backdrop-blur-md border border-white/90 rounded-full shadow-md shadow-black/5 flex items-center gap-1 sm:gap-2 transition-all duration-300 hover:scale-105 hover:bg-white/95">
+            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full animate-pulse shrink-0" style={{ backgroundColor: accent }} />
+            <span className="font-sans font-semibold text-[8px] sm:text-[10px] md:text-[11px] tracking-[0.12em] sm:tracking-[0.18em] uppercase text-[#1A1A1A] whitespace-nowrap">
+              {notes[2]}
+            </span>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// SVG Product Image Hero Component - Clean Presentation with Responsive Motion
+// ──────────────────────────────────────────────────────────────────────────────
+function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirection }) {
+  const currentBottleRef = useRef(null);
+  const incomingBottleRef = useRef(null);
+  const activeSlideRef = useRef(currentSlide);
+  const [currentSlideIdx, setCurrentSlideIdx] = useState(currentSlide);
+  const [incomingSlideIdx, setIncomingSlideIdx] = useState(currentSlide);
+
+  // Notify parent component that asset is ready
+  useEffect(() => {
+    if (onModelLoaded) {
+      onModelLoaded();
+    }
+  }, [onModelLoaded]);
+
+  useEffect(() => {
+    if (activeSlideRef.current === currentSlide) return;
+
+    setIncomingSlideIdx(currentSlide);
+
+    const isNext = slideDirection === 'next';
+    const isMobile = window.innerWidth < 768;
+
+    const currentEl = currentBottleRef.current;
+    const incomingEl = incomingBottleRef.current;
+
+    if (currentEl && incomingEl) {
+      if (isMobile) {
+        // Mobile horizontal slide animation:
+        // isNext: current product goes left out of screen (-100vw), incoming product enters from right (100vw)
+        // isPrev: current product goes right out of screen (100vw), incoming product enters from left (-100vw)
+        const exitX = isNext ? '-100vw' : '100vw';
+        const entryX = isNext ? '100vw' : '-100vw';
+
+        gsap.set(incomingEl, {
+          x: entryX,
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          display: 'flex',
+        });
+
+        gsap.set(currentEl, {
+          x: 0,
+          y: 0,
+          opacity: 1,
+          scale: 1,
+        });
+
+        const tl = gsap.timeline({
+          onComplete: () => {
+            activeSlideRef.current = currentSlide;
+            setCurrentSlideIdx(currentSlide);
+            // Snap current bottle back to center x: 0, y: 0
+            gsap.set(currentEl, { x: 0, y: 0, opacity: 1, scale: 1 });
+            // Hide temporary incoming bottle off-screen
+            gsap.set(incomingEl, { display: 'none', x: entryX, y: 0 });
+          },
+        });
+
+        tl.to(currentEl, {
+          x: exitX,
+          duration: 0.7,
+          ease: 'power2.inOut',
+          force3D: true,
+        }, 0);
+
+        tl.to(incomingEl, {
+          x: 0,
+          duration: 0.7,
+          ease: 'power2.inOut',
+          force3D: true,
+        }, 0);
+      } else {
+        // Desktop & iPad vertical slide animation along single vertical line
+        const exitY = isNext ? '-110vh' : '110vh';
+        const entryY = isNext ? '110vh' : '-110vh';
+
+        gsap.set(incomingEl, {
+          x: 0,
+          y: entryY,
+          opacity: 1,
+          scale: 1,
+          display: 'flex',
+        });
+
+        gsap.set(currentEl, {
+          x: 0,
+          y: 0,
+          opacity: 1,
+          scale: 1,
+        });
+
+        const tl = gsap.timeline({
+          onComplete: () => {
+            activeSlideRef.current = currentSlide;
+            setCurrentSlideIdx(currentSlide);
+            // Snap current bottle back to center y: 0
+            gsap.set(currentEl, { x: 0, y: 0, opacity: 1, scale: 1 });
+            // Hide temporary incoming bottle off-screen
+            gsap.set(incomingEl, { display: 'none', x: 0, y: entryY });
+          },
+        });
+
+        tl.to(currentEl, {
+          y: exitY,
+          duration: 0.8,
+          ease: 'power2.inOut',
+          force3D: true,
+        }, 0);
+
+        tl.to(incomingEl, {
+          y: 0,
+          duration: 0.8,
+          ease: 'power2.inOut',
+          force3D: true,
+        }, 0);
+      }
+    } else {
+      activeSlideRef.current = currentSlide;
+      setCurrentSlideIdx(currentSlide);
+    }
+  }, [currentSlide, slideDirection]);
+
+  const currentData = SLIDES[currentSlideIdx] || SLIDES[0];
+  const incomingData = SLIDES[incomingSlideIdx] || SLIDES[0];
+
+  return (
+    <div className="relative w-full h-full flex items-center justify-center pointer-events-none select-none">
+      {/* Active Product Flacon */}
+      <div
+        ref={currentBottleRef}
+        className="absolute inset-0 flex flex-col items-center justify-center max-w-[250px] sm:max-w-[280px] md:max-w-[340px] lg:max-w-[380px] w-full mx-auto will-change-transform pt-14 sm:pt-16 md:pt-0"
+      >
+        <FloatingNotes slideData={currentData} />
+        <img
+          src={HERO_SVG}
+          alt="Chanel N°19 Perfume Flacon"
+          className="w-auto h-[36vh] sm:h-[42vh] md:h-[50vh] lg:h-[58vh] max-h-[620px] object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.18)] select-none pointer-events-none"
+          draggable={false}
+        />
+        {/* Contact Shadow */}
+        <div className="w-3/5 h-4 sm:h-5 bg-black/20 rounded-[100%] blur-md -mt-2 sm:-mt-4 pointer-events-none select-none opacity-30" />
+      </div>
+
+      {/* Incoming Product Flacon */}
+      <div
+        ref={incomingBottleRef}
+        style={{ display: 'none' }}
+        className="absolute inset-0 flex flex-col items-center justify-center max-w-[250px] sm:max-w-[280px] md:max-w-[340px] lg:max-w-[380px] w-full mx-auto will-change-transform pt-14 sm:pt-16 md:pt-0"
+      >
+        <FloatingNotes slideData={incomingData} />
+        <img
+          src={HERO_SVG}
+          alt="Chanel N°19 Perfume Flacon"
+          className="w-auto h-[36vh] sm:h-[42vh] md:h-[50vh] lg:h-[58vh] max-h-[620px] object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.18)] select-none pointer-events-none"
+          draggable={false}
+        />
+        {/* Contact Shadow */}
+        <div className="w-3/5 h-4 sm:h-5 bg-black/20 rounded-[100%] blur-md -mt-2 sm:-mt-4 pointer-events-none select-none opacity-30" />
+      </div>
+    </div>
+  );
+}
+
 export default function HeroSlider({ onReplayLoader, loaderState, onModelLoaded }) {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [slideDirection, setSlideDirection] = useState('next');
   const [displayedSlideIndex, setDisplayedSlideIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showDetailsPage, setShowDetailsPage] = useState(false);
@@ -184,7 +402,11 @@ export default function HeroSlider({ onReplayLoader, loaderState, onModelLoaded 
       if (isTransitioning || targetIndex === currentSlide) return;
       if (targetIndex < 0 || targetIndex >= SLIDES.length) return;
 
-      const isNext = targetIndex > currentSlide || (currentSlide === SLIDES.length - 1 && targetIndex === 0);
+      const isNext = targetIndex > currentSlide 
+        ? (currentSlide === 0 && targetIndex === SLIDES.length - 1 ? false : true)
+        : (currentSlide === SLIDES.length - 1 && targetIndex === 0 ? true : false);
+
+      setSlideDirection(isNext ? 'next' : 'prev');
       setIsTransitioning(true);
       setCurrentSlide(targetIndex);
 
@@ -276,11 +498,13 @@ export default function HeroSlider({ onReplayLoader, loaderState, onModelLoaded 
   );
 
   const handleNext = useCallback(() => {
+    setSlideDirection('next');
     const nextIndex = (currentSlide + 1) % SLIDES.length;
     goToSlide(nextIndex);
   }, [currentSlide, goToSlide]);
 
   const handlePrev = useCallback(() => {
+    setSlideDirection('prev');
     const prevIndex = (currentSlide - 1 + SLIDES.length) % SLIDES.length;
     goToSlide(prevIndex);
   }, [currentSlide, goToSlide]);
@@ -357,23 +581,35 @@ export default function HeroSlider({ onReplayLoader, loaderState, onModelLoaded 
         aria-label="Chanel N°19 Interactive Fragrance Showcase"
       >
         {/* Large Background Watermark Text */}
-        <div className="absolute inset-0 pointer-events-none z-0 flex items-start pt-6 sm:pt-8 md:items-center md:pt-0 justify-center md:justify-end md:pl-0 md:pr-8 lg:pr-12 overflow-hidden select-none">
+        <div className="absolute inset-0 pointer-events-none z-0 flex items-start pt-24 sm:pt-28 md:items-center md:pt-0 justify-center md:justify-end md:pl-0 md:pr-8 lg:pr-12 overflow-hidden select-none">
           <h1
             ref={watermarkRef}
-            className="font-serif font-extrabold text-[15vw] sm:text-[14vw] md:text-[11vw] lg:text-[13vw] xl:text-[15vw] leading-none text-black/45 sm:text-black/50 md:text-black/35 lg:text-black/22 tracking-tighter uppercase whitespace-nowrap will-change-transform"
+            className="font-serif font-extrabold text-[15vw] sm:text-[14vw] md:text-[11vw] lg:text-[13vw] xl:text-[15vw] leading-none text-black/20 sm:text-black/30 md:text-black/35 lg:text-black/22 tracking-tighter uppercase whitespace-nowrap will-change-transform"
           >
             {activeSlideData.shortTitle}
           </h1>
         </div>
 
-        {/* 3D WebGL Canvas Layer */}
-        <Scene currentSlide={currentSlide} slideData={SLIDES[currentSlide]} loaderState={loaderState} onModelLoaded={onModelLoaded} />
+        {/* ──────────────────────────────────────────────────────────── */}
+        {/* 3D WebGL Canvas Layer — COMMENTED OUT (client requested     */}
+        {/* SVG product image). Uncomment below + the Scene import      */}
+        {/* at top of file to restore the WebGL 3D model.               */}
+        {/* ──────────────────────────────────────────────────────────── */}
+        {/* <Scene currentSlide={currentSlide} slideData={SLIDES[currentSlide]} loaderState={loaderState} onModelLoaded={onModelLoaded} /> */}
 
         {/* Main Split Screen Content Area */}
-        <div className="relative z-10 w-full flex-1 max-w-7xl mx-auto px-4 sm:px-8 md:px-10 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-6 md:gap-6 pt-3 sm:pt-6 md:pt-16 pb-4 sm:pb-6 md:pb-12 pointer-events-none">
+        <div className="relative z-10 w-full flex-1 max-w-7xl mx-auto px-4 sm:px-8 md:px-10 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8 md:gap-6 pt-20 sm:pt-24 md:pt-28 lg:pt-20 pb-4 sm:pb-6 md:pb-10 pointer-events-none">
 
-          {/* Dynamic 3D Model Spacer Area on Mobile (order-first), Right Panel on iPad/Desktop (order-last) */}
-          <div className="w-full md:w-[46%] lg:w-[54%] h-[28vh] min-h-[170px] max-h-[240px] sm:h-[220px] md:h-full pointer-events-none order-first md:order-last shrink-0" />
+          {/* Right Product Showcase Panel (Scoped strictly to right side of Hero) */}
+          <div className="relative w-full md:w-[46%] lg:w-[54%] h-[40vh] min-h-[260px] sm:h-[46vh] md:h-[65vh] flex items-center justify-center pointer-events-auto order-first md:order-last shrink-0 overflow-visible">
+            <HeroProductImage
+              loaderState={loaderState}
+              onModelLoaded={onModelLoaded}
+              currentSlide={currentSlide}
+              isTransitioning={isTransitioning}
+              slideDirection={slideDirection}
+            />
+          </div>
 
           {/* Editorial Content Panel (order-last on mobile centered under 3D model, order-first on desktop/iPad) */}
           <div className="w-full md:w-[54%] lg:w-[46%] flex flex-col items-center md:items-start text-center md:text-left justify-center gap-3 sm:gap-5 md:gap-6 pointer-events-auto order-last md:order-first px-1 md:px-0">
@@ -414,11 +650,11 @@ export default function HeroSlider({ onReplayLoader, loaderState, onModelLoaded 
             </p>
 
             {/* Key Notes Badges */}
-            <div ref={notesBadgeRef} className="flex flex-wrap justify-center md:justify-start gap-1.5 sm:gap-2 pt-0.5">
+            <div ref={notesBadgeRef} className="flex flex-wrap justify-center md:justify-start gap-1 sm:gap-2 pt-0.5">
               {activeSlideData.keyNotes.map((note, idx) => (
                 <span
                   key={idx}
-                  className="px-2.5 py-1 sm:px-3.5 sm:py-1.5 text-[9px] sm:text-[11px] font-sans font-medium tracking-wider uppercase bg-black/5 text-[#1A1A1A] rounded-full border border-black/10 shadow-2xs"
+                  className="px-2 py-0.5 sm:px-3 sm:py-1 text-[8.5px] sm:text-[10px] font-sans font-medium tracking-widest uppercase bg-black/5 text-[#4A4A4A] rounded-full border border-black/10"
                 >
                   {note}
                 </span>
@@ -426,13 +662,13 @@ export default function HeroSlider({ onReplayLoader, loaderState, onModelLoaded 
             </div>
 
             {/* Action CTA Buttons */}
-            <div ref={actionBtnRef} className="flex flex-wrap justify-center md:justify-start items-center gap-2 sm:gap-3 pt-1 sm:pt-2">
+            <div ref={actionBtnRef} className="flex flex-wrap justify-center md:justify-start items-center gap-1.5 sm:gap-3 pt-1">
               <button
                 onClick={handleNext}
-                className="px-5 sm:px-7 py-3 sm:py-3.5 text-[11px] sm:text-xs font-sans font-semibold tracking-[0.25em] uppercase text-white bg-[#1A1A1A] rounded-full hover:bg-black hover:shadow-lg hover:shadow-black/10 hover:scale-[1.02] transition-all duration-300 cursor-pointer active:scale-95 flex items-center gap-2 min-h-[44px]"
+                className="px-3.5 sm:px-6 py-2 sm:py-3 text-[10px] sm:text-xs font-sans font-semibold tracking-[0.2em] uppercase text-white bg-[#1A1A1A] rounded-full hover:bg-black hover:shadow-md transition-all duration-300 cursor-pointer active:scale-95 flex items-center gap-1.5 min-h-[36px] sm:min-h-[42px]"
               >
                 <span>{currentSlide === SLIDES.length - 1 ? 'REPLAY STORY' : 'NEXT NOTE'}</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </button>
@@ -440,10 +676,10 @@ export default function HeroSlider({ onReplayLoader, loaderState, onModelLoaded 
               {/* Separate Page Details CTA Button */}
               <button
                 onClick={() => setShowDetailsPage(true)}
-                className="px-4 sm:px-6 py-3 sm:py-3.5 text-[11px] sm:text-xs font-sans font-semibold tracking-[0.25em] uppercase text-[#1A1A1A] bg-white border border-black/20 rounded-full hover:bg-black/5 hover:border-black/50 transition-all duration-300 cursor-pointer active:scale-95 flex items-center gap-2 shadow-xs min-h-[44px]"
+                className="px-3 sm:px-5 py-2 sm:py-3 text-[10px] sm:text-xs font-sans font-semibold tracking-[0.2em] uppercase text-[#1A1A1A] bg-white/90 border border-black/20 rounded-full hover:bg-black/5 transition-all duration-300 cursor-pointer active:scale-95 flex items-center gap-1.5 shadow-2xs min-h-[36px] sm:min-h-[42px]"
               >
                 <span>EXPLORE DETAILS</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -454,30 +690,30 @@ export default function HeroSlider({ onReplayLoader, loaderState, onModelLoaded 
         {/* Minimal High-Fashion Bottom Navigation Bar */}
         <footer
           ref={stepperBarRef}
-          className="relative z-20 w-full px-4 sm:px-8 md:px-12 py-3 sm:py-4 bg-gradient-to-t from-white/95 via-white/70 to-transparent flex items-center justify-center md:justify-end border-t border-black/5"
+          className="relative z-20 w-full px-4 sm:px-8 md:px-12 py-2 sm:py-3.5 bg-gradient-to-t from-white/95 via-white/70 to-transparent flex items-center justify-center md:justify-end border-t border-black/5"
         >
           {/* Directional Controls & Counter */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button
               onClick={handlePrev}
               aria-label="Previous Fragrance Step"
-              className="p-3 rounded-full border border-black/20 hover:border-black/60 hover:bg-black/5 hover:scale-105 transition-all duration-300 cursor-pointer active:scale-95 text-[#1A1A1A] shadow-xs min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="p-2 sm:p-2.5 rounded-full border border-black/20 hover:border-black/60 hover:bg-black/5 transition-all duration-300 cursor-pointer active:scale-95 text-[#1A1A1A] min-w-[36px] min-h-[36px] sm:min-w-[42px] sm:min-h-[42px] flex items-center justify-center"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
 
-            <span className="font-sans text-xs tracking-[0.2em] font-semibold text-[#1A1A1A] px-0.5">
+            <span className="font-sans text-[11px] sm:text-xs tracking-[0.2em] font-semibold text-[#1A1A1A] px-1">
               {activeSlideData.id} / 0{SLIDES.length}
             </span>
 
             <button
               onClick={handleNext}
               aria-label="Next Fragrance Step"
-              className="p-3 rounded-full border border-black/20 hover:border-black/60 hover:bg-black/5 hover:scale-105 transition-all duration-300 cursor-pointer active:scale-95 text-[#1A1A1A] shadow-xs min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="p-2 sm:p-2.5 rounded-full border border-black/20 hover:border-black/60 hover:bg-black/5 transition-all duration-300 cursor-pointer active:scale-95 text-[#1A1A1A] min-w-[36px] min-h-[36px] sm:min-w-[42px] sm:min-h-[42px] flex items-center justify-center"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>

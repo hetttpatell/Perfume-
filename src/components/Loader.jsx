@@ -6,6 +6,9 @@ const BRAND = ['P', 'E', 'R', 'F', 'U', 'M', 'E'];
 const Loader = ({ onStartExit, onComplete, isModelLoaded = false }) => {
   const containerRef = useRef(null);
   const counterRef = useRef(null);
+  const brandGroupRef = useRef(null);
+  const leftNavRef = useRef(null);
+  const rightNavRef = useRef(null);
   const letterRefs = useRef([]);
   const mainTlRef = useRef(null);
 
@@ -32,7 +35,7 @@ const Loader = ({ onStartExit, onComplete, isModelLoaded = false }) => {
   useEffect(() => {
     document.body.style.overflow = 'hidden';
 
-    // Force GPU hardware acceleration layer promotion
+    // Force GPU acceleration layer promotion
     letterRefs.current.forEach((el) => {
       if (el) {
         gsap.set(el, {
@@ -53,12 +56,31 @@ const Loader = ({ onStartExit, onComplete, isModelLoaded = false }) => {
       });
     }
 
+    if (leftNavRef.current) {
+      gsap.set(leftNavRef.current, { opacity: 0, x: -20 });
+    }
+
+    if (rightNavRef.current) {
+      gsap.set(rightNavRef.current, { opacity: 0, x: 20 });
+    }
+
     if (containerRef.current) {
       gsap.set(containerRef.current, {
         force3D: true,
-        z: 0.01,
-        yPercent: 0,
-        willChange: 'transform',
+        position: 'fixed',
+        top: 0,
+        left: '50%',
+        xPercent: -50,
+        width: '100vw',
+        height: '100vh',
+        maxWidth: '100vw',
+        borderRadius: '0px',
+        backgroundColor: '#FAFAFA',
+        border: '0px solid transparent',
+        boxShadow: 'none',
+        margin: 0,
+        padding: '1.25rem 2.5rem',
+        willChange: 'transform, width, height, border-radius, top, margin, background-color',
       });
     }
 
@@ -132,7 +154,7 @@ const Loader = ({ onStartExit, onComplete, isModelLoaded = false }) => {
       {
         opacity: 0,
         y: -15,
-        duration: 0.5,
+        duration: 0.4,
         ease: 'power2.out',
         force3D: true,
       },
@@ -145,27 +167,84 @@ const Loader = ({ onStartExit, onComplete, isModelLoaded = false }) => {
         if (onStartExitRef.current) onStartExitRef.current();
       },
       [],
-      2.7
+      2.6
     );
 
-    // 7. Grand Curtain lifts UP with a luxurious, silky-smooth 2.0s ease (keeping text intact)
+    // 7. Morphing Transformation: Full screen loader physically contracts into top navbar pill!
+    const isMobile = window.innerWidth < 640;
+    const targetWidth = isMobile ? '94vw' : '90vw';
+    const targetMaxWidth = '1152px'; // max-w-6xl
+    const targetHeight = isMobile ? '52px' : '62px';
+    const targetTop = isMobile ? '12px' : '16px';
+    const targetScale = Math.max(0.14, 22 / (window.innerWidth * 0.11));
+
+    // Shrink full-screen container into floating glass pill header
     mainTl.to(
       containerRef.current,
       {
-        yPercent: -100,
-        duration: 2.0,
+        top: targetTop,
+        height: targetHeight,
+        width: targetWidth,
+        maxWidth: targetMaxWidth,
+        borderRadius: '9999px',
+        backgroundColor: 'rgba(255, 255, 255, 0.88)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid rgba(0, 0, 0, 0.1)',
+        boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)',
+        padding: isMobile ? '0.5rem 1rem' : '0.75rem 1.5rem',
+        duration: 1.5,
         ease: 'power3.inOut',
         force3D: true,
-        onComplete: () => {
-          document.body.style.overflow = '';
-          if (containerRef.current) {
-            gsap.set(containerRef.current, { clearProps: 'willChange' });
-          }
-          if (onCompleteRef.current) onCompleteRef.current();
-        },
       },
-      2.7
+      2.6
     );
+
+    // Scale PERFUME letters smoothly down to title size while flexbox centers it inside shrinking pill
+    if (brandGroupRef.current) {
+      mainTl.to(
+        brandGroupRef.current,
+        {
+          scale: targetScale,
+          gap: '0.12vw',
+          duration: 1.5,
+          ease: 'power3.inOut',
+          force3D: true,
+        },
+        2.6
+      );
+    }
+
+    // Fade in Left links and Right e-commerce controls right inside the morphing container
+    if (leftNavRef.current) {
+      mainTl.to(
+        leftNavRef.current,
+        {
+          opacity: 1,
+          x: 0,
+          duration: 0.8,
+          ease: 'power2.out',
+        },
+        3.0
+      );
+    }
+
+    if (rightNavRef.current) {
+      mainTl.to(
+        rightNavRef.current,
+        {
+          opacity: 1,
+          x: 0,
+          duration: 0.8,
+          ease: 'power2.out',
+          onComplete: () => {
+            document.body.style.overflow = '';
+            if (onCompleteRef.current) onCompleteRef.current();
+          },
+        },
+        3.0
+      );
+    }
 
     // Safety fallback (10s max) to guarantee exit if model fails to load
     const safetyTimeout = setTimeout(() => {
@@ -184,25 +263,46 @@ const Loader = ({ onStartExit, onComplete, isModelLoaded = false }) => {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-surface-base transform-gpu"
+      className="fixed z-50 flex items-center justify-between transform-gpu pointer-events-none select-none"
       style={{
-        willChange: 'transform',
+        willChange: 'transform, width, height, border-radius, top, background-color',
         backfaceVisibility: 'hidden',
         WebkitBackfaceVisibility: 'hidden',
       }}
     >
-      <div className="flex items-end gap-[0.4vw] sm:gap-[0.6vw] md:gap-[0.8vw]">
+      {/* Left Navigation Placeholder */}
+      <div ref={leftNavRef} className="hidden lg:flex items-center gap-1 xl:gap-2">
+        <span className="px-3 py-1.5 text-[11px] xl:text-[12px] font-sans font-medium tracking-[0.12em] uppercase text-[#555555]">
+          Homepage
+        </span>
+        <span className="px-3 py-1.5 text-[11px] xl:text-[12px] font-sans font-medium tracking-[0.12em] uppercase text-[#555555]">
+          About
+        </span>
+        <span className="px-3 py-1.5 text-[11px] xl:text-[12px] font-sans font-medium tracking-[0.12em] uppercase text-[#555555]">
+          Services/Products
+        </span>
+        <span className="px-3 py-1.5 text-[11px] xl:text-[12px] font-sans font-medium tracking-[0.12em] uppercase text-[#555555]">
+          Contact
+        </span>
+        <span className="px-3 py-1.5 text-[11px] xl:text-[12px] font-sans font-medium tracking-[0.12em] uppercase text-[#555555]">
+          Gallery/FAQ
+        </span>
+      </div>
+
+      {/* Center PERFUME Brand Group */}
+      <div
+        ref={brandGroupRef}
+        className="flex items-center justify-center gap-[0.4vw] sm:gap-[0.6vw] md:gap-[0.8vw] transform-gpu will-change-transform mx-auto"
+      >
         {BRAND.map((char, i) => (
           <div
             key={i}
-            className="overflow-hidden leading-none py-1 transform-gpu"
-            style={{
-              contain: 'paint',
-            }}
+            className="overflow-hidden leading-none py-1 transform-gpu flex items-center justify-center"
+            style={{ contain: 'paint' }}
           >
             <span
               ref={(el) => setLetterRef(el, i)}
-              className="block font-serif font-light text-text-primary leading-[0.85] select-none text-[13vw] sm:text-[11vw] md:text-[12vw] transform-gpu"
+              className="block font-serif font-light text-[#1A1A1A] leading-[0.85] select-none text-[13vw] sm:text-[11vw] md:text-[12vw] tracking-wider transform-gpu"
               style={{
                 backfaceVisibility: 'hidden',
                 WebkitBackfaceVisibility: 'hidden',
@@ -214,9 +314,36 @@ const Loader = ({ onStartExit, onComplete, isModelLoaded = false }) => {
         ))}
       </div>
 
+      {/* Right E-Commerce Controls Placeholder */}
+      <div ref={rightNavRef} className="flex items-center gap-2 sm:gap-3">
+        <div className="px-3.5 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-[11px] font-sans font-semibold tracking-[0.18em] uppercase text-[#1A1A1A] bg-black/5 rounded-full border border-black/15 flex items-center gap-1.5">
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            />
+          </svg>
+          <span className="hidden xs:inline">ACCOUNT</span>
+        </div>
+        <div className="px-4 sm:px-5 py-1.5 sm:py-2 text-[10px] sm:text-[11px] font-sans font-bold tracking-[0.2em] uppercase text-white bg-[#1A1A1A] rounded-full flex items-center gap-2 shadow-md">
+          <svg className="w-3.5 h-3.5 text-[#C08A3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.8}
+              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+            />
+          </svg>
+          <span>BAG (0)</span>
+        </div>
+      </div>
+
+      {/* Numerical Counter */}
       <div
         ref={counterRef}
-        className="absolute font-sans font-light text-text-secondary tracking-[0.25em] pointer-events-none tabular-nums text-xs bottom-8 sm:text-sm sm:bottom-10 md:text-base md:bottom-12 transform-gpu"
+        className="absolute font-sans font-light text-[#737373] tracking-[0.25em] pointer-events-none tabular-nums text-xs bottom-8 sm:text-sm sm:bottom-10 md:text-base md:bottom-12 transform-gpu left-1/2 -translate-x-1/2"
         style={{
           backfaceVisibility: 'hidden',
           WebkitBackfaceVisibility: 'hidden',
