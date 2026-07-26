@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { motion, AnimatePresence } from 'framer-motion';
+import logoImg from '../assets/Logo.png';
 
-const BRAND = ['P', 'E', 'R', 'F', 'U', 'M', 'E'];
+const BRAND = ['L', 'U', 'N', 'E'];
 
 const navLinks = [
   { id: 'hero', label: 'Homepage', targetId: 'hero' },
@@ -350,9 +351,9 @@ export default function NavbarLoader({
 
             <span
               ref={subTitleRef}
-              className="font-sans text-[8px] sm:text-[10px] uppercase tracking-[0.35em] text-[#737373] font-semibold mt-2 block"
+              className="font-sans text-[8px] sm:text-[10px] uppercase tracking-[0.45em] text-[#737373] font-bold mt-3 block"
             >
-              HAUTE PARFUMERIE
+              FRAGRANCE
             </span>
           </div>
 
@@ -376,8 +377,8 @@ export default function NavbarLoader({
           ref={navContentRef}
           className={`pointer-events-auto transition-all duration-500 flex items-center justify-between select-none ${
             isScrolled
-              ? 'mt-3 sm:mt-4 w-[94%] sm:w-[90%] max-w-6xl px-4 sm:px-6 py-2.5 sm:py-3 rounded-full bg-white/85 backdrop-blur-2xl shadow-[0_12px_40px_rgba(0,0,0,0.12)] border border-black/10 hover:border-[#C08A3E]/40'
-              : 'w-full max-w-7xl px-5 sm:px-10 py-4 sm:py-6 bg-gradient-to-b from-white/90 via-white/40 to-transparent border-b border-transparent'
+              ? 'mt-2 sm:mt-3.5 w-[94%] sm:w-[90%] max-w-6xl px-3.5 sm:px-6 py-1.5 sm:py-2.5 rounded-full bg-white/95 backdrop-blur-2xl shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-black/10'
+              : 'w-full max-w-7xl px-3 sm:px-6 md:px-8 py-2.5 sm:py-4 bg-gradient-to-b from-white/95 via-white/60 to-transparent border-b border-transparent'
           }`}
         >
           {/* Scroll Progress Gold Line (Scrolled Pill Mode) */}
@@ -421,56 +422,52 @@ export default function NavbarLoader({
             {/* Mobile Hamburger Toggle Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-1.5 sm:p-2 rounded-full text-[#1A1A1A] hover:bg-black/5 transition-colors cursor-pointer shrink-0"
+              className="lg:hidden p-1.5 sm:p-2 rounded-full text-[#111111] hover:bg-black/5 transition-colors cursor-pointer shrink-0 flex items-center justify-center border border-black/10"
               aria-label="Toggle Navigation Menu"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {mobileMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M6 18L18 6M6 6l12 12" />
                 ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 6h16M4 12h16M4 18h16" />
                 )}
               </svg>
             </button>
           </div>
 
-          {/* CENTER SECTION: Navbar Brand Title */}
+          {/* CENTER SECTION: Official Brand Logo Image (Perfectly Balanced) */}
           <div
             onClick={() => scrollToSection('hero')}
-            className="flex flex-col items-center justify-center cursor-pointer group select-none text-center shrink-0 px-1 sm:px-3"
+            className="flex items-center justify-center cursor-pointer group select-none px-3.5 sm:px-5 shrink-0 overflow-visible py-1"
           >
-            <span className="font-serif font-light text-base sm:text-xl md:text-2xl tracking-[0.22em] sm:tracking-[0.3em] uppercase text-[#1A1A1A] group-hover:text-[#C08A3E] transition-colors duration-300 font-medium">
-              PERFUME
-            </span>
-            <span className="font-sans text-[6.5px] sm:text-[8.5px] uppercase tracking-[0.3em] text-[#737373] font-semibold mt-0.5">
-              HAUTE PARFUMERIE
-            </span>
+            <img
+              src={logoImg}
+              alt="LUNE Fragrance Logo"
+              className="h-10 sm:h-12 md:h-14 max-h-[60px] w-auto object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-[2.75] scale-[2.05] sm:scale-[2.35] md:scale-[2.65] origin-center"
+            />
           </div>
 
-          {/* RIGHT SECTION: Account & Cart Bag Buttons */}
-          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          {/* RIGHT SECTION: Minimal Luxury Bag & Desktop Account */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Account Button — Desktop Only (Hover turns button black and text white) */}
             <button
               onClick={onOpenAccount}
-              className="p-1.5 sm:px-3.5 sm:py-2 text-[10px] sm:text-[11px] font-sans font-semibold tracking-[0.15em] uppercase text-[#1A1A1A] hover:text-[#C08A3E] sm:bg-black/5 sm:hover:bg-black sm:hover:text-white rounded-full sm:border sm:border-black/15 transition-all duration-300 cursor-pointer flex items-center gap-1.5 active:scale-95"
+              className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full text-[#111111] hover:bg-[#111111] hover:text-white transition-all duration-200 cursor-pointer active:scale-95 group"
               aria-label="User Account"
             >
-              <svg className="w-4 h-4 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                />
-              </svg>
-              <span className="hidden sm:inline">ACCOUNT</span>
+              <div className="w-5 h-5 rounded-full bg-[#111111] group-hover:bg-white text-white group-hover:text-[#111111] font-serif font-extrabold text-[10px] flex items-center justify-center transition-colors duration-200 shadow-xs">
+                E
+              </div>
+              <span className="font-sans font-extrabold text-xs tracking-[0.18em] uppercase">ACCOUNT</span>
             </button>
 
+            {/* Bag Icon + Number — Hover turns button black and text white */}
             <button
               onClick={onOpenCart}
-              className="px-2.5 sm:px-4.5 py-1.5 sm:py-2 text-[9px] sm:text-[11px] font-sans font-bold tracking-[0.15em] sm:tracking-[0.2em] uppercase text-white bg-[#1A1A1A] hover:bg-black rounded-full transition-all duration-300 cursor-pointer flex items-center gap-1 sm:gap-2 shadow-xs active:scale-95 relative"
+              className="px-2.5 sm:px-3 py-1.5 rounded-full text-[#111111] hover:bg-[#111111] hover:text-white transition-all duration-200 cursor-pointer flex items-center gap-1.5 active:scale-95 relative group"
               aria-label="Open Shopping Cart Bag"
             >
-              <svg className="w-3.5 h-3.5 text-[#C08A3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4.5 h-4.5 text-[#111111] group-hover:text-white transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -478,10 +475,9 @@ export default function NavbarLoader({
                   d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
                 />
               </svg>
-              <span>BAG ({cartCount})</span>
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#C08A3E] rounded-full animate-ping" />
-              )}
+              <span className="font-sans font-extrabold text-xs sm:text-sm text-[#111111] group-hover:text-white transition-colors duration-200">
+                {cartCount}
+              </span>
             </button>
           </div>
         </nav>

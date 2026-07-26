@@ -1,3 +1,4 @@
+import productMainImg from '../assets/Product-image.png';
 import extraitImg from '../assets/chanel_n19_extrait.png';
 import edpImg from '../assets/chanel_n19_edp.png';
 import bodyOilImg from '../assets/chanel_n19_body_oil.png';
@@ -6,7 +7,7 @@ import poudreImg from '../assets/chanel_n19_poudre.png';
 export const BOUTIQUE_PRODUCTS = [
   {
     id: 'n19-extrait',
-    name: "N°19 EXTRAIT DE PARFUM",
+    name: "LUNE EXTRAIT DE PARFUM",
     frenchName: "L'Extrait Flacon Baudruchage",
     category: 'EXTRAIT',
     subtitle: 'FLORENTINE IRIS & GALBANUM ESSENCE',
@@ -15,7 +16,7 @@ export const BOUTIQUE_PRODUCTS = [
     inStock: true,
     badge: 'HAUTE COUTURE',
     rating: '5.0',
-    image: extraitImg,
+    image: productMainImg,
     engravingAvailable: true,
     giftBoxIncluded: true,
     sizes: [

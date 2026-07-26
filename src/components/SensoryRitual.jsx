@@ -53,7 +53,7 @@ export default function SensoryRitual() {
       {/* Floating Section Badge */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 w-full flex flex-col items-start justify-end h-full pb-10 sm:pb-14">
         <span className="inline-block px-4 py-1.5 bg-black/50 backdrop-blur-md border border-white/20 font-sans text-[10px] sm:text-[11px] uppercase tracking-[0.3em] text-white font-semibold rounded-full mb-3 shadow-lg">
-          04 // THE APPLICATION RITUAL • CHANEL N°19
+          THE APPLICATION RITUAL • CHANEL N°19
         </span>
         <h2 className="font-serif font-light text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-white tracking-tight uppercase max-w-2xl drop-shadow-md">
           LE RITUEL DE SOIN ET D’ÉLÉGANCE

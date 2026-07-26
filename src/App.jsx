@@ -45,7 +45,8 @@ function App() {
   }, []);
 
   return (
-    <main className="relative min-h-screen w-full bg-[#FAFAFA] flex flex-col justify-between overflow-hidden">
+    /* Previous background: bg-[#FAFAFA] */
+    <main className="relative min-h-screen w-full bg-white flex flex-col justify-between overflow-hidden">
       <div className="w-full min-h-screen z-10">
         <HeroSlider
           loaderKey={loaderKey}

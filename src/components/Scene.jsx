@@ -639,7 +639,8 @@ export default function Scene({ currentSlide, slideData, loaderState, onModelLoa
           alpha: true,
           powerPreference: 'high-performance',
           toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.3,
+          /* Previous exposure: toneMappingExposure: 1.3 */
+          toneMappingExposure: 1.85,
         }}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
@@ -648,20 +649,27 @@ export default function Scene({ currentSlide, slideData, loaderState, onModelLoa
       >
         <ProgressNotifier onModelLoaded={handleModelLoaded} />
 
-        {/* Lighting Rig — stripped down on mobile for GPU savings */}
+        {/* Previous Lighting Rig (commented out for trial brighter theme):
         <ambientLight intensity={0.6} color="#FFF8E8" />
         <directionalLight position={[5, 8, 5]} intensity={3.5} color="#FFFAF0" castShadow={!IS_MOBILE} />
         <directionalLight position={[-5, 3, 4]} intensity={1.6} color="#F0F0FF" />
         <directionalLight position={[0, 4, -6]} intensity={2.5} color="#FFFFFF" />
+        */}
+
+        {/* High-Key Bright Studio Lighting Rig */}
+        <ambientLight intensity={1.25} color="#FFFFFF" />
+        <directionalLight position={[5, 8, 5]} intensity={4.8} color="#FFFFFF" castShadow={!IS_MOBILE} />
+        <directionalLight position={[-5, 3, 4]} intensity={2.4} color="#F5F8FF" />
+        <directionalLight position={[0, 4, -6]} intensity={3.2} color="#FFFFFF" />
 
         {/* Desktop-only supplementary lights */}
         {!IS_MOBILE && (
           <>
-            <directionalLight position={[-5, 3, 4]} intensity={2.0} color="#F0F0FF" />
-            <directionalLight position={[0, 2, 8]} intensity={1.5} color="#FFFFFF" />
-            <spotLight position={[1.4, 10, 3]} intensity={3.0} angle={0.3} penumbra={0.5} color="#FFFFFF" castShadow />
-            <pointLight position={[1.4, -4, 2]} intensity={0.8} color="#FFF0C0" />
-            <pointLight position={[4, 0, 0]} intensity={0.6} color="#FFE8B0" />
+            <directionalLight position={[-5, 3, 4]} intensity={2.6} color="#F5F8FF" />
+            <directionalLight position={[0, 2, 8]} intensity={2.0} color="#FFFFFF" />
+            <spotLight position={[1.4, 10, 3]} intensity={4.0} angle={0.35} penumbra={0.6} color="#FFFFFF" castShadow />
+            <pointLight position={[1.4, -4, 2]} intensity={1.2} color="#FFF8E0" />
+            <pointLight position={[4, 0, 0]} intensity={1.0} color="#FFF5E0" />
           </>
         )}
 

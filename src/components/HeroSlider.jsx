@@ -4,10 +4,10 @@ import FragranceDetails from './FragranceDetails';
 import SensoryRitual from './SensoryRitual';
 import BrandStory from './BrandStory';
 import OlfactoryExperience from './OlfactoryExperience';
-import NavbarLoader from './navbarloader';
+import Navbar from './Navbar';
+import Loader from './Loader';
 import AccountModal from './AccountModal';
 import { SLIDES } from '../utils/slidesData';
-
 const HERO_SVG = '/SVGs/Perfume-SVG.png';
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -16,40 +16,40 @@ const HERO_SVG = '/SVGs/Perfume-SVG.png';
 function FloatingNotes({ slideData }) {
   if (!slideData || !slideData.keyNotes) return null;
   const notes = slideData.keyNotes;
-  const accent = slideData.accent || '#8A9A86';
+  const accent = slideData.accent || '#059669';
 
   return (
     <>
-      {/* Floating Note 1 - Top Left (Lowered clear of watermark text) */}
+      {/* Floating Note 1 - Top Left */}
       {notes[0] && (
-        <div className="absolute top-[26%] -left-6 sm:-left-8 md:-left-12 lg:-left-16 z-20 animate-float-slow pointer-events-auto">
-          <div className="px-2 py-0.5 sm:px-3.5 sm:py-1.5 bg-white/85 backdrop-blur-md border border-white/90 rounded-full shadow-md shadow-black/5 flex items-center gap-1 sm:gap-2 transition-all duration-300 hover:scale-105 hover:bg-white/95">
-            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full animate-pulse shrink-0" style={{ backgroundColor: accent }} />
-            <span className="font-sans font-semibold text-[8px] sm:text-[10px] md:text-[11px] tracking-[0.12em] sm:tracking-[0.18em] uppercase text-[#1A1A1A] whitespace-nowrap">
+        <div className="absolute top-[24%] -left-6 sm:-left-8 md:-left-12 lg:-left-16 z-20 animate-float-slow pointer-events-auto">
+          <div className="px-3 py-1 sm:px-4 sm:py-2 bg-white backdrop-blur-xl border border-black/10 rounded-full shadow-lg shadow-black/5 flex items-center gap-1.5 sm:gap-2.5 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+            <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shrink-0" style={{ backgroundColor: accent }} />
+            <span className="font-sans font-bold text-[9px] sm:text-[11px] md:text-[12px] tracking-[0.15em] uppercase text-[#111111] whitespace-nowrap">
               {notes[0]}
             </span>
           </div>
         </div>
       )}
 
-      {/* Floating Note 2 - Middle Right (Pushed out into wide right margin) */}
+      {/* Floating Note 2 - Middle Right */}
       {notes[1] && (
         <div className="absolute top-[42%] -right-6 sm:-right-8 md:-right-12 lg:-right-16 z-20 animate-float-reverse pointer-events-auto">
-          <div className="px-2 py-0.5 sm:px-3.5 sm:py-1.5 bg-white/85 backdrop-blur-md border border-white/90 rounded-full shadow-md shadow-black/5 flex items-center gap-1 sm:gap-2 transition-all duration-300 hover:scale-105 hover:bg-white/95">
-            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full animate-pulse shrink-0" style={{ backgroundColor: accent }} />
-            <span className="font-sans font-semibold text-[8px] sm:text-[10px] md:text-[11px] tracking-[0.12em] sm:tracking-[0.18em] uppercase text-[#1A1A1A] whitespace-nowrap">
+          <div className="px-3 py-1 sm:px-4 sm:py-2 bg-white backdrop-blur-xl border border-black/10 rounded-full shadow-lg shadow-black/5 flex items-center gap-1.5 sm:gap-2.5 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+            <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shrink-0" style={{ backgroundColor: accent }} />
+            <span className="font-sans font-bold text-[9px] sm:text-[11px] md:text-[12px] tracking-[0.15em] uppercase text-[#111111] whitespace-nowrap">
               {notes[1]}
             </span>
           </div>
         </div>
       )}
 
-      {/* Floating Note 3 - Bottom Left (Pushed out into wide left margin) */}
+      {/* Floating Note 3 - Bottom Left */}
       {notes[2] && (
         <div className="absolute bottom-[6%] -left-5 sm:-left-7 md:-left-10 lg:-left-14 z-20 animate-float-delayed pointer-events-auto">
-          <div className="px-2 py-0.5 sm:px-3.5 sm:py-1.5 bg-white/85 backdrop-blur-md border border-white/90 rounded-full shadow-md shadow-black/5 flex items-center gap-1 sm:gap-2 transition-all duration-300 hover:scale-105 hover:bg-white/95">
-            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full animate-pulse shrink-0" style={{ backgroundColor: accent }} />
-            <span className="font-sans font-semibold text-[8px] sm:text-[10px] md:text-[11px] tracking-[0.12em] sm:tracking-[0.18em] uppercase text-[#1A1A1A] whitespace-nowrap">
+          <div className="px-3 py-1 sm:px-4 sm:py-2 bg-white backdrop-blur-xl border border-black/10 rounded-full shadow-lg shadow-black/5 flex items-center gap-1.5 sm:gap-2.5 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+            <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shrink-0" style={{ backgroundColor: accent }} />
+            <span className="font-sans font-bold text-[9px] sm:text-[11px] md:text-[12px] tracking-[0.15em] uppercase text-[#111111] whitespace-nowrap">
               {notes[2]}
             </span>
           </div>
@@ -69,6 +69,8 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
   const [currentSlideIdx, setCurrentSlideIdx] = useState(currentSlide);
   const [incomingSlideIdx, setIncomingSlideIdx] = useState(currentSlide);
 
+  const hasEntranceAnimatedRef = useRef(false);
+
   // Notify parent component that asset is ready
   useEffect(() => {
     if (onModelLoaded) {
@@ -76,109 +78,114 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
     }
   }, [onModelLoaded]);
 
+  // Initial loader entrance animation for product SVG flacon
+  useEffect(() => {
+    if (loaderState === 'loading') {
+      hasEntranceAnimatedRef.current = false;
+      if (currentBottleRef.current) {
+        gsap.set(currentBottleRef.current, {
+          y: 110,
+          opacity: 0,
+          scale: 0.85,
+          rotation: -2,
+          force3D: true,
+        });
+      }
+    } else if ((loaderState === 'exiting' || loaderState === 'completed') && !hasEntranceAnimatedRef.current) {
+      hasEntranceAnimatedRef.current = true;
+      if (currentBottleRef.current) {
+        const bottleEl = currentBottleRef.current;
+        const imgEl = bottleEl.querySelector('img');
+        const shadowEl = bottleEl.querySelector('.bg-black\\/20');
+
+        const tl = gsap.timeline({
+          delay: loaderState === 'exiting' ? 0.02 : 0,
+          defaults: { ease: 'power4.out', force3D: true },
+        });
+
+        tl.to(
+          bottleEl,
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            rotation: 0,
+            duration: 1.35,
+          },
+          0
+        );
+
+        if (imgEl) {
+          tl.fromTo(
+            imgEl,
+            { filter: 'drop-shadow(0px 5px 10px rgba(0,0,0,0.05))' },
+            { filter: 'drop-shadow(0px 25px 35px rgba(0,0,0,0.18))', duration: 1.35 },
+            0
+          );
+        }
+
+        if (shadowEl) {
+          tl.fromTo(
+            shadowEl,
+            { opacity: 0, scale: 0.5 },
+            { opacity: 0.3, scale: 1, duration: 1.2 },
+            0.1
+          );
+        }
+      }
+    }
+  }, [loaderState]);
+
   useEffect(() => {
     if (activeSlideRef.current === currentSlide) return;
 
     setIncomingSlideIdx(currentSlide);
 
-    const isNext = slideDirection === 'next';
-    const isMobile = window.innerWidth < 768;
-
     const currentEl = currentBottleRef.current;
     const incomingEl = incomingBottleRef.current;
 
     if (currentEl && incomingEl) {
-      if (isMobile) {
-        // Mobile horizontal slide animation:
-        // isNext: current product goes left out of screen (-100vw), incoming product enters from right (100vw)
-        // isPrev: current product goes right out of screen (100vw), incoming product enters from left (-100vw)
-        const exitX = isNext ? '-100vw' : '100vw';
-        const entryX = isNext ? '100vw' : '-100vw';
+      const isNext = slideDirection === 'next';
+      const exitY = isNext ? '-110vh' : '110vh';
+      const entryY = isNext ? '110vh' : '-110vh';
 
-        gsap.set(incomingEl, {
-          x: entryX,
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          display: 'flex',
-        });
+      gsap.set(incomingEl, {
+        x: 0,
+        y: entryY,
+        opacity: 1,
+        scale: 1,
+        display: 'flex',
+      });
 
-        gsap.set(currentEl, {
-          x: 0,
-          y: 0,
-          opacity: 1,
-          scale: 1,
-        });
+      gsap.set(currentEl, {
+        x: 0,
+        y: 0,
+        opacity: 1,
+        scale: 1,
+      });
 
-        const tl = gsap.timeline({
-          onComplete: () => {
-            activeSlideRef.current = currentSlide;
-            setCurrentSlideIdx(currentSlide);
-            // Snap current bottle back to center x: 0, y: 0
-            gsap.set(currentEl, { x: 0, y: 0, opacity: 1, scale: 1 });
-            // Hide temporary incoming bottle off-screen
-            gsap.set(incomingEl, { display: 'none', x: entryX, y: 0 });
-          },
-        });
+      const tl = gsap.timeline({
+        onComplete: () => {
+          activeSlideRef.current = currentSlide;
+          setCurrentSlideIdx(currentSlide);
+          gsap.set(currentEl, { x: 0, y: 0, opacity: 1, scale: 1 });
+          gsap.set(incomingEl, { display: 'none', x: 0, y: entryY });
+        },
+      });
 
-        tl.to(currentEl, {
-          x: exitX,
-          duration: 0.7,
-          ease: 'power2.inOut',
-          force3D: true,
-        }, 0);
+      tl.to(currentEl, {
+        y: exitY,
+        duration: 0.8,
+        ease: 'power2.inOut',
+        force3D: true,
+      }, 0);
 
-        tl.to(incomingEl, {
-          x: 0,
-          duration: 0.7,
-          ease: 'power2.inOut',
-          force3D: true,
-        }, 0);
-      } else {
-        // Desktop & iPad vertical slide animation along single vertical line
-        const exitY = isNext ? '-110vh' : '110vh';
-        const entryY = isNext ? '110vh' : '-110vh';
-
-        gsap.set(incomingEl, {
-          x: 0,
-          y: entryY,
-          opacity: 1,
-          scale: 1,
-          display: 'flex',
-        });
-
-        gsap.set(currentEl, {
-          x: 0,
-          y: 0,
-          opacity: 1,
-          scale: 1,
-        });
-
-        const tl = gsap.timeline({
-          onComplete: () => {
-            activeSlideRef.current = currentSlide;
-            setCurrentSlideIdx(currentSlide);
-            // Snap current bottle back to center y: 0
-            gsap.set(currentEl, { x: 0, y: 0, opacity: 1, scale: 1 });
-            // Hide temporary incoming bottle off-screen
-            gsap.set(incomingEl, { display: 'none', x: 0, y: entryY });
-          },
-        });
-
-        tl.to(currentEl, {
-          y: exitY,
-          duration: 0.8,
-          ease: 'power2.inOut',
-          force3D: true,
-        }, 0);
-
-        tl.to(incomingEl, {
-          y: 0,
-          duration: 0.8,
-          ease: 'power2.inOut',
-          force3D: true,
-        }, 0);
-      }
+      tl.to(incomingEl, {
+        y: 0,
+        duration: 0.8,
+        ease: 'power2.inOut',
+        force3D: true,
+      }, 0);
     } else {
       activeSlideRef.current = currentSlide;
       setCurrentSlideIdx(currentSlide);
@@ -190,37 +197,40 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
 
   return (
     <div className="relative w-full h-full flex items-center justify-center pointer-events-none select-none">
+      {/* Subtle Transparent Ambient Glow (Does not obscure background watermark text) */}
+      <div className="absolute w-[300px] h-[300px] sm:w-[420px] sm:h-[420px] md:w-[500px] md:h-[500px] bg-radial from-black/5 to-transparent rounded-full blur-3xl opacity-30 pointer-events-none" />
+
       {/* Active Product Flacon */}
       <div
         ref={currentBottleRef}
-        className="absolute inset-0 flex flex-col items-center justify-center max-w-[250px] sm:max-w-[280px] md:max-w-[340px] lg:max-w-[380px] w-full mx-auto will-change-transform pt-14 sm:pt-16 md:pt-0"
+        className="absolute inset-0 flex flex-col items-center justify-center max-w-[280px] sm:max-w-[340px] md:max-w-[420px] lg:max-w-[460px] w-full mx-auto will-change-transform pt-6 sm:pt-8 md:pt-0"
       >
         <FloatingNotes slideData={currentData} />
         <img
           src={HERO_SVG}
           alt="Chanel N°19 Perfume Flacon"
-          className="w-auto h-[36vh] sm:h-[42vh] md:h-[50vh] lg:h-[58vh] max-h-[620px] object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.18)] select-none pointer-events-none"
+          className="w-auto h-[44vh] sm:h-[50vh] md:h-[58vh] lg:h-[65vh] xl:h-[70vh] max-h-[720px] object-contain drop-shadow-[0_30px_45px_rgba(0,0,0,0.15)] select-none pointer-events-none"
           draggable={false}
         />
         {/* Contact Shadow */}
-        <div className="w-3/5 h-4 sm:h-5 bg-black/20 rounded-[100%] blur-md -mt-2 sm:-mt-4 pointer-events-none select-none opacity-30" />
+        <div className="w-3/5 h-4 sm:h-5 bg-black/20 rounded-[100%] blur-md -mt-2 sm:-mt-4 pointer-events-none select-none opacity-25" />
       </div>
 
       {/* Incoming Product Flacon */}
       <div
         ref={incomingBottleRef}
         style={{ display: 'none' }}
-        className="absolute inset-0 flex flex-col items-center justify-center max-w-[250px] sm:max-w-[280px] md:max-w-[340px] lg:max-w-[380px] w-full mx-auto will-change-transform pt-14 sm:pt-16 md:pt-0"
+        className="absolute inset-0 flex flex-col items-center justify-center max-w-[280px] sm:max-w-[340px] md:max-w-[420px] lg:max-w-[460px] w-full mx-auto will-change-transform pt-6 sm:pt-8 md:pt-0"
       >
         <FloatingNotes slideData={incomingData} />
         <img
           src={HERO_SVG}
           alt="Chanel N°19 Perfume Flacon"
-          className="w-auto h-[36vh] sm:h-[42vh] md:h-[50vh] lg:h-[58vh] max-h-[620px] object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.18)] select-none pointer-events-none"
+          className="w-auto h-[44vh] sm:h-[50vh] md:h-[58vh] lg:h-[65vh] xl:h-[70vh] max-h-[720px] object-contain drop-shadow-[0_30px_45px_rgba(0,0,0,0.15)] select-none pointer-events-none"
           draggable={false}
         />
         {/* Contact Shadow */}
-        <div className="w-3/5 h-4 sm:h-5 bg-black/20 rounded-[100%] blur-md -mt-2 sm:-mt-4 pointer-events-none select-none opacity-30" />
+        <div className="w-3/5 h-4 sm:h-5 bg-black/20 rounded-[100%] blur-md -mt-2 sm:-mt-4 pointer-events-none select-none opacity-25" />
       </div>
     </div>
   );
@@ -304,101 +314,116 @@ export default function HeroSlider({
         entranceTimelineRef.current.kill();
         entranceTimelineRef.current = null;
       }
-      gsap.set(allElements, { opacity: 0, y: 40, clearProps: 'scale,filter,letterSpacing' });
+      if (containerRef.current) {
+        gsap.set(containerRef.current, { y: 100, opacity: 0.8 });
+      }
+      gsap.set(allElements, { opacity: 0, y: 50, clearProps: 'scale,filter,letterSpacing' });
       if (watermarkRef.current) {
-        gsap.set(watermarkRef.current, { opacity: 0, scale: 0.92, y: 20 });
+        gsap.set(watermarkRef.current, { opacity: 0, scale: 0.92, y: 40 });
       }
     } else if ((loaderState === 'exiting' || loaderState === 'completed') && !hasAnimatedRef.current) {
       hasAnimatedRef.current = true;
 
       gsap.killTweensOf(allElements);
+      if (containerRef.current) gsap.killTweensOf(containerRef.current);
       if (entranceTimelineRef.current) entranceTimelineRef.current.kill();
 
-      const isExiting = loaderState === 'exiting';
-      // Frame-locked delay: starts entrance sequence right as curtain begins moving
       const tl = gsap.timeline({
-        delay: isExiting ? 0.08 : 0.05,
-        defaults: { ease: 'power2.out', force3D: true },
+        defaults: { ease: 'power3.out', force3D: true },
       });
       entranceTimelineRef.current = tl;
 
-      // Bottom Navigation Stepper — reveals gracefully as curtain lifts off bottom
+      // 1. Whole Hero Section container rises smoothly from below in sync with loader curtain
+      if (containerRef.current) {
+        tl.to(
+          containerRef.current,
+          {
+            y: 0,
+            opacity: 1,
+            duration: 1.1,
+            ease: 'power3.out',
+          },
+          0
+        );
+      }
+
+      // 2. Bottom Navigation Stepper Bar
       if (stepperBarRef.current) {
         tl.fromTo(
           stepperBarRef.current,
-          { opacity: 0, y: 25 },
-          { opacity: 1, y: 0, duration: 1.1 },
+          { opacity: 0, y: 30 },
+          { opacity: 1, y: 0, duration: 1.0 },
           0.05
         );
       }
 
-      // Watermark — ambient background
+      // 3. Background Watermark Text
       if (watermarkRef.current) {
         tl.fromTo(
           watermarkRef.current,
-          { opacity: 0, scale: 0.94, y: 25 },
-          { opacity: 0.35, scale: 1, y: 0, duration: 1.6, ease: 'power2.out' },
+          { opacity: 0, scale: 0.94, y: 40 },
+          { opacity: 0.35, scale: 1, y: 0, duration: 1.3, ease: 'power2.out' },
+          0.05
+        );
+      }
+
+      // 4. Step Label
+      if (stepLabelRef.current) {
+        tl.fromTo(
+          stepLabelRef.current,
+          { opacity: 0, y: 40 },
+          { opacity: 1, y: 0, duration: 1.0 },
           0.10
         );
       }
 
-      // Step Label
-      if (stepLabelRef.current) {
-        tl.fromTo(
-          stepLabelRef.current,
-          { opacity: 0, y: 25 },
-          { opacity: 1, y: 0, duration: 1.1 },
-          0.18
-        );
-      }
-
-      // Main Title
+      // 5. Main Title
       if (titleRef.current) {
         tl.fromTo(
           titleRef.current,
-          { opacity: 0, y: 30, scale: 0.97 },
-          { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: 'power2.out' },
-          0.26
+          { opacity: 0, y: 45, scale: 0.97 },
+          { opacity: 1, y: 0, scale: 1, duration: 1.1, ease: 'power2.out' },
+          0.15
         );
       }
 
-      // Subtitle
+      // 6. Subtitle
       if (subtitleRef.current) {
         tl.fromTo(
           subtitleRef.current,
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 1.0 },
-          0.36
+          { opacity: 0, y: 35 },
+          { opacity: 1, y: 0, duration: 0.9 },
+          0.22
         );
       }
 
-      // Description
+      // 7. Description Copy
       if (descriptionRef.current) {
         tl.fromTo(
           descriptionRef.current,
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 1.0 },
-          0.44
+          { opacity: 0, y: 35 },
+          { opacity: 1, y: 0, duration: 0.9 },
+          0.28
         );
       }
 
-      // Key Notes Badges
+      // 8. Key Notes Badges
       if (notesBadgeRef.current) {
         tl.fromTo(
           notesBadgeRef.current,
-          { opacity: 0, y: 15, scale: 0.94 },
+          { opacity: 0, y: 30, scale: 0.94 },
           { opacity: 1, y: 0, scale: 1, duration: 0.9, ease: 'power2.out' },
-          0.52
+          0.34
         );
       }
 
-      // Action CTA Buttons
+      // 9. Action CTA Buttons
       if (actionBtnRef.current) {
         tl.fromTo(
           actionBtnRef.current,
-          { opacity: 0, y: 15 },
+          { opacity: 0, y: 30 },
           { opacity: 1, y: 0, duration: 0.9 },
-          0.60
+          0.40
         );
       }
     }
@@ -564,17 +589,21 @@ export default function HeroSlider({
 
   return (
     <div className="w-full flex flex-col">
-      {/* Top Floating Luxury Navbar & Smooth Loader */}
-      <NavbarLoader
-        key={loaderKey}
-        loaderState={loaderState}
-        isModelLoaded={isModelLoaded}
-        onStartExit={onLoaderStartExit}
-        onComplete={onLoaderComplete}
+      {/* Standalone Smooth Loader Overlay */}
+      {loaderState !== 'completed' && (
+        <Loader
+          key={loaderKey}
+          isModelLoaded={isModelLoaded}
+          onStartExit={onLoaderStartExit}
+          onComplete={onLoaderComplete}
+        />
+      )}
+
+      {/* Standalone Top Floating Luxury Navbar */}
+      <Navbar
         cartCount={totalCartCount}
         onOpenCart={() => setIsCartOpen(true)}
         onOpenAccount={() => setIsAccountOpen(true)}
-        onReplayLoader={onReplayLoader}
       />
 
       {/* Account VIP Drawer Modal */}
@@ -594,11 +623,11 @@ export default function HeroSlider({
         style={{ backgroundColor: SLIDES[0].bg, color: SLIDES[0].text }}
         aria-label="Chanel N°19 Interactive Fragrance Showcase"
       >
-        {/* Large Background Watermark Text */}
-        <div className="absolute inset-0 pointer-events-none z-0 flex items-start pt-24 sm:pt-28 md:items-center md:pt-0 justify-center md:justify-end md:pl-0 md:pr-8 lg:pr-12 overflow-hidden select-none">
+        {/* Large Background Watermark Text — Continuous Unbroken Display */}
+        <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center md:justify-end md:pr-6 lg:pr-10 overflow-hidden select-none">
           <h1
             ref={watermarkRef}
-            className="font-serif font-extrabold text-[15vw] sm:text-[14vw] md:text-[11vw] lg:text-[13vw] xl:text-[15vw] leading-none text-black/20 sm:text-black/30 md:text-black/35 lg:text-black/22 tracking-tighter uppercase whitespace-nowrap will-change-transform"
+            className="font-serif font-black text-[16vw] sm:text-[15vw] md:text-[13vw] lg:text-[14vw] xl:text-[16vw] leading-none text-[#D8D8DC] tracking-tighter uppercase whitespace-nowrap will-change-transform select-none"
           >
             {activeSlideData.shortTitle}
           </h1>
@@ -628,20 +657,20 @@ export default function HeroSlider({
           {/* Editorial Content Panel (order-last on mobile centered under 3D model, order-first on desktop/iPad) */}
           <div className="w-full md:w-[54%] lg:w-[46%] flex flex-col items-center md:items-start text-center md:text-left justify-center gap-3 sm:gap-5 md:gap-6 pointer-events-auto order-last md:order-first px-1 md:px-0">
 
-            <div ref={textGroupRef} className="flex flex-col items-center md:items-start gap-1 sm:gap-2.5">
-              {/* Step Label / Category */}
+            <div ref={textGroupRef} className="flex flex-col items-center md:items-start gap-1.5 sm:gap-2.5">
+              {/* Step Label / Category Pill */}
               <span
                 ref={stepLabelRef}
-                className="inline-block text-[10px] sm:text-xs md:text-sm font-sans font-semibold tracking-[0.3em] uppercase text-[#737373]"
+                className="px-3 py-1 bg-black/5 rounded-full font-sans font-extrabold text-[10px] sm:text-xs tracking-[0.25em] uppercase text-[#111111] border border-black/5 shadow-2xs"
                 style={{ color: activeSlideData.accent }}
               >
                 {activeSlideData.stepLabel}
               </span>
 
-              {/* Main Garamond Heading */}
+              {/* Main Display Heading */}
               <h1
                 ref={titleRef}
-                className="font-serif font-light text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl tracking-tight leading-[1.08] text-[#1A1A1A]"
+                className="font-serif font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl tracking-tight leading-[1.02] text-[#111111] uppercase"
               >
                 {activeSlideData.title}
               </h1>
@@ -649,37 +678,25 @@ export default function HeroSlider({
               {/* Subtitle / Note Theme */}
               <h2
                 ref={subtitleRef}
-                className="font-sans font-medium text-[10px] sm:text-xs md:text-sm tracking-[0.25em] uppercase text-[#737373]"
+                className="font-sans font-extrabold text-xs sm:text-sm md:text-base tracking-[0.3em] uppercase text-[#555555]"
               >
                 {activeSlideData.subtitle}
               </h2>
-            </div>
 
-            {/* Detailed Narrative Body Copy */}
-            <p
-              ref={descriptionRef}
-              className="font-sans font-light text-xs sm:text-sm md:text-base leading-relaxed text-[#4A4A4A] max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg"
-            >
-              {activeSlideData.description}
-            </p>
-
-            {/* Key Notes Badges */}
-            <div ref={notesBadgeRef} className="flex flex-wrap justify-center md:justify-start gap-1 sm:gap-2 pt-0.5">
-              {activeSlideData.keyNotes.map((note, idx) => (
-                <span
-                  key={idx}
-                  className="px-2 py-0.5 sm:px-3 sm:py-1 text-[8.5px] sm:text-[10px] font-sans font-medium tracking-widest uppercase bg-black/5 text-[#4A4A4A] rounded-full border border-black/10"
-                >
-                  {note}
-                </span>
-              ))}
+              {/* High-Fashion Editorial 1-Liner Quote */}
+              <p
+                ref={descriptionRef}
+                className="font-serif italic font-normal text-xs sm:text-sm md:text-base text-[#444444] leading-relaxed max-w-xs sm:max-w-sm md:max-w-md pt-1"
+              >
+                “{activeSlideData.oneLiner}”
+              </p>
             </div>
 
             {/* Action CTA Buttons */}
-            <div ref={actionBtnRef} className="flex flex-wrap justify-center md:justify-start items-center gap-1.5 sm:gap-3 pt-1">
+            <div ref={actionBtnRef} className="flex flex-wrap justify-center md:justify-start items-center gap-2 sm:gap-3 pt-2">
               <button
                 onClick={handleNext}
-                className="px-3.5 sm:px-6 py-2 sm:py-3 text-[10px] sm:text-xs font-sans font-semibold tracking-[0.2em] uppercase text-white bg-[#1A1A1A] rounded-full hover:bg-black hover:shadow-md transition-all duration-300 cursor-pointer active:scale-95 flex items-center gap-1.5 min-h-[36px] sm:min-h-[42px]"
+                className="px-5 sm:px-6.5 py-2.5 sm:py-3 text-[10.5px] sm:text-xs font-sans font-extrabold tracking-[0.2em] uppercase text-white bg-[#111111] hover:bg-black rounded-full transition-all duration-200 cursor-pointer active:scale-95 flex items-center justify-center gap-2 shadow-xs min-h-[40px] sm:min-h-[44px]"
               >
                 <span>{currentSlide === SLIDES.length - 1 ? 'REPLAY STORY' : 'NEXT NOTE'}</span>
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -687,13 +704,13 @@ export default function HeroSlider({
                 </svg>
               </button>
 
-              {/* Separate Page Details CTA Button */}
+              {/* Separate Page Details CTA Button (Black & White Hover) */}
               <button
                 onClick={() => setShowDetailsPage(true)}
-                className="px-3 sm:px-5 py-2 sm:py-3 text-[10px] sm:text-xs font-sans font-semibold tracking-[0.2em] uppercase text-[#1A1A1A] bg-white/90 border border-black/20 rounded-full hover:bg-black/5 transition-all duration-300 cursor-pointer active:scale-95 flex items-center gap-1.5 shadow-2xs min-h-[36px] sm:min-h-[42px]"
+                className="px-5 sm:px-6 py-2.5 sm:py-3 text-[10.5px] sm:text-xs font-sans font-extrabold tracking-[0.2em] uppercase text-[#111111] hover:bg-[#111111] hover:text-white bg-white border border-black/20 rounded-full transition-all duration-200 cursor-pointer active:scale-95 flex items-center justify-center gap-2 shadow-2xs group min-h-[40px] sm:min-h-[44px]"
               >
                 <span>EXPLORE DETAILS</span>
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 text-[#111111] group-hover:text-white transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>

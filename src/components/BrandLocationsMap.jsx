@@ -13,13 +13,14 @@ export default function BrandLocationsMap() {
   };
 
   return (
-    <section className="w-full max-w-7xl mx-auto pt-10 sm:pt-14 pb-6 border-t border-black/10 text-[#1A1A1A] bg-[#FAFAFA]">
+    /* Previous theme: bg-[#FAFAFA] border-black/10 */
+    <section className="w-full max-w-7xl mx-auto pt-10 sm:pt-14 pb-6 border-t border-black/5 text-[#111111] bg-white">
       {/* Section Title matching website design theme */}
       <div className="mb-6 sm:mb-8 text-center sm:text-left">
-        <span className="font-sans text-[10px] sm:text-xs uppercase tracking-[0.35em] text-[#737373] font-semibold block mb-1">
-          07 // HAUTE BOUTIQUE LOCATION
+        <span className="font-sans text-[10px] sm:text-xs uppercase tracking-[0.35em] text-[#555555] font-semibold block mb-1">
+          HAUTE BOUTIQUE LOCATION
         </span>
-        <h2 className="font-serif font-light text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-[#1A1A1A] tracking-tight uppercase">
+        <h2 className="font-serif font-light text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-[#111111] tracking-tight uppercase">
           VISIT OUR PARISIAN ATELIER
         </h2>
         <p className="font-sans text-xs sm:text-sm text-[#555555] font-light mt-1 max-w-2xl leading-relaxed">
@@ -28,24 +29,24 @@ export default function BrandLocationsMap() {
       </div>
 
       {/* Single Location Card & Map - Exact Website Theme */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 items-stretch bg-white border border-black/10 rounded-xl overflow-hidden shadow-xs">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 items-stretch bg-white border border-black/5 rounded-xl overflow-hidden shadow-xs">
         {/* Left Info Column */}
-        <div className="md:col-span-5 p-6 sm:p-8 md:p-10 flex flex-col justify-between bg-white text-[#1A1A1A]">
+        <div className="md:col-span-5 p-6 sm:p-8 md:p-10 flex flex-col justify-between bg-white text-[#111111]">
           <div>
             <div className="flex items-center justify-between mb-3">
               <span className="text-[10px] font-sans tracking-[0.3em] text-[#C08A3E] font-semibold uppercase">
                 {primaryLocation.city}
               </span>
-              <span className="px-3 py-1 bg-black/5 text-[#1A1A1A] border border-black/10 text-[9px] font-sans tracking-[0.2em] uppercase rounded-full font-medium">
+              <span className="px-3 py-1 bg-black/5 text-[#111111] border border-black/5 text-[9px] font-sans tracking-[0.2em] uppercase rounded-full font-medium">
                 FLAGSHIP SANCTUARY
               </span>
             </div>
 
-            <p className="font-serif italic text-xs text-[#737373] mb-1">
+            <p className="font-serif italic text-xs text-[#555555] mb-1">
               {primaryLocation.frenchTitle}
             </p>
 
-            <h3 className="font-serif font-light text-2xl sm:text-3xl text-[#1A1A1A] uppercase tracking-tight mb-4">
+            <h3 className="font-serif font-light text-2xl sm:text-3xl text-[#111111] uppercase tracking-tight mb-4">
               {primaryLocation.name}
             </h3>
 
@@ -54,7 +55,8 @@ export default function BrandLocationsMap() {
             </p>
 
             {/* Address & Contact Info Block */}
-            <div className="space-y-3 p-4 bg-[#FAFAFA] border border-black/10 rounded-lg text-xs font-sans">
+            {/* Previous theme: bg-[#FAFAFA] border-black/10 */}
+            <div className="space-y-3 p-4 bg-[#FBFBFB] border border-black/5 rounded-lg text-xs font-sans">
               <div className="flex items-start gap-2.5">
                 <svg className="w-4 h-4 text-[#C08A3E] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />

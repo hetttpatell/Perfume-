@@ -96,21 +96,21 @@ export default function Footer({ onScrollToTop }) {
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 py-12 sm:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 items-start">
           
-          {/* Column 1: PERFUME Brand & Newsletter */}
+          {/* Column 1: LUNE FRAGRANCE Brand & Newsletter */}
           <div className="flex flex-col pr-0 lg:pr-4">
-            <h3 className="font-serif font-light uppercase text-3xl sm:text-4xl text-[#1A1A1A] tracking-[0.15em] mb-2 leading-none">
-              PERFUME
+            <h3 style={{ fontFamily: "'Cinzel', 'Cormorant Garamond', serif" }} className="font-bold uppercase text-3xl sm:text-4xl text-[#1A1A1A] tracking-[0.25em] mb-1 leading-none">
+              LUNE
             </h3>
-            <span className="font-sans text-[10px] uppercase tracking-[0.3em] text-[#C08A3E] font-semibold mb-3">
-              HAUTE PARFUMERIE • PARIS
+            <span className="font-sans text-[10px] uppercase tracking-[0.4em] text-[#555555] font-bold mb-3">
+              FRAGRANCE
             </span>
             <p className="font-sans text-xs sm:text-sm text-[#737373] leading-relaxed mb-6">
-              Crafting luxury olfactory masterpieces since 1921. Join our Gazette for confidential updates and exclusive offers.
+              Crafting luxury olfactory masterpieces. Join our Gazette for confidential updates and exclusive offers.
             </p>
 
             {subscribed ? (
               <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs rounded-xl font-medium">
-                ✓ Thank you for subscribing to PERFUME!
+                ✓ Thank you for subscribing to LUNE FRAGRANCE!
               </div>
             ) : (
               <form onSubmit={handleSubscribe} className="relative w-full max-w-sm">
@@ -125,12 +125,9 @@ export default function Footer({ onScrollToTop }) {
                   />
                   <button
                     type="submit"
-                    aria-label="Submit Email"
-                    className="w-9 h-9 bg-[#1A1A1A] hover:bg-black text-white rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-95 cursor-pointer"
+                    className="bg-[#1A1A1A] hover:bg-black text-white text-xs font-semibold px-4 py-2 rounded-full transition-colors cursor-pointer shrink-0"
                   >
-                    <svg className="w-4 h-4 transform rotate-45 -translate-x-0.5 translate-y-0.5 text-[#C08A3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                    </svg>
+                    Subscribe
                   </button>
                 </div>
               </form>
@@ -215,7 +212,7 @@ export default function Footer({ onScrollToTop }) {
       <div className="w-full border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-sans text-[#737373]">
           <div>
-            © 2026 PERFUME. All rights reserved.
+            © 2026 LUNE FRAGRANCE. All rights reserved.
           </div>
 
           <div className="flex items-center gap-6">

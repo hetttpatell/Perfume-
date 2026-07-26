@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function FragranceDetails({ slideData, onClose, onReplayLoader }) {
+  const [sampleRequested, setSampleRequested] = useState(false);
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
@@ -14,13 +15,15 @@ export default function FragranceDetails({ slideData, onClose, onReplayLoader })
   if (!slideData) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#FAFAFA]/95 backdrop-blur-xl overflow-y-auto animate-fade-in flex flex-col justify-between text-[#1A1A1A]">
+    /* Previous theme: bg-[#FAFAFA]/95 text-[#1A1A1A] */
+    <div className="fixed inset-0 z-50 bg-white/95 backdrop-blur-xl overflow-y-auto animate-fade-in flex flex-col justify-between text-[#111111]">
       {/* Top Details Bar */}
-      <header className="sticky top-0 z-20 w-full px-6 md:px-12 py-6 flex items-center justify-between bg-[#FAFAFA]/80 backdrop-blur-md border-b border-black/5">
+      {/* Previous theme header: bg-[#FAFAFA]/80 */}
+      <header className="sticky top-0 z-20 w-full px-6 md:px-12 py-6 flex items-center justify-between bg-white/90 backdrop-blur-md border-b border-black/5">
         <div className="flex items-center gap-3">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#1A1A1A]" />
-          <span className="font-serif text-lg md:text-xl font-medium tracking-[0.2em] uppercase text-[#1A1A1A]">
-            CHANEL N°19 // DETAILS
+          <span className="w-2.5 h-2.5 rounded-full bg-[#111111]" />
+          <span className="font-serif text-lg md:text-xl font-medium tracking-[0.2em] uppercase text-[#111111]">
+            CHANEL N°19 DETAILS
           </span>
         </div>
 
@@ -159,10 +162,13 @@ export default function FragranceDetails({ slideData, onClose, onReplayLoader })
             {/* Action CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
               <button
-                onClick={() => alert('Boutique availability request initiated.')}
+                onClick={() => {
+                  setSampleRequested(true);
+                  setTimeout(() => setSampleRequested(false), 3000);
+                }}
                 className="flex-1 py-4 px-6 text-xs font-sans font-semibold tracking-[0.25em] uppercase text-white bg-[#1A1A1A] rounded-full hover:bg-black transition-all duration-300 cursor-pointer active:scale-95 shadow-md text-center"
               >
-                REQUEST BOUTIQUE SAMPLE
+                {sampleRequested ? 'REQUEST SENT ✓' : 'REQUEST BOUTIQUE SAMPLE'}
               </button>
 
               <button

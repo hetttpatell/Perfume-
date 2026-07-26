@@ -66,14 +66,15 @@ export default function OlfactoryExperience({
   };
 
   return (
-    <div id="products" className="w-full min-h-full bg-[#FAFAFA] text-[#1A1A1A] flex flex-col justify-start gap-4 sm:gap-6 md:gap-8 p-4 sm:p-8 md:p-10 lg:p-12 overflow-y-auto font-sans scroll-mt-24">
+    /* Previous theme: bg-[#FAFAFA] */
+    <div id="products" className="w-full min-h-full bg-white text-[#111111] flex flex-col justify-start gap-4 sm:gap-6 md:gap-8 p-4 sm:p-8 md:p-10 lg:p-12 overflow-y-auto font-sans scroll-mt-24">
       {/* Header Bar */}
-      <div className="w-full max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-end justify-between border-b border-black/10 pb-4 sm:pb-6 gap-4">
+      <div className="w-full max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-end justify-between border-b border-black/5 pb-4 sm:pb-6 gap-4">
         <div>
-          <span className="font-sans text-[10px] sm:text-xs uppercase tracking-[0.35em] text-[#737373] font-semibold block mb-1">
-            05 // HAUTE PARFUMERIE BOUTIQUE
+          <span className="font-sans text-[10px] sm:text-xs uppercase tracking-[0.35em] text-[#555555] font-semibold block mb-1">
+            HAUTE PARFUMERIE BOUTIQUE
           </span>
-          <h2 className="font-serif font-light text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-[#1A1A1A] tracking-tight uppercase">
+          <h2 className="font-serif font-light text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-[#111111] tracking-tight uppercase">
             CHANEL N°19 EXCLUSIVE COLLECTION
           </h2>
         </div>
@@ -83,7 +84,7 @@ export default function OlfactoryExperience({
           {onScrollToTop && (
             <button
               onClick={onScrollToTop}
-              className="px-3.5 sm:px-5 py-2.5 sm:py-3 text-[10px] sm:text-[11px] font-sans font-semibold tracking-[0.2em] uppercase text-[#1A1A1A] bg-black/5 hover:bg-black hover:text-white rounded-full border border-black/15 transition-all duration-300 cursor-pointer shrink-0"
+              className="px-3.5 sm:px-5 py-2.5 sm:py-3 text-[10px] sm:text-[11px] font-sans font-semibold tracking-[0.2em] uppercase text-[#111111] bg-black/5 hover:bg-black hover:text-white rounded-full border border-black/10 transition-all duration-300 cursor-pointer shrink-0"
             >
               TOP OF PAGE
             </button>
@@ -92,15 +93,15 @@ export default function OlfactoryExperience({
       </div>
 
       {/* Category Filter Navigation Bar */}
-      <div className="w-full max-w-7xl mx-auto pt-1 sm:pt-2 pb-2 flex flex-wrap items-center justify-start gap-3 sm:gap-6 border-b border-black/10">
+      <div className="w-full max-w-7xl mx-auto pt-1 sm:pt-2 pb-2 flex flex-wrap items-center justify-start gap-3 sm:gap-6 border-b border-black/5">
         {categories.map((cat) => (
           <button
             key={cat.id}
             onClick={() => setActiveCategory(cat.id)}
             className={`pb-2 text-[10px] sm:text-[11px] md:text-xs font-sans font-medium tracking-[0.2em] uppercase transition-all duration-300 cursor-pointer relative ${
               activeCategory === cat.id
-                ? 'text-[#1A1A1A] font-bold'
-                : 'text-[#737373] hover:text-[#1A1A1A]'
+                ? 'text-[#111111] font-bold'
+                : 'text-[#555555] hover:text-[#111111]'
             }`}
           >
             {cat.label}
@@ -116,47 +117,53 @@ export default function OlfactoryExperience({
         {filteredProducts.map((product) => (
           <div
             key={product.id}
-            className="flex flex-col bg-white border border-black/10 rounded-xl sm:rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 relative"
+            /* Previous theme: bg-white border-black/5 rounded-xl */
+            className="flex flex-col bg-[#F4F4F6] border border-black/5 rounded-xs overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 relative group"
           >
             {/* Top Badge */}
-            <div className="absolute top-2 left-2 sm:top-3.5 sm:left-3.5 z-10">
-              <span className="px-2 py-0.5 sm:px-3 sm:py-1 bg-black/80 backdrop-blur-md text-[8px] sm:text-[9px] font-sans tracking-[0.12em] sm:tracking-[0.18em] text-white uppercase rounded-full font-semibold">
+            <div className="absolute top-2.5 left-2.5 sm:top-3.5 sm:left-3.5 z-10">
+              <span className="px-2.5 py-1 bg-black/85 backdrop-blur-md text-[8px] sm:text-[9.5px] font-sans tracking-[0.18em] text-white uppercase rounded-none font-bold">
                 {product.badge}
               </span>
             </div>
 
-            {/* Studio Product Image Viewport */}
-            <div className="w-full h-40 xs:h-48 sm:h-60 md:h-64 lg:h-72 bg-[#F6F6F6] relative overflow-hidden flex items-center justify-center p-3 sm:p-6 border-b border-black/5">
-              <div className="absolute inset-0 bg-radial from-white/70 via-transparent to-transparent pointer-events-none" />
+            {/* Studio Product Image Viewport — High Key Brightness like drinkblip.com */}
+            <div className="w-full h-44 xs:h-52 sm:h-64 md:h-72 bg-[#F9F9FB] relative overflow-hidden flex items-center justify-center p-4 sm:p-6 border-b border-black/5">
+              <div className="absolute inset-0 bg-radial from-white via-white/80 to-transparent pointer-events-none" />
               <img
                 src={product.image}
                 alt={product.name}
-                className="max-h-full max-w-full object-contain filter drop-shadow-md hover:scale-105 transition-transform duration-500"
+                className="max-h-full max-w-full object-contain filter brightness-105 drop-shadow-lg group-hover:scale-105 transition-transform duration-500"
               />
             </div>
 
             {/* Bottom Content Area */}
-            <div className="p-3 sm:p-5 flex flex-col justify-between flex-1 bg-white gap-2">
+            <div className="p-3.5 sm:p-5 flex flex-col justify-between flex-1 bg-[#F4F4F6] gap-3">
               <div>
-                <p className="font-sans text-[8.5px] xs:text-[9.5px] sm:text-[10px] text-[#737373] font-semibold tracking-wider uppercase mb-0.5 line-clamp-1">
+                <p className="font-sans text-[9px] sm:text-[10px] text-[#555555] font-bold tracking-wider uppercase mb-1 line-clamp-1">
                   {product.subtitle}
                 </p>
-                <h3 className="font-sans font-bold text-xs sm:text-sm md:text-base text-[#1A1A1A] uppercase tracking-wide leading-tight line-clamp-2">
+                <h3 className="font-sans font-extrabold text-xs sm:text-sm md:text-base text-[#111111] uppercase tracking-wide leading-snug line-clamp-2">
                   {product.name}
                 </h3>
               </div>
 
-              {/* Bottom Row: Price & Shop CTA Button */}
-              <div className="flex items-center justify-between pt-2 border-t border-black/10 mt-0.5">
-                <span className="font-sans font-extrabold text-xs xs:text-sm sm:text-base md:text-lg text-[#1A1A1A]">
-                  {product.priceFormatted}
-                </span>
+              {/* Price & Full Width SHOP CTA Button (Exact drinkblip.com aesthetic) */}
+              <div className="flex flex-col gap-2.5 pt-2 border-t border-black/10 mt-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-sans font-extrabold text-xs sm:text-sm md:text-base text-[#111111]">
+                    {product.priceFormatted}
+                  </span>
+                  <span className="text-[10px] font-sans font-semibold tracking-widest text-[#555555] uppercase">
+                    EDP 100ML
+                  </span>
+                </div>
 
                 <button
                   onClick={() => setSelectedProduct(product)}
-                  className="px-2.5 xs:px-3.5 sm:px-5 py-1.5 sm:py-2.5 text-[9px] xs:text-[10px] sm:text-xs font-sans font-bold tracking-[0.12em] sm:tracking-[0.2em] uppercase text-white bg-[#1A1A1A] hover:bg-black rounded-md transition-all duration-200 shadow-xs cursor-pointer active:scale-95 shrink-0"
+                  className="w-full py-2.5 sm:py-3 text-[10px] sm:text-xs font-sans font-extrabold tracking-[0.22em] uppercase text-white bg-[#111111] hover:bg-black transition-all duration-200 shadow-sm cursor-pointer active:scale-[0.98] text-center"
                 >
-                  SHOP
+                  SHOP NOW
                 </button>
               </div>
             </div>

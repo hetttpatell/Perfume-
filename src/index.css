@@ -2,22 +2,37 @@
 @config "../tailwind.config.js";
 
 @theme {
+  /* Previous theme (commented out for trial brighter theme):
   --color-surface-base: #FAFAFA;
   --color-text-primary: #1A1A1A;
   --color-text-secondary: #737373;
   --color-text-inverse: #FAFAFA;
   --color-action-base: #1A1A1A;
   --color-action-hover: #000000;
+  */
 
+  --color-surface-base: #FFFFFF;
+  --color-text-primary: #111111;
+  --color-text-secondary: #555555;
+  --color-text-inverse: #FFFFFF;
+  --color-action-base: #111111;
+  --color-action-hover: #000000;
+
+  /* Previous font definitions (commented out for drinkblip.com font style trial):
   --font-serif: "Cormorant Garamond", serif;
   --font-sans: "Manrope", sans-serif;
+  */
+
+  --font-serif: "Outfit", "Inter", sans-serif;
+  --font-sans: "Inter", "Outfit", sans-serif;
 }
 
 :root {
   color-scheme: light;
-  background-color: #FAFAFA;
-  color: #1A1A1A;
-  font-family: "Manrope", sans-serif;
+  /* Previous theme: background-color: #FAFAFA; color: #1A1A1A; */
+  background-color: #FFFFFF;
+  color: #111111;
+  font-family: "Inter", "Outfit", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -27,8 +42,9 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #FAFAFA;
-  color: #1A1A1A;
+  /* Previous theme: background-color: #FAFAFA; color: #1A1A1A; */
+  background-color: #FFFFFF;
+  color: #111111;
   overflow-x: hidden;
 }
 
