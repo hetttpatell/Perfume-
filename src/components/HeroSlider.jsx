@@ -658,15 +658,6 @@ export default function HeroSlider({
           <div className="w-full md:w-[54%] lg:w-[46%] flex flex-col items-center md:items-start text-center md:text-left justify-center gap-3 sm:gap-5 md:gap-6 pointer-events-auto order-last md:order-first px-1 md:px-0">
 
             <div ref={textGroupRef} className="flex flex-col items-center md:items-start gap-1.5 sm:gap-2.5">
-              {/* Step Label / Category Pill */}
-              <span
-                ref={stepLabelRef}
-                className="px-3 py-1 bg-black/5 rounded-full font-sans font-extrabold text-[10px] sm:text-xs tracking-[0.25em] uppercase text-[#111111] border border-black/5 shadow-2xs"
-                style={{ color: activeSlideData.accent }}
-              >
-                {activeSlideData.stepLabel}
-              </span>
-
               {/* Main Display Heading */}
               <h1
                 ref={titleRef}
