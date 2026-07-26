@@ -145,12 +145,28 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
     const incomingEl = incomingBottleRef.current;
 
     if (currentEl && incomingEl) {
+      const isMobile = window.innerWidth < 768;
       const isNext = slideDirection === 'next';
-      const exitY = isNext ? '-110vh' : '110vh';
-      const entryY = isNext ? '110vh' : '-110vh';
+
+      let exitX = 0;
+      let exitY = 0;
+      let entryX = 0;
+      let entryY = 0;
+
+      if (isMobile) {
+        // Mobile view: horizontal transition
+        // Next product: current goes out left (-100vw), new comes from right (100vw)
+        // Prev product: current goes out right (100vw), new comes from left (-100vw)
+        exitX = isNext ? '-100vw' : '100vw';
+        entryX = isNext ? '100vw' : '-100vw';
+      } else {
+        // Desktop view: vertical transition
+        exitY = isNext ? '-110vh' : '110vh';
+        entryY = isNext ? '110vh' : '-110vh';
+      }
 
       gsap.set(incomingEl, {
-        x: 0,
+        x: entryX,
         y: entryY,
         opacity: 1,
         scale: 1,
@@ -169,23 +185,33 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
           activeSlideRef.current = currentSlide;
           setCurrentSlideIdx(currentSlide);
           gsap.set(currentEl, { x: 0, y: 0, opacity: 1, scale: 1 });
-          gsap.set(incomingEl, { display: 'none', x: 0, y: entryY });
+          gsap.set(incomingEl, { display: 'none', x: entryX, y: entryY });
         },
       });
 
-      tl.to(currentEl, {
-        y: exitY,
-        duration: 0.8,
-        ease: 'power2.inOut',
-        force3D: true,
-      }, 0);
+      tl.to(
+        currentEl,
+        {
+          x: exitX,
+          y: exitY,
+          duration: 0.8,
+          ease: 'power2.inOut',
+          force3D: true,
+        },
+        0
+      );
 
-      tl.to(incomingEl, {
-        y: 0,
-        duration: 0.8,
-        ease: 'power2.inOut',
-        force3D: true,
-      }, 0);
+      tl.to(
+        incomingEl,
+        {
+          x: 0,
+          y: 0,
+          duration: 0.8,
+          ease: 'power2.inOut',
+          force3D: true,
+        },
+        0
+      );
     } else {
       activeSlideRef.current = currentSlide;
       setCurrentSlideIdx(currentSlide);

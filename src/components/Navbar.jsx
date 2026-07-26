@@ -15,23 +15,46 @@ export default function Navbar({ cartCount = 0, onOpenCart, onOpenAccount }) {
     { id: 'gallery', label: 'Gallery/FAQ', targetId: 'gallery' },
   ];
 
+  // Lock background scrolling when mobile menu drawer is open
   useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    };
+  }, [mobileMenuOpen]);
+
+  useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      setIsScrolled(currentScrollY > 40);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          setIsScrolled(currentScrollY > 40);
 
-      // Section tracking for active highlighting
-      const sections = navLinks.map((link) => document.getElementById(link.targetId)).filter(Boolean);
-      let currentActive = 'hero';
+          // Section tracking for active highlighting
+          const sections = navLinks.map((link) => document.getElementById(link.targetId)).filter(Boolean);
+          let currentActive = 'hero';
 
-      sections.forEach((sec) => {
-        const rect = sec.getBoundingClientRect();
-        if (rect.top <= window.innerHeight * 0.35 && rect.bottom >= 100) {
-          currentActive = sec.id;
-        }
-      });
+          sections.forEach((sec) => {
+            const rect = sec.getBoundingClientRect();
+            if (rect.top <= window.innerHeight * 0.35 && rect.bottom >= 100) {
+              currentActive = sec.id;
+            }
+          });
 
-      setActiveSection(currentActive);
+          setActiveSection(currentActive);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -159,14 +182,14 @@ export default function Navbar({ cartCount = 0, onOpenCart, onOpenAccount }) {
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
-            {/* Dark Frosted Backdrop Overlay */}
+            {/* Dark Overlay */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
               onClick={() => setMobileMenuOpen(false)}
-              className="pointer-events-auto fixed inset-0 z-50 bg-black/40 backdrop-blur-sm xl:hidden"
+              className="pointer-events-auto fixed inset-0 z-50 bg-black/40 backdrop-blur-xs xl:hidden"
             />
 
             {/* Right-Side Luxury Floating Slide Panel */}
@@ -174,8 +197,8 @@ export default function Navbar({ cartCount = 0, onOpenCart, onOpenAccount }) {
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'spring', stiffness: 320, damping: 32 }}
-              className="pointer-events-auto fixed top-0 right-0 bottom-0 z-50 w-[85vw] max-w-[360px] sm:w-[380px] h-full bg-[#FAFAFA]/95 backdrop-blur-3xl border-l border-black/10 shadow-[-20px_0_50px_rgba(0,0,0,0.18)] flex flex-col justify-between p-6 sm:p-8 xl:hidden"
+              transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+              className="pointer-events-auto fixed top-0 right-0 bottom-0 z-50 w-[85vw] max-w-[360px] sm:w-[380px] h-full bg-[#FAFAFA] border-l border-black/10 shadow-[-20px_0_50px_rgba(0,0,0,0.15)] flex flex-col justify-between p-6 sm:p-8 xl:hidden will-change-transform"
             >
               {/* Top Drawer Header */}
               <div className="flex flex-col gap-6">
@@ -206,10 +229,13 @@ export default function Navbar({ cartCount = 0, onOpenCart, onOpenAccount }) {
                     const isActive = activeSection === link.id;
                     const numStr = `0${idx + 1}`;
                     return (
-                      <button
+                      <motion.button
                         key={link.id}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.05 + idx * 0.04, duration: 0.25, ease: 'easeOut' }}
                         onClick={() => scrollToSection(link.targetId)}
-                        className={`group relative text-left px-4 py-3.5 rounded-2xl transition-all duration-300 flex items-center justify-between cursor-pointer ${
+                        className={`group relative text-left px-4 py-3.5 rounded-2xl transition-colors duration-200 flex items-center justify-between cursor-pointer ${
                           isActive
                             ? 'bg-[#1A1A1A] text-white shadow-md'
                             : 'text-[#1A1A1A] hover:bg-black/5 hover:translate-x-1.5'
@@ -240,7 +266,7 @@ export default function Navbar({ cartCount = 0, onOpenCart, onOpenAccount }) {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
                         )}
-                      </button>
+                      </motion.button>
                     );
                   })}
                 </div>
