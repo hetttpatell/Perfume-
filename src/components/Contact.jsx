@@ -1,13 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 import Footer from './Footer';
 
 export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCartOpen, onOpenAccount }) {
-  const navigate = useNavigate();
-
   // Contact Form State
-  const [selectedTopic, setSelectedTopic] = useState('General Inquiry');
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -18,13 +14,6 @@ export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCart
 
   // FAQ Accordion State
   const [openFaq, setOpenFaq] = useState('faq-1');
-
-  const topicOptions = [
-    'General Inquiry',
-    'Order Status',
-    'Boutique & Salon',
-    'Bespoke Engraving',
-  ];
 
   const faqs = [
     {
@@ -93,45 +82,24 @@ export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCart
         </motion.div>
       </section>
 
-      {/* ── 2. UNIQUE SPLIT LAYOUT (Form Left / Concierge & FAQs Right) ── */}
+      {/* ── 2. SPLIT LAYOUT (Form Left / Concierge Channels & FAQs Right) ── */}
       <section className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 pb-16 sm:pb-24">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
-          {/* LEFT COLUMN: Luxury Contact Form Card */}
+          {/* LEFT COLUMN: Clean Luxury Contact Form */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7 }}
-            className="lg:col-span-7 bg-[#FDFBF7] p-6 sm:p-10 rounded-3xl border border-[#E5DFD3] shadow-sm flex flex-col gap-6 relative overflow-hidden"
+            className="lg:col-span-7 bg-white p-6 sm:p-10 rounded-3xl border border-gray-200 shadow-sm flex flex-col gap-6"
           >
-            {/* Subtle Gold Ambient Glow */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[#C08A3E]/10 rounded-full blur-3xl pointer-events-none" />
-
             <div>
               <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#111111]">
                 Send a Message
               </h2>
               <p className="font-sans text-xs sm:text-sm text-[#666666] mt-1">
-                Select your topic and fill out your details below.
+                Fill out your details below and our concierge team will respond within 24 hours.
               </p>
-            </div>
-
-            {/* Topic Selector Pills */}
-            <div className="flex flex-wrap items-center gap-2">
-              {topicOptions.map((topic) => (
-                <button
-                  key={topic}
-                  type="button"
-                  onClick={() => setSelectedTopic(topic)}
-                  className={`px-3.5 py-2 rounded-full font-sans text-xs font-semibold tracking-wider transition-all duration-300 cursor-pointer ${
-                    selectedTopic === topic
-                      ? 'bg-[#111111] text-white shadow-sm'
-                      : 'bg-white text-[#555555] border border-gray-200 hover:border-black/40'
-                  }`}
-                >
-                  {topic}
-                </button>
-              ))}
             </div>
 
             {/* Success Toast Notification */}
@@ -149,7 +117,7 @@ export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCart
                   <div>
                     <span className="font-bold block">Inquiry Submitted</span>
                     <span className="text-emerald-200 text-xs">
-                      Your message regarding "{selectedTopic}" has been received by our concierge desk.
+                      Your message has been transmitted to our concierge desk. We will respond shortly.
                     </span>
                   </div>
                 </motion.div>
@@ -160,7 +128,7 @@ export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCart
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <label className="font-sans text-[11px] font-bold uppercase tracking-wider text-[#333333]">
+                  <label className="font-sans text-[11px] font-bold uppercase tracking-wider text-[#111111]">
                     Full Name *
                   </label>
                   <input
@@ -169,12 +137,12 @@ export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCart
                     value={formData.fullName}
                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                     placeholder="e.g. Eleanor Vance"
-                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm text-[#111111] focus:outline-none focus:border-[#C08A3E] focus:ring-1 focus:ring-[#C08A3E] transition-colors"
+                    className="w-full px-4 py-3 bg-[#F9F9F9] border border-gray-300 rounded-xl text-xs sm:text-sm text-[#111111] focus:outline-none focus:border-black transition-colors"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="font-sans text-[11px] font-bold uppercase tracking-wider text-[#333333]">
+                  <label className="font-sans text-[11px] font-bold uppercase tracking-wider text-[#111111]">
                     Email Address *
                   </label>
                   <input
@@ -183,13 +151,13 @@ export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCart
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="concierge@example.com"
-                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm text-[#111111] focus:outline-none focus:border-[#C08A3E] focus:ring-1 focus:ring-[#C08A3E] transition-colors"
+                    className="w-full px-4 py-3 bg-[#F9F9F9] border border-gray-300 rounded-xl text-xs sm:text-sm text-[#111111] focus:outline-none focus:border-black transition-colors"
                   />
                 </div>
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="font-sans text-[11px] font-bold uppercase tracking-wider text-[#333333]">
+                <label className="font-sans text-[11px] font-bold uppercase tracking-wider text-[#111111]">
                   Subject / Order Number (Optional)
                 </label>
                 <input
@@ -197,12 +165,12 @@ export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCart
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                   placeholder="e.g. Order #LUNE-9842 or Engraving Request"
-                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm text-[#111111] focus:outline-none focus:border-[#C08A3E] focus:ring-1 focus:ring-[#C08A3E] transition-colors"
+                  className="w-full px-4 py-3 bg-[#F9F9F9] border border-gray-300 rounded-xl text-xs sm:text-sm text-[#111111] focus:outline-none focus:border-black transition-colors"
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="font-sans text-[11px] font-bold uppercase tracking-wider text-[#333333]">
+                <label className="font-sans text-[11px] font-bold uppercase tracking-wider text-[#111111]">
                   Your Message *
                 </label>
                 <textarea
@@ -211,20 +179,20 @@ export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCart
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   placeholder="How can our Haute Parfumerie concierge team assist you today?"
-                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm text-[#111111] focus:outline-none focus:border-[#C08A3E] focus:ring-1 focus:ring-[#C08A3E] transition-colors resize-none"
+                  className="w-full px-4 py-3 bg-[#F9F9F9] border border-gray-300 rounded-xl text-xs sm:text-sm text-[#111111] focus:outline-none focus:border-black transition-colors resize-none"
                 />
               </div>
 
               <button
                 type="submit"
-                className="mt-2 w-full py-4 bg-[#111111] hover:bg-[#C08A3E] text-white font-sans text-xs font-bold tracking-[0.2em] uppercase rounded-xl transition-all duration-300 shadow-md cursor-pointer active:scale-[0.99] text-center"
+                className="mt-2 w-full py-4 bg-[#111111] hover:bg-[#333333] text-white font-sans text-xs font-bold tracking-[0.25em] uppercase rounded-xl transition-all duration-300 shadow-md cursor-pointer active:scale-[0.99] text-center"
               >
                 SUBMIT CONCIERGE INQUIRY
               </button>
             </form>
           </motion.div>
 
-          {/* RIGHT COLUMN: Concierge Channels & Unique Styled FAQ Accordion */}
+          {/* RIGHT COLUMN: Concierge Channels & Numbered FAQ Accordion */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -286,7 +254,7 @@ export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCart
                       key={faq.id}
                       className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
                         isOpen
-                          ? 'bg-[#FDFBF7] border-[#C08A3E]/40 shadow-2xs'
+                          ? 'bg-[#FAF8F5] border-[#C08A3E]/40 shadow-2xs'
                           : 'bg-white border-gray-200/80 hover:border-gray-300'
                       }`}
                     >
