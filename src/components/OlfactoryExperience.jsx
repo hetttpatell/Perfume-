@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { BOUTIQUE_PRODUCTS } from '../data/boutiqueProducts';
-import { QuickBuyModal, CartDrawer } from './ShopCartModal';
+import CartDrawer from './CartDrawer';
 import Testimonials from './Testimonials';
 import BrandLocationsMap from './BrandLocationsMap';
 import Footer from './Footer';
@@ -12,9 +13,9 @@ export default function OlfactoryExperience({
   isCartOpen: parentIsCartOpen,
   setIsCartOpen: parentSetIsCartOpen,
 }) {
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState('ALL');
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  
+
   // Local fallbacks if parent state is not supplied
   const [localCartItems, setLocalCartItems] = useState([]);
   const [localIsCartOpen, setLocalIsCartOpen] = useState(false);
@@ -25,36 +26,23 @@ export default function OlfactoryExperience({
   const setIsCartOpen = parentSetIsCartOpen || setLocalIsCartOpen;
 
   const categories = [
-    { id: 'ALL', label: 'TOUT' },
-    { id: 'EXTRAIT', label: 'LES EXTRAITS' },
-    { id: 'EAU DE PARFUM', label: 'EAU DE PARFUM' },
-    { id: 'BODY & RITUALS', label: 'RITUELS DE SOIN' },
+    { id: 'ALL', label: 'ALL CREATIONS' },
+    { id: 'PERFUME', label: 'PERFUME' },
+    { id: 'BODY_ROLLON', label: 'BODY ROLL-ON' },
   ];
 
   const filteredProducts = activeCategory === 'ALL'
     ? BOUTIQUE_PRODUCTS
-    : BOUTIQUE_PRODUCTS.filter(p => p.category === activeCategory);
-
-  const handleAddToCart = (newItem) => {
-    setCartItems(prev => {
-      const existingIdx = prev.findIndex(
-        i => i.product.id === newItem.product.id && i.size.size === newItem.size.size && i.engraving === newItem.engraving
-      );
-      if (existingIdx > -1) {
-        const updated = [...prev];
-        updated[existingIdx].quantity += newItem.quantity;
-        return updated;
-      }
-      return [...prev, newItem];
-    });
-  };
+    : activeCategory === 'PERFUME'
+      ? BOUTIQUE_PRODUCTS.filter(p => p.category === 'EXTRAIT' || p.category === 'EAU DE PARFUM')
+      : BOUTIQUE_PRODUCTS.filter(p => p.category === 'BODY & RITUALS');
 
   const handleUpdateQuantity = (index, newQty) => {
     if (newQty <= 0) {
       handleRemoveItem(index);
       return;
     }
-    setCartItems(prev => {
+    setCartItems((prev) => {
       const updated = [...prev];
       updated[index].quantity = newQty;
       return updated;
@@ -62,108 +50,112 @@ export default function OlfactoryExperience({
   };
 
   const handleRemoveItem = (index) => {
-    setCartItems(prev => prev.filter((_, i) => i !== index));
+    setCartItems((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
-    /* Previous theme: bg-[#FAFAFA] */
-    <div id="products" className="w-full min-h-full bg-white text-[#111111] flex flex-col justify-start gap-4 sm:gap-6 md:gap-8 p-4 sm:p-8 md:p-10 lg:p-12 overflow-y-auto font-sans scroll-mt-24">
-      {/* Header Bar */}
-      <div className="w-full max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-end justify-between border-b border-black/5 pb-4 sm:pb-6 gap-4">
-        <div>
-          <span className="font-sans text-[10px] sm:text-xs uppercase tracking-[0.35em] text-[#555555] font-semibold block mb-1">
-            HAUTE PARFUMERIE BOUTIQUE
-          </span>
-          <h2 className="font-serif font-light text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-[#111111] tracking-tight uppercase">
-            CHANEL N°19 EXCLUSIVE COLLECTION
-          </h2>
-        </div>
+    <section className="w-full min-h-screen bg-white text-[#111111] font-sans pt-28 sm:pt-36 lg:pt-40 pb-16 px-4 sm:px-6 md:px-8 lg:px-12">
+      {/* Category Header */}
+      <div className="w-full max-w-7xl mx-auto mb-6 sm:mb-8">
+        <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-light text-[#111111] uppercase tracking-tight mb-2">
+          The Atelier Collection
+        </h2>
+        <p className="font-sans text-xs sm:text-sm text-[#555555] font-light max-w-xl">
+          Explore our handcrafted Haute Parfumerie creations and nourishing satin body roll-ons.
+        </p>
+      </div>
 
-        <div className="flex items-center gap-2.5 sm:gap-4 self-end sm:self-auto shrink-0">
-          {/* Note: BAG functionality removed from shop header as requested by user & moved to main top Navbar */}
-          {onScrollToTop && (
+      {/* Category Filter Navigation Bar — Unique Luxury Pill Tabs */}
+      <div className="w-full max-w-7xl mx-auto pt-2 pb-6 flex flex-wrap items-center justify-start gap-2.5 sm:gap-4 border-b border-black/10 mb-6">
+        {categories.map((cat) => {
+          const isSelected = activeCategory === cat.id;
+          const count = cat.id === 'ALL'
+            ? BOUTIQUE_PRODUCTS.length
+            : cat.id === 'PERFUME'
+              ? BOUTIQUE_PRODUCTS.filter(p => p.category === 'EXTRAIT' || p.category === 'EAU DE PARFUM').length
+              : BOUTIQUE_PRODUCTS.filter(p => p.category === 'BODY & RITUALS').length;
+
+          return (
             <button
-              onClick={onScrollToTop}
-              className="px-3.5 sm:px-5 py-2.5 sm:py-3 text-[10px] sm:text-[11px] font-sans font-semibold tracking-[0.2em] uppercase text-[#111111] bg-black/5 hover:bg-black hover:text-white rounded-full border border-black/10 transition-all duration-300 cursor-pointer shrink-0"
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-[10px] sm:text-xs font-sans font-extrabold tracking-[0.2em] uppercase transition-all duration-300 cursor-pointer flex items-center gap-2 border ${isSelected
+                  ? 'bg-[#111111] text-white border-[#111111] shadow-sm'
+                  : 'bg-[#F4F4F6] text-[#555555] border-black/5 hover:border-black/20 hover:text-[#111111]'
+                }`}
             >
-              TOP OF PAGE
+              <span>{cat.label}</span>
+              <span className={`text-[9px] px-1.5 py-0.2 rounded-full font-bold ${isSelected ? 'bg-white/20 text-white' : 'bg-black/10 text-[#555555]'
+                }`}>
+                {count}
+              </span>
             </button>
-          )}
-        </div>
+          );
+        })}
       </div>
 
-      {/* Category Filter Navigation Bar */}
-      <div className="w-full max-w-7xl mx-auto pt-1 sm:pt-2 pb-2 flex flex-wrap items-center justify-start gap-3 sm:gap-6 border-b border-black/5">
-        {categories.map((cat) => (
-          <button
-            key={cat.id}
-            onClick={() => setActiveCategory(cat.id)}
-            className={`pb-2 text-[10px] sm:text-[11px] md:text-xs font-sans font-medium tracking-[0.2em] uppercase transition-all duration-300 cursor-pointer relative ${
-              activeCategory === cat.id
-                ? 'text-[#111111] font-bold'
-                : 'text-[#555555] hover:text-[#111111]'
-            }`}
-          >
-            {cat.label}
-            {activeCategory === cat.id && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#C08A3E] animate-fadeIn" />
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* 2x2 Grid on Mobile (grid-cols-2), 4 columns on Desktop (lg) */}
-      <div className="w-full max-w-7xl mx-auto py-2 sm:py-4 md:py-6 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 md:gap-6 lg:gap-8">
+      {/* Products Grid */}
+      <div className="w-full max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-6 md:gap-6 lg:gap-8 pt-2">
         {filteredProducts.map((product) => (
           <div
             key={product.id}
-            /* Previous theme: bg-white border-black/5 rounded-xl */
-            className="flex flex-col bg-[#F4F4F6] border border-black/5 rounded-xs overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 relative group"
+            onClick={() => navigate(`/product/${product.id}`)}
+            className="flex flex-col bg-[#F4F4F6] border border-black/5 rounded-xs overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 relative group cursor-pointer"
           >
             {/* Top Badge */}
-            <div className="absolute top-2.5 left-2.5 sm:top-3.5 sm:left-3.5 z-10">
-              <span className="px-2.5 py-1 bg-black/85 backdrop-blur-md text-[8px] sm:text-[9.5px] font-sans tracking-[0.18em] text-white uppercase rounded-none font-bold">
+            <div className="absolute top-2 left-2 sm:top-3.5 sm:left-3.5 z-10">
+              <span className="px-1.5 py-0.5 sm:px-2.5 sm:py-1 bg-black/85 backdrop-blur-md text-[7px] xs:text-[8px] sm:text-[9.5px] font-sans tracking-[0.15em] sm:tracking-[0.18em] text-white uppercase rounded-none font-bold">
                 {product.badge}
               </span>
             </div>
 
-            {/* Studio Product Image Viewport — High Key Brightness like drinkblip.com */}
-            <div className="w-full h-44 xs:h-52 sm:h-64 md:h-72 bg-[#F9F9FB] relative overflow-hidden flex items-center justify-center p-4 sm:p-6 border-b border-black/5">
-              <div className="absolute inset-0 bg-radial from-white via-white/80 to-transparent pointer-events-none" />
+            {/* Studio Product Image Viewport — Full Edge-to-Edge with Hover Sub-Image */}
+            <div className="w-full h-44 xs:h-52 sm:h-64 md:h-72 bg-[#F5F5F7] relative overflow-hidden border-b border-black/5">
+              {/* Primary Image */}
               <img
                 src={product.image}
                 alt={product.name}
-                className="max-h-full max-w-full object-contain filter brightness-105 drop-shadow-lg group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105 group-hover:opacity-0"
+              />
+
+              {/* Hover Sub-Image (Secondary Gallery View) */}
+              <img
+                src={product.galleryImages?.[1] || product.galleryImages?.[0] || product.image}
+                alt={`${product.name} alternate view`}
+                className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
               />
             </div>
 
             {/* Bottom Content Area */}
-            <div className="p-3.5 sm:p-5 flex flex-col justify-between flex-1 bg-[#F4F4F6] gap-3">
+            <div className="p-2.5 xs:p-3 sm:p-5 flex flex-col justify-between flex-1 bg-[#F4F4F6] gap-2 sm:gap-3">
               <div>
-                <p className="font-sans text-[9px] sm:text-[10px] text-[#555555] font-bold tracking-wider uppercase mb-1 line-clamp-1">
+                <p className="font-sans text-[8px] xs:text-[8.5px] sm:text-[10px] text-[#555555] font-bold tracking-wider uppercase mb-0.5 sm:mb-1 line-clamp-1">
                   {product.subtitle}
                 </p>
-                <h3 className="font-sans font-extrabold text-xs sm:text-sm md:text-base text-[#111111] uppercase tracking-wide leading-snug line-clamp-2">
+                <h3 className="font-sans font-extrabold text-[11px] xs:text-xs sm:text-sm md:text-base text-[#111111] uppercase tracking-wide leading-tight sm:leading-snug line-clamp-2 min-h-[2rem] sm:min-h-0">
                   {product.name}
                 </h3>
               </div>
 
-              {/* Price & Full Width SHOP CTA Button (Exact drinkblip.com aesthetic) */}
-              <div className="flex flex-col gap-2.5 pt-2 border-t border-black/10 mt-1">
+              {/* Price & Full Width SHOP CTA Button */}
+              <div className="flex flex-col gap-2 pt-2 border-t border-black/10 mt-1">
                 <div className="flex items-center justify-between">
                   <span className="font-sans font-extrabold text-xs sm:text-sm md:text-base text-[#111111]">
                     {product.priceFormatted}
                   </span>
-                  <span className="text-[10px] font-sans font-semibold tracking-widest text-[#555555] uppercase">
-                    EDP 100ML
+                  <span className="text-[8.5px] sm:text-[10px] font-sans font-semibold tracking-widest text-[#555555] uppercase">
+                    {product.sizes ? product.sizes[0].size : '100ML'}
                   </span>
                 </div>
 
                 <button
-                  onClick={() => setSelectedProduct(product)}
-                  className="w-full py-2.5 sm:py-3 text-[10px] sm:text-xs font-sans font-extrabold tracking-[0.22em] uppercase text-white bg-[#111111] hover:bg-black transition-all duration-200 shadow-sm cursor-pointer active:scale-[0.98] text-center"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/product/${product.id}`);
+                  }}
+                  className="w-full py-2 sm:py-3 text-[9px] xs:text-[10px] sm:text-xs font-sans font-extrabold tracking-[0.2em] uppercase text-white bg-[#111111] hover:bg-black transition-all duration-200 shadow-sm cursor-pointer active:scale-[0.98] text-center"
                 >
-                  SHOP NOW
+                  EXPLORE CREATION
                 </button>
               </div>
             </div>
@@ -183,7 +175,7 @@ export default function OlfactoryExperience({
           <svg className="w-4 h-4 text-[#C08A3E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
           </svg>
-          <span>SIGNATURE CHANEL GIFT BOX</span>
+          <span>SIGNATURE LUNE GIFT BOX</span>
         </div>
         <div className="flex items-center justify-center sm:justify-start gap-2">
           <svg className="w-4 h-4 text-[#C08A3E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -206,15 +198,6 @@ export default function OlfactoryExperience({
       {/* Luxury Haute Footer Section */}
       <Footer onScrollToTop={onScrollToTop} />
 
-      {/* Interactive Quick-Buy Modal */}
-      {selectedProduct && (
-        <QuickBuyModal
-          product={selectedProduct}
-          onClose={() => setSelectedProduct(null)}
-          onAddToCart={handleAddToCart}
-        />
-      )}
-
       {/* Interactive Cart Drawer */}
       <CartDrawer
         isOpen={isCartOpen}
@@ -224,6 +207,6 @@ export default function OlfactoryExperience({
         onRemoveItem={handleRemoveItem}
         onCheckout={() => setCartItems([])}
       />
-    </div>
+    </section>
   );
 }

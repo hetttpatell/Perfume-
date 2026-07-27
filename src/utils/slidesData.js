@@ -1,13 +1,13 @@
 export const SLIDES = [
   {
     id: '01',
-    shortTitle: 'N°19',
-    stepLabel: 'N°19 EAU DE PARFUM',
-    title: 'N°19 CHANEL',
+    shortTitle: 'LUNE',
+    stepLabel: 'LUNE EAU DE PARFUM',
+    title: 'LUNE PARFUM',
     subtitle: 'THE SIGNATURE IMPRESSION',
     oneLiner: 'An audacious harmony of crisp green notes and rare white florals.',
     tagline: 'Green Floral Masterpiece',
-    description: 'An audacious, uncompromising harmony of crisp green botanical notes and rare white flowers. Created as Coco Chanel\'s final personal fragrance signature.',
+    description: 'An audacious, uncompromising harmony of crisp green botanical notes and rare white flowers. Created as Maison Lune\'s signature fragrance.',
     /* Previous: accent: '#8A9A86' */
     bg: '#FFFFFF',
     text: '#111111',
@@ -114,7 +114,7 @@ export const SLIDES = [
     secondaryText: '#555555',
     accent: '#D97706',
     noteCategory: 'COLLECTOR EDITION',
-    keyNotes: ['Faceted Glass Flacon', 'Hand-Sealed Baudruchage', 'Chanel Seal'],
+    keyNotes: ['Faceted Glass Flacon', 'Hand-Sealed Baudruchage', 'Lune Seal'],
     pose: {
       rotation: [0, Math.PI * 2, 0],
     },

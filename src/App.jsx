@@ -1,6 +1,21 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import HeroSlider from './components/HeroSlider';
+import Collectionproducts from './components/Collectionproducts';
+import ProductDetailsPage from './components/ProductDetailsPage';
+import Navbar from './components/Navbar';
+import AccountModal from './components/AccountModal';
+import DiscountOfferModal from './components/DiscountOfferModal';
 import './App.css';
+
+// Automatically scroll to top of page on route changes
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
 
 function App() {
   const [loaderKey, setLoaderKey] = useState(0);
@@ -13,6 +28,13 @@ function App() {
       return 'loading';
     }
   });
+
+  // Global E-commerce Cart & Account State
+  const [cartItems, setCartItems] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+
+  const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleModelLoaded = useCallback(() => {
     setIsModelLoaded(true);
@@ -45,20 +67,83 @@ function App() {
   }, []);
 
   return (
-    /* Previous background: bg-[#FAFAFA] */
-    <main className="relative min-h-screen w-full bg-white flex flex-col justify-between overflow-hidden">
-      <div className="w-full min-h-screen z-10">
-        <HeroSlider
-          loaderKey={loaderKey}
+    <BrowserRouter>
+      <ScrollToTop />
+      <main className="relative min-h-screen w-full bg-white flex flex-col justify-between overflow-x-hidden">
+        {/* Global Floating Luxury Navbar */}
+        <Navbar
           loaderState={loaderState}
-          isModelLoaded={isModelLoaded}
-          onModelLoaded={handleModelLoaded}
-          onLoaderStartExit={handleLoaderStartExit}
-          onLoaderComplete={handleLoaderComplete}
-          onReplayLoader={handleReplayLoader}
+          cartCount={totalCartCount}
+          onOpenCart={() => setIsCartOpen(true)}
+          onOpenAccount={() => setIsAccountOpen(true)}
         />
-      </div>
-    </main>
+
+        {/* Global Account Drawer Modal */}
+        <AccountModal
+          isOpen={isAccountOpen}
+          onClose={() => setIsAccountOpen(false)}
+          onOpenCart={() => setIsCartOpen(true)}
+        />
+
+        <div className="w-full min-h-screen z-10">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <HeroSlider
+                  loaderKey={loaderKey}
+                  loaderState={loaderState}
+                  isModelLoaded={isModelLoaded}
+                  onModelLoaded={handleModelLoaded}
+                  onLoaderStartExit={handleLoaderStartExit}
+                  onLoaderComplete={handleLoaderComplete}
+                  onReplayLoader={handleReplayLoader}
+                  cartItems={cartItems}
+                  setCartItems={setCartItems}
+                  isCartOpen={isCartOpen}
+                  setIsCartOpen={setIsCartOpen}
+                />
+              }
+            />
+            <Route
+              path="/collection"
+              element={
+                <Collectionproducts
+                  cartItems={cartItems}
+                  setCartItems={setCartItems}
+                  isCartOpen={isCartOpen}
+                  setIsCartOpen={setIsCartOpen}
+                  onOpenAccount={() => setIsAccountOpen(true)}
+                />
+              }
+            />
+            <Route
+              path="/product"
+              element={
+                <ProductDetailsPage
+                  cartItems={cartItems}
+                  setCartItems={setCartItems}
+                  isCartOpen={isCartOpen}
+                  setIsCartOpen={setIsCartOpen}
+                />
+              }
+            />
+            <Route
+              path="/product/:id"
+              element={
+                <ProductDetailsPage
+                  cartItems={cartItems}
+                  setCartItems={setCartItems}
+                  isCartOpen={isCartOpen}
+                  setIsCartOpen={setIsCartOpen}
+                />
+              }
+            />
+          </Routes>
+          <DiscountOfferModal />
+        </div>
+      </main>
+    </BrowserRouter>
   );
 }
 

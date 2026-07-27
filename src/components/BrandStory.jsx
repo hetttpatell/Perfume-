@@ -56,7 +56,7 @@ export default function BrandStory() {
         >
           <img
             src={brandHeritageBg}
-            alt="Chanel N°19 Heritage Photography"
+            alt="Lune Heritage Photography"
             /* Previous theme filter: filter brightness-95 contrast-105 */
             className="w-full h-full object-cover object-center filter brightness-105 contrast-100 group-hover:scale-105 transition-transform duration-700"
           />
@@ -69,7 +69,7 @@ export default function BrandStory() {
               PARIS, 1970 • ARCHIVE
             </span>
             <p className="font-serif text-lg md:text-xl font-light text-white tracking-wide drop-shadow-sm">
-              Mademoiselle Chanel & Henri Robert
+              Maison Lune & Master Perfumers
             </p>
           </div>
         </div>
@@ -94,7 +94,7 @@ export default function BrandStory() {
             </h3>
 
             <p className="font-sans font-light text-xs sm:text-sm md:text-base leading-relaxed text-[#333333] mb-8">
-              In 1970, at eighty-seven years of age, Coco Chanel commissioned master perfumer Henri Robert to craft her final personal fragrance signature. Refusing sweet conformist florals, she demanded a scent with bite—an unexpected contrast between sharp galbanum green freshness and rich iris nobility.
+              In 1970, Maison Lune commissioned master perfumers to craft a signature fragrance statement. Refusing sweet conformist florals, the house demanded a scent with bite—an unexpected contrast between sharp galbanum green freshness and rich iris nobility.
             </p>
 
             <div className="pt-6 border-t border-black/5 flex items-center justify-between">
@@ -134,7 +134,7 @@ export default function BrandStory() {
             </h3>
 
             <p className="font-sans font-light text-xs sm:text-sm md:text-base leading-relaxed text-[#333333] mb-8">
-              The soul of N°19 rests upon Iris Pallida, cultivated in the historic fields of Florence and Grasse. Maturing the rhizomes requires six years of unhurried patience—three years growing in the soil and three years drying in quiet darkness before slow steam distillation yields the precious powdery iris butter.
+              The soul of Lune rests upon Iris Pallida, cultivated in the historic fields of Florence and Grasse. Maturing the rhizomes requires six years of unhurried patience—three years growing in the soil and three years drying in quiet darkness before slow steam distillation yields the precious powdery iris butter.
             </p>
 
             <div className="pt-6 border-t border-black/5 flex items-center justify-between">

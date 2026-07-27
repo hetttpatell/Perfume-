@@ -7,11 +7,11 @@ const TESTIMONIALS_DATA = [
     author: 'VOGUE HAUTE PARFUMERIE',
     role: 'Editorial Review',
     location: 'PARIS, FRANCE',
-    product: 'N°19 EXTRAIT DE PARFUM',
+    product: 'LUNE EXTRAIT DE PARFUM',
     rating: 5,
     title: 'AN AUDACIOUS STATEMENT OF ELEGANCE',
     quote:
-      'N°19 is not merely a fragrance; it is an audacious statement of independence. The green iris opening resolves into a velvet embrace that lingers with unmatched Parisian elegance.',
+      'Lune is not merely a fragrance; it is an audacious statement of independence. The green iris opening resolves into a velvet embrace that lingers with unmatched Parisian elegance.',
   },
   {
     id: 2,
@@ -29,11 +29,11 @@ const TESTIMONIALS_DATA = [
     author: "HARPER'S BAZAAR",
     role: 'Beauty Gazette',
     location: 'NEW YORK, USA',
-    product: 'LES ATELIERS CHANEL',
+    product: 'LES ATELIERS LUNE',
     rating: 5,
     title: 'THE ULTIMATE OLFACTORY SIGNATURE',
     quote:
-      'The perfect balance between crisp Galbanum and velvety Iris Pallida. Chanel N°19 remains the ultimate olfactory signature of modern haute couture sophistication.',
+      'The perfect balance between crisp Galbanum and velvety Iris Pallida. Lune remains the ultimate olfactory signature of modern haute couture sophistication.',
   },
   {
     id: 4,
@@ -44,7 +44,7 @@ const TESTIMONIALS_DATA = [
     rating: 5,
     title: 'INCOMPARABLE HAUTE COUTURE SILPAGE',
     quote:
-      'Wearing Chanel N°19 feels like wearing an invisible haute couture gown. The sillage is sophisticated, magnetic, and supremely refined without ever feeling overpowering.',
+      'Wearing Lune feels like wearing an invisible haute couture gown. The sillage is sophisticated, magnetic, and supremely refined without ever feeling overpowering.',
   },
   {
     id: 5,
@@ -62,7 +62,7 @@ const TESTIMONIALS_DATA = [
     author: 'SOPHIE VAN DER BERG',
     role: 'Art Director',
     location: 'AMSTERDAM, NETHERLANDS',
-    product: 'N°19 EXTRAIT DE PARFUM',
+    product: 'LUNE EXTRAIT DE PARFUM',
     rating: 5,
     title: 'SENSORY UNBOXING RITUAL',
     quote:

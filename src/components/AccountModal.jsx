@@ -16,7 +16,7 @@ export default function AccountModal({ isOpen, onClose, onOpenCart }) {
   const savedItems = [
     {
       id: 'p1',
-      name: 'N°19 EXTRAIT DE PARFUM',
+      name: 'LUNE EXTRAIT DE PARFUM',
       subtitle: 'FLACON DE PRÉCISION • 15 ML',
       price: '$380.00',
       badge: 'BAUDRUCHAGE SEALED',
@@ -24,7 +24,7 @@ export default function AccountModal({ isOpen, onClose, onOpenCart }) {
     },
     {
       id: 'p2',
-      name: 'N°19 EAU DE PARFUM SPRAY',
+      name: 'LUNE EAU DE PARFUM SPRAY',
       subtitle: 'VAPORISATEUR HAUTE COUTURE • 100 ML',
       price: '$185.00',
       badge: 'ICONIC GREEN IRIS',
@@ -36,14 +36,14 @@ export default function AccountModal({ isOpen, onClose, onOpenCart }) {
     {
       orderId: 'ORD-2026-9812',
       date: 'JULY 18, 2026',
-      items: 'N°19 EXTRAIT DE PARFUM (15 ML) • CUSTOM ENGRAVED',
+      items: 'LUNE EXTRAIT DE PARFUM (15 ML) • CUSTOM ENGRAVED',
       total: '$380.00',
       status: 'DELIVERED',
     },
     {
       orderId: 'ORD-2026-4410',
       date: 'MAY 02, 2026',
-      items: 'N°19 RITUEL BODY CREAM & SOAP SET',
+      items: 'LUNE RITUEL BODY CREAM & SOAP SET',
       total: '$210.00',
       status: 'DELIVERED',
     },

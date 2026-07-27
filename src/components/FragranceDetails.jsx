@@ -23,7 +23,7 @@ export default function FragranceDetails({ slideData, onClose, onReplayLoader })
         <div className="flex items-center gap-3">
           <span className="w-2.5 h-2.5 rounded-full bg-[#111111]" />
           <span className="font-serif text-lg md:text-xl font-medium tracking-[0.2em] uppercase text-[#111111]">
-            CHANEL N°19 DETAILS
+            LUNE PARFUM DETAILS
           </span>
         </div>
 
@@ -184,7 +184,7 @@ export default function FragranceDetails({ slideData, onClose, onReplayLoader })
 
       {/* Footer */}
       <footer className="w-full px-6 md:px-12 py-6 border-t border-black/5 flex items-center justify-between text-xs font-sans text-[#737373]">
-        <span>CHANEL N°19 HAUTE PARFUMERIE</span>
+        <span>LUNE HAUTE PARFUMERIE</span>
         <span>GRASSE & PARIS</span>
       </footer>
     </div>

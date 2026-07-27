@@ -234,7 +234,7 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
         <FloatingNotes slideData={currentData} />
         <img
           src={HERO_SVG}
-          alt="Chanel N°19 Perfume Flacon"
+          alt="Lune Perfume Flacon"
           className="w-auto h-[44vh] sm:h-[50vh] md:h-[58vh] lg:h-[65vh] xl:h-[70vh] max-h-[720px] object-contain drop-shadow-[0_30px_45px_rgba(0,0,0,0.15)] select-none pointer-events-none"
           draggable={false}
         />
@@ -251,7 +251,7 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
         <FloatingNotes slideData={incomingData} />
         <img
           src={HERO_SVG}
-          alt="Chanel N°19 Perfume Flacon"
+          alt="Lune Perfume Flacon"
           className="w-auto h-[44vh] sm:h-[50vh] md:h-[58vh] lg:h-[65vh] xl:h-[70vh] max-h-[720px] object-contain drop-shadow-[0_30px_45px_rgba(0,0,0,0.15)] select-none pointer-events-none"
           draggable={false}
         />
@@ -625,20 +625,6 @@ export default function HeroSlider({
         />
       )}
 
-      {/* Standalone Top Floating Luxury Navbar */}
-      <Navbar
-        cartCount={totalCartCount}
-        onOpenCart={() => setIsCartOpen(true)}
-        onOpenAccount={() => setIsAccountOpen(true)}
-      />
-
-      {/* Account VIP Drawer Modal */}
-      <AccountModal
-        isOpen={isAccountOpen}
-        onClose={() => setIsAccountOpen(false)}
-        onOpenCart={() => setIsCartOpen(true)}
-      />
-
       {/* Hero Showcase Section */}
       <section
         id="hero"
@@ -647,7 +633,7 @@ export default function HeroSlider({
         onTouchEnd={handleTouchEnd}
         className="relative w-full min-h-[100dvh] md:min-h-screen flex flex-col justify-between overflow-hidden select-none transition-colors duration-300 touch-pan-y"
         style={{ backgroundColor: SLIDES[0].bg, color: SLIDES[0].text }}
-        aria-label="Chanel N°19 Interactive Fragrance Showcase"
+        aria-label="Lune Interactive Fragrance Showcase"
       >
         {/* Large Background Watermark Text — Continuous Unbroken Display */}
         <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center md:justify-end md:pr-6 lg:pr-10 overflow-hidden select-none">
@@ -784,7 +770,7 @@ export default function HeroSlider({
         <SensoryRitual />
       </div>
 
-      {/* Haute Parfumerie Boutique (Products, Testimonials, Map & Footer) */}
+      {/* Haute Parfumerie Boutique (Featured Products, Testimonials, Map & Footer) */}
       <OlfactoryExperience
         onScrollToTop={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         cartItems={cartItems}

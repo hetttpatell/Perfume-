@@ -1,12 +1,12 @@
 export default function BrandLocationsMap() {
   const primaryLocation = {
     name: '31 RUE CAMBON • PARIS FLAGSHIP',
-    frenchTitle: 'Maison Haute Parfumerie Chanel',
+    frenchTitle: 'Maison Haute Parfumerie Lune',
     city: 'PARIS, FRANCE',
     address: '31 Rue Cambon, 75001 Paris, France',
     hours: 'MON - SAT: 10:00 AM - 7:00 PM',
     phone: '+33 1 44 50 70 00',
-    description: 'The historic heart of Chanel. Experience bespoke fragrance consultations, private olfactory rituals, and hand-sealed baudruchage flacon sealing.',
+    description: 'The historic heart of Lune. Experience bespoke fragrance consultations, private olfactory rituals, and hand-sealed baudruchage flacon sealing.',
     mapUrl: 'https://maps.google.com/maps?q=31%20Rue%20Cambon%2075001%20Paris%20France&t=&z=16&ie=UTF8&iwloc=&output=embed',
     directionsUrl: 'https://www.google.com/maps/dir/?api=1&destination=31+Rue+Cambon+75001+Paris+France',
     coordinates: '48.8681° N, 2.3259° E'
@@ -24,7 +24,7 @@ export default function BrandLocationsMap() {
           VISIT OUR PARISIAN ATELIER
         </h2>
         <p className="font-sans text-xs sm:text-sm text-[#555555] font-light mt-1 max-w-2xl leading-relaxed">
-          The historic home of Chanel Haute Parfumerie. Discover our full N°19 collection, private fragrance rituals, and artisanal baudruchage flacons.
+          The historic home of Lune Haute Parfumerie. Discover our full Lune collection, private fragrance rituals, and artisanal baudruchage flacons.
         </p>
       </div>
 
@@ -131,7 +131,7 @@ export default function BrandLocationsMap() {
           {/* Embedded Google Map iframe in full vivid color */}
           <div className="flex-1 w-full h-full min-h-[300px] relative">
             <iframe
-              title="Google Map of Chanel Paris Flagship Boutique"
+              title="Google Map of Lune Paris Flagship Boutique"
               src={primaryLocation.mapUrl}
               className="w-full h-full min-h-[300px] border-0"
               allowFullScreen=""
