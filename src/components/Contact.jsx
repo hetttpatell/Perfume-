@@ -82,8 +82,8 @@ export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCart
         </motion.div>
       </section>
 
-      {/* ── 2. SPLIT LAYOUT (Form Left / Concierge Channels & FAQs Right) ── */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 pb-16 sm:pb-24">
+      {/* ── 2. SECTION 1: CONTACT FORM & DIRECT CHANNELS GRID ── */}
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 pb-12 sm:pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
           {/* LEFT COLUMN: Clean Luxury Contact Form */}
@@ -192,7 +192,7 @@ export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCart
             </form>
           </motion.div>
 
-          {/* RIGHT COLUMN: Concierge Channels & Numbered FAQ Accordion */}
+          {/* RIGHT COLUMN: Direct Concierge Channels */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -200,7 +200,7 @@ export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCart
             className="lg:col-span-5 flex flex-col gap-6"
           >
             {/* Direct Concierge Contact Box */}
-            <div className="bg-[#111111] text-white p-6 sm:p-8 rounded-3xl flex flex-col gap-5 border border-black shadow-md">
+            <div className="bg-[#111111] text-white p-6 sm:p-8 rounded-3xl flex flex-col gap-6 border border-black shadow-md">
               <div className="flex items-center justify-between border-b border-white/15 pb-4">
                 <span className="font-sans text-[10px] font-bold uppercase tracking-[0.25em] text-[#C08A3E]">
                   DIRECT CHANNELS
@@ -208,100 +208,107 @@ export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCart
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div className="flex flex-col gap-5 text-xs">
                 <div>
-                  <span className="text-gray-400 block text-[10px] uppercase tracking-wider">Email Concierge</span>
-                  <a href="mailto:concierge@perfume.com" className="font-semibold text-white hover:text-[#C08A3E] transition-colors">
+                  <span className="text-gray-400 block text-[10px] uppercase tracking-wider mb-0.5">Email Concierge</span>
+                  <a href="mailto:concierge@perfume.com" className="font-semibold text-sm text-white hover:text-[#C08A3E] transition-colors">
                     concierge@perfume.com
                   </a>
                 </div>
 
-                <div>
-                  <span className="text-gray-400 block text-[10px] uppercase tracking-wider">Telephone</span>
-                  <a href="tel:+33144507000" className="font-semibold text-white hover:text-[#C08A3E] transition-colors">
+                <div className="border-t border-white/10 pt-3">
+                  <span className="text-gray-400 block text-[10px] uppercase tracking-wider mb-0.5">Telephone Hotline</span>
+                  <a href="tel:+33144507000" className="font-semibold text-sm text-white hover:text-[#C08A3E] transition-colors">
                     +33 (0)1 44 50 70 00
                   </a>
                 </div>
 
-                <div>
-                  <span className="text-gray-400 block text-[10px] uppercase tracking-wider">Paris Flagship</span>
-                  <span className="text-gray-200">31 Rue Cambon, 75001</span>
+                <div className="border-t border-white/10 pt-3">
+                  <span className="text-gray-400 block text-[10px] uppercase tracking-wider mb-0.5">Paris Flagship Boutique</span>
+                  <span className="text-gray-200 block text-xs font-medium">31 Rue Cambon, 75001 Paris</span>
+                  <span className="text-[11px] text-[#C08A3E]">Baudruchage Sealing Workshop</span>
                 </div>
 
-                <div>
-                  <span className="text-gray-400 block text-[10px] uppercase tracking-wider">New York Salon</span>
-                  <span className="text-gray-200">767 Fifth Avenue, NY</span>
+                <div className="border-t border-white/10 pt-3">
+                  <span className="text-gray-400 block text-[10px] uppercase tracking-wider mb-0.5">New York Boutique</span>
+                  <span className="text-gray-200 block text-xs font-medium">767 Fifth Avenue, New York, NY</span>
+                  <span className="text-[11px] text-[#C08A3E]">Diamond Monogramming Atelier</span>
                 </div>
               </div>
             </div>
-
-            {/* Unique Styled Luxury FAQ Accordion */}
-            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-200 shadow-2xs flex flex-col gap-5">
-              <div className="flex flex-col gap-1 border-b border-gray-100 pb-4">
-                <span className="font-sans text-[10px] font-bold uppercase tracking-[0.25em] text-[#C08A3E]">
-                  HELPFUL ANSWERS
-                </span>
-                <h3 className="font-serif text-xl font-bold text-[#111111]">
-                  Frequently Asked Questions
-                </h3>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                {faqs.map((faq) => {
-                  const isOpen = openFaq === faq.id;
-                  return (
-                    <div
-                      key={faq.id}
-                      className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
-                        isOpen
-                          ? 'bg-[#FAF8F5] border-[#C08A3E]/40 shadow-2xs'
-                          : 'bg-white border-gray-200/80 hover:border-gray-300'
-                      }`}
-                    >
-                      <button
-                        onClick={() => setOpenFaq(isOpen ? null : faq.id)}
-                        className="w-full p-4 text-left flex items-center justify-between gap-3 cursor-pointer"
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className={`font-sans text-xs font-bold tracking-widest ${isOpen ? 'text-[#C08A3E]' : 'text-gray-400'}`}>
-                            {faq.num}
-                          </span>
-                          <span className="font-sans font-bold text-xs sm:text-sm text-[#111111]">
-                            {faq.question}
-                          </span>
-                        </div>
-                        <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180 bg-[#111111] text-white' : 'bg-gray-100 text-[#555555]'}`}>
-                          ↓
-                        </span>
-                      </button>
-
-                      <AnimatePresence>
-                        {isOpen && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.25 }}
-                            className="overflow-hidden"
-                          >
-                            <div className="px-4 pb-4 pt-1 pl-10 text-xs text-[#555555] leading-relaxed border-t border-gray-200/40">
-                              {faq.answer}
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
           </motion.div>
 
         </div>
       </section>
 
-      {/* ── 3. GLOBAL FOOTER ── */}
+      {/* ── 3. SECTION 2: FREQUENTLY ASKED QUESTIONS (Positioned Below Form) ── */}
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 py-12 sm:py-20 border-t border-gray-200">
+        
+        {/* Centered FAQ Header */}
+        <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-10 sm:mb-14">
+          <span className="font-sans text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-[#C08A3E] bg-[#C08A3E]/10 px-4 py-1.5 rounded-full border border-[#C08A3E]/20 mb-3">
+            HELPFUL ANSWERS
+          </span>
+          <h2 className="font-serif text-3xl sm:text-5xl font-bold text-[#111111] tracking-tight">
+            Frequently Asked Questions
+          </h2>
+          <p className="font-sans text-xs sm:text-sm text-[#666666] mt-2">
+            Quick answers regarding sample orders, custom engraving, returns, and scent consultations.
+          </p>
+        </div>
+
+        {/* Centered FAQ Accordion List */}
+        <div className="max-w-4xl mx-auto flex flex-col gap-4">
+          {faqs.map((faq) => {
+            const isOpen = openFaq === faq.id;
+            return (
+              <div
+                key={faq.id}
+                className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
+                  isOpen
+                    ? 'bg-[#FAF8F5] border-[#C08A3E]/40 shadow-xs'
+                    : 'bg-white border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <button
+                  onClick={() => setOpenFaq(isOpen ? null : faq.id)}
+                  className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 cursor-pointer"
+                >
+                  <div className="flex items-center gap-4">
+                    <span className={`font-sans text-xs font-bold tracking-widest ${isOpen ? 'text-[#C08A3E]' : 'text-gray-400'}`}>
+                      {faq.num}
+                    </span>
+                    <span className="font-sans font-bold text-xs sm:text-sm md:text-base text-[#111111]">
+                      {faq.question}
+                    </span>
+                  </div>
+                  <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180 bg-[#111111] text-white' : 'bg-gray-100 text-[#555555]'}`}>
+                    ↓
+                  </span>
+                </button>
+
+                <AnimatePresence>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-5 sm:px-6 pb-6 pt-1 pl-12 text-xs sm:text-sm text-[#555555] leading-relaxed border-t border-gray-200/40">
+                        {faq.answer}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ── 4. GLOBAL FOOTER ── */}
       <Footer />
 
     </div>
