@@ -68,10 +68,6 @@ export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCart
           transition={{ duration: 0.6 }}
           className="flex flex-col items-center gap-3 max-w-2xl"
         >
-          <span className="font-sans text-[10px] sm:text-xs font-bold uppercase tracking-[0.35em] text-[#C08A3E] bg-[#C08A3E]/10 px-4 py-1.5 rounded-full border border-[#C08A3E]/20">
-            HAUTE PARFUMERIE CONCIERGE
-          </span>
-
           <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl font-bold text-[#111111] tracking-tight leading-tight">
             Concierge & Inquiries
           </h1>
@@ -246,9 +242,6 @@ export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCart
         
         {/* Centered FAQ Header */}
         <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-10 sm:mb-14">
-          <span className="font-sans text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-[#C08A3E] bg-[#C08A3E]/10 px-4 py-1.5 rounded-full border border-[#C08A3E]/20 mb-3">
-            HELPFUL ANSWERS
-          </span>
           <h2 className="font-serif text-3xl sm:text-5xl font-bold text-[#111111] tracking-tight">
             Frequently Asked Questions
           </h2>
