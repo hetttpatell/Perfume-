@@ -4,6 +4,7 @@ import HeroSlider from './components/HeroSlider';
 import Collectionproducts from './components/Collectionproducts';
 import ProductDetailsPage from './components/ProductDetailsPage';
 import Navbar from './components/Navbar';
+import About from './components/About';
 import AccountModal from './components/AccountModal';
 import DiscountOfferModal from './components/DiscountOfferModal';
 import './App.css';
@@ -109,6 +110,18 @@ function App() {
               path="/collection"
               element={
                 <Collectionproducts
+                  cartItems={cartItems}
+                  setCartItems={setCartItems}
+                  isCartOpen={isCartOpen}
+                  setIsCartOpen={setIsCartOpen}
+                  onOpenAccount={() => setIsAccountOpen(true)}
+                />
+              }
+            />
+            <Route
+              path="/about"
+              element={
+                <About
                   cartItems={cartItems}
                   setCartItems={setCartItems}
                   isCartOpen={isCartOpen}

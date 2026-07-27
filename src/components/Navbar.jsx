@@ -14,7 +14,7 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
   const navLinks = [
     { id: 'hero', label: 'Homepage', targetId: 'hero', path: '/' },
     { id: 'products', label: 'Collection', targetId: 'products', path: '/collection' },
-    { id: 'about', label: 'About', targetId: 'about', path: '/#about' },
+    { id: 'about', label: 'About', targetId: 'about', path: '/about' },
     { id: 'gallery', label: 'Gallery', targetId: 'gallery', path: '/#gallery' },
     { id: 'contact', label: 'Contact', targetId: 'contact', path: '/#contact' },
   ];
@@ -37,6 +37,8 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
   useEffect(() => {
     if (location.pathname === '/collection') {
       setActiveSection('products');
+    } else if (location.pathname === '/about') {
+      setActiveSection('about');
     }
 
     let ticking = false;
@@ -50,7 +52,7 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
           if (location.pathname === '/') {
             // Section tracking for active highlighting on Homepage
             const sections = navLinks
-              .filter(link => link.id !== 'products')
+              .filter(link => link.id !== 'products' && link.id !== 'about')
               .map((link) => document.getElementById(link.targetId))
               .filter(Boolean);
             let currentActive = 'hero';
@@ -81,6 +83,12 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
 
     if (targetId === 'products') {
       navigate('/collection');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (targetId === 'about') {
+      navigate('/about');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }

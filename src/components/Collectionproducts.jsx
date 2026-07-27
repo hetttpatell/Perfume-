@@ -83,7 +83,7 @@ export default function Collectionproducts({
   };
 
   return (
-    <div className="w-full min-h-screen bg-white text-[#111111] font-sans pt-14 sm:pt-24 md:pt-28 pb-12 overflow-x-hidden selection:bg-[#111111] selection:text-white">
+    <div className="w-full min-h-screen bg-white text-[#111111] font-sans pt-0 sm:pt-24 md:pt-28 pb-12 overflow-x-hidden selection:bg-[#111111] selection:text-white">
       {/* ── 1. DEDICATED RESPONSIVE HERO BANNER (MOBILE PORTRAIT vs DESKTOP 10:3) ── */}
       <section className="relative w-full overflow-hidden bg-[#0F2230] text-white min-h-[310px] sm:min-h-[380px] lg:min-h-[440px] sm:aspect-[16/9] lg:aspect-[10/3] flex items-center border-b border-black/10 shadow-[0_15px_40px_rgba(0,0,0,0.15)]">
         {/* Dedicated Mobile Image (< sm screens) */}
@@ -101,10 +101,10 @@ export default function Collectionproducts({
         />
 
         {/* Soft Contrast Gradient Layer (Ensures Text Legibility) */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/45 to-transparent sm:bg-gradient-to-r sm:from-black/75 sm:via-black/35 sm:to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-transparent sm:bg-gradient-to-r sm:from-black/80 sm:via-black/40 sm:to-transparent pointer-events-none" />
 
         {/* Max-Width Content Wrapper */}
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 py-8 sm:py-14 md:py-16 relative z-10">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 pt-20 sm:py-14 md:py-16 pb-8 relative z-10">
           <div className="w-full md:w-8/12 lg:w-6/12">
             {/* Main Headline */}
             <h1 className="font-serif font-light text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-white tracking-tight leading-[1.1] mb-3 sm:mb-5 drop-shadow-md">

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { BOUTIQUE_PRODUCTS } from '../data/boutiqueProducts';
 import Footer from './Footer';
@@ -31,8 +31,8 @@ export default function ProductDetailsPage({
   // Lightbox Zoom state
   const [zoomImage, setZoomImage] = useState(null);
 
-  // Reviews Drawer / Modal state
-  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  // Reviews Drawer / Inline Form state
+  const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
   const [newReview, setNewReview] = useState({ rating: 5, author: '', title: '', comment: '' });
   const [localReviews, setLocalReviews] = useState(product.reviews || []);
 
@@ -41,6 +41,16 @@ export default function ProductDetailsPage({
   // Fixed unit price
   const unitPrice = product.price;
   const totalPrice = unitPrice * quantity;
+
+  // Auto-dismiss added toast after 4 seconds
+  useEffect(() => {
+    if (addedToast) {
+      const timer = setTimeout(() => {
+        setAddedToast(false);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [addedToast]);
 
   const handleAddToCart = () => {
     setCartItems((prev) => {
@@ -63,10 +73,6 @@ export default function ProductDetailsPage({
     });
 
     setAddedToast(true);
-    setTimeout(() => {
-      setAddedToast(false);
-      setIsCartOpen(true);
-    }, 800);
   };
 
   const handleShare = () => {
@@ -94,7 +100,7 @@ export default function ProductDetailsPage({
 
     setLocalReviews((prev) => [created, ...prev]);
     setNewReview({ rating: 5, author: '', title: '', comment: '' });
-    setIsReviewModalOpen(false);
+    setIsReviewFormOpen(false);
   };
 
   return (
@@ -338,31 +344,33 @@ export default function ProductDetailsPage({
               </div>
 
               {/* QUANTITY & ADD TO CART CTA */}
-              <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-2 sm:gap-3 mb-4 w-full">
                 {/* Quantity Selector Box */}
-                <div className="flex items-center border border-black/20 rounded-xl overflow-hidden bg-[#F9F9F9] h-12">
+                <div className="flex items-center border border-black/20 rounded-xl overflow-hidden bg-[#F9F9F9] h-12 shrink-0">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="px-4 text-base font-bold text-[#1A1A1A] hover:bg-black/10 transition-colors cursor-pointer h-full"
+                    className="w-8 sm:w-10 text-base font-bold text-[#1A1A1A] hover:bg-black/10 transition-colors cursor-pointer h-full flex items-center justify-center"
+                    aria-label="Decrease quantity"
                   >
                     -
                   </button>
-                  <span className="px-3 font-sans text-sm font-extrabold text-[#1A1A1A]">
+                  <span className="px-2 sm:px-3 font-sans text-xs sm:text-sm font-extrabold text-[#1A1A1A]">
                     {quantity}
                   </span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
-                    className="px-4 text-base font-bold text-[#1A1A1A] hover:bg-black/10 transition-colors cursor-pointer h-full"
+                    className="w-8 sm:w-10 text-base font-bold text-[#1A1A1A] hover:bg-black/10 transition-colors cursor-pointer h-full flex items-center justify-center"
+                    aria-label="Increase quantity"
                   >
                     +
                   </button>
                 </div>
 
-                {/* ADD TO BAG Button */}
+                {/* ADD TO BAG Button - Optimized for Mobile & Desktop */}
                 <button
                   onClick={handleAddToCart}
                   disabled={addedToast}
-                  className={`flex-1 h-12 text-xs font-sans font-extrabold tracking-[0.25em] uppercase rounded-xl transition-all duration-300 cursor-pointer shadow-md flex items-center justify-center gap-2 ${
+                  className={`flex-1 h-12 px-2.5 sm:px-5 text-[10px] xs:text-xs sm:text-xs font-sans font-extrabold tracking-[0.08em] xs:tracking-[0.15em] sm:tracking-[0.25em] uppercase rounded-xl transition-all duration-300 cursor-pointer shadow-md flex items-center justify-center gap-1.5 whitespace-nowrap overflow-hidden text-ellipsis ${
                     addedToast
                       ? 'bg-emerald-700 text-white'
                       : 'bg-[#1A1A1A] text-white hover:bg-black active:scale-[0.98]'
@@ -370,14 +378,14 @@ export default function ProductDetailsPage({
                 >
                   {addedToast ? (
                     <>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span>ADDED TO HAUTE BAG</span>
+                      <span className="truncate">ADDED TO BAG</span>
                     </>
                   ) : (
                     <>
-                      <span>ADD TO CART • ${totalPrice.toFixed(2)}</span>
+                      <span className="truncate">ADD TO CART • ${totalPrice.toFixed(2)}</span>
                     </>
                   )}
                 </button>
@@ -543,12 +551,115 @@ export default function ProductDetailsPage({
             </div>
 
             <button
-              onClick={() => setIsReviewModalOpen(true)}
-              className="px-6 py-3.5 bg-[#1A1A1A] text-white text-xs font-sans font-extrabold tracking-[0.2em] uppercase rounded-xl hover:bg-black transition-colors cursor-pointer shadow-md"
+              onClick={() => setIsReviewFormOpen(!isReviewFormOpen)}
+              className="px-6 py-3.5 bg-[#1A1A1A] text-white text-xs font-sans font-extrabold tracking-[0.2em] uppercase rounded-xl hover:bg-black transition-colors cursor-pointer shadow-md flex items-center gap-2"
             >
-              WRITE A REVIEW
+              <span>{isReviewFormOpen ? 'CANCEL REVIEW' : 'WRITE A REVIEW'}</span>
+              <span className="text-base leading-none">{isReviewFormOpen ? '✕' : '+'}</span>
             </button>
           </div>
+
+          {/* Inline Write a Review Form Section */}
+          {isReviewFormOpen && (
+            <div className="bg-white border border-black/10 rounded-2xl p-6 sm:p-8 mb-10 shadow-sm animate-fadeIn text-[#1A1A1A]">
+              <div className="flex items-center justify-between border-b border-black/10 pb-4 mb-6">
+                <div>
+                  <span className="text-[10px] font-sans uppercase tracking-[0.25em] text-[#C08A3E] font-bold block mb-1">
+                    COMMUNITY FEEDBACK
+                  </span>
+                  <h3 className="font-serif text-xl sm:text-2xl font-bold uppercase tracking-tight text-[#1A1A1A]">
+                    Write a Customer Review
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setIsReviewFormOpen(false)}
+                  className="p-2 text-[#737373] hover:text-[#1A1A1A] text-sm font-bold cursor-pointer"
+                  aria-label="Close review form"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleAddReviewSubmit} className="space-y-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-sans font-bold uppercase tracking-wider text-[#1A1A1A] mb-1.5">
+                      Overall Rating:
+                    </label>
+                    <select
+                      value={newReview.rating}
+                      onChange={(e) => setNewReview({ ...newReview, rating: Number(e.target.value) })}
+                      className="w-full p-3 bg-[#F9F9FB] border border-black/15 rounded-xl text-xs font-sans text-[#1A1A1A] focus:outline-none focus:border-black cursor-pointer"
+                    >
+                      <option value={5}>★★★★★ (5/5 Excellent)</option>
+                      <option value={4}>★★★★☆ (4/5 Very Good)</option>
+                      <option value={3}>★★★☆☆ (3/5 Average)</option>
+                      <option value={2}>★★☆☆☆ (2/5 Below Average)</option>
+                      <option value={1}>★☆☆☆☆ (1/5 Poor)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-sans font-bold uppercase tracking-wider text-[#1A1A1A] mb-1.5">
+                      Your Name:
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Vivienne Westwood"
+                      value={newReview.author}
+                      onChange={(e) => setNewReview({ ...newReview, author: e.target.value })}
+                      className="w-full p-3 bg-[#F9F9FB] border border-black/15 rounded-xl text-xs font-sans text-[#1A1A1A] focus:outline-none focus:border-black"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-sans font-bold uppercase tracking-wider text-[#1A1A1A] mb-1.5">
+                    Review Headline:
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Exquisite fragrance with unparalleled elegance"
+                    value={newReview.title}
+                    onChange={(e) => setNewReview({ ...newReview, title: e.target.value })}
+                    className="w-full p-3 bg-[#F9F9FB] border border-black/15 rounded-xl text-xs font-sans text-[#1A1A1A] focus:outline-none focus:border-black"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-sans font-bold uppercase tracking-wider text-[#1A1A1A] mb-1.5">
+                    Review Details:
+                  </label>
+                  <textarea
+                    rows={4}
+                    required
+                    placeholder="Share your experience regarding scent longevity, packaging, and notes..."
+                    value={newReview.comment}
+                    onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+                    className="w-full p-3 bg-[#F9F9FB] border border-black/15 rounded-xl text-xs font-sans text-[#1A1A1A] focus:outline-none focus:border-black"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsReviewFormOpen(false)}
+                    className="px-6 py-3 text-xs font-sans font-bold tracking-widest uppercase text-[#1A1A1A] bg-[#F4F4F6] hover:bg-black/10 rounded-xl transition-all cursor-pointer"
+                  >
+                    CANCEL
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-8 py-3 bg-[#1A1A1A] hover:bg-black text-white text-xs font-sans font-extrabold tracking-[0.2em] uppercase rounded-xl transition-all cursor-pointer shadow-md active:scale-95"
+                  >
+                    SUBMIT REVIEW
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
 
           {/* Rating Breakdown Overview Grid */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12 items-center bg-white p-6 sm:p-8 rounded-2xl border border-black/10 shadow-xs">
@@ -584,42 +695,46 @@ export default function ProductDetailsPage({
             </div>
           </div>
 
-          {/* Reviews List Grid */}
-          <div className="space-y-6">
+          {/* Reviews 2x2 Responsive Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {localReviews.map((rev) => (
               <div
                 key={rev.id}
-                className="p-6 bg-white border border-black/10 rounded-2xl shadow-xs transition-all hover:border-black/30"
+                className="p-4 sm:p-6 bg-white border border-black/10 rounded-2xl shadow-xs transition-all hover:border-black/25 flex flex-col justify-between"
               >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-3">
-                    <div className="flex text-[#C08A3E] text-sm">
-                      {'★'.repeat(rev.rating)}
-                      {'☆'.repeat(5 - rev.rating)}
-                    </div>
-                    <span className="font-sans font-extrabold text-sm text-[#1A1A1A]">
-                      {rev.author}
-                    </span>
-                    {rev.verified && (
-                      <span className="bg-emerald-100 text-emerald-800 text-[9px] font-sans font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                        VERIFIED BUYER
+                <div>
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-3 border-b border-black/5 pb-2.5">
+                    <div className="flex items-center gap-2">
+                      <div className="flex text-[#C08A3E] text-xs sm:text-sm">
+                        {'★'.repeat(rev.rating)}
+                        {'☆'.repeat(5 - rev.rating)}
+                      </div>
+                      <span className="font-sans font-bold text-xs sm:text-sm text-[#1A1A1A]">
+                        {rev.author}
                       </span>
-                    )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {rev.verified && (
+                        <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[8.5px] sm:text-[9px] font-sans font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                          VERIFIED
+                        </span>
+                      )}
+                      <span className="text-[10px] font-sans text-[#888888]">{rev.date}</span>
+                    </div>
                   </div>
-                  <span className="text-[11px] font-sans text-[#888888]">{rev.date}</span>
+
+                  <h4 className="font-serif text-sm sm:text-base text-[#1A1A1A] font-semibold mb-2 uppercase line-clamp-1">
+                    {rev.title}
+                  </h4>
+
+                  <p className="text-xs font-sans text-[#555555] leading-relaxed font-light mb-4">
+                    {rev.comment}
+                  </p>
                 </div>
 
-                <h4 className="font-serif text-base text-[#1A1A1A] font-semibold mb-2 uppercase">
-                  {rev.title}
-                </h4>
-
-                <p className="text-xs font-sans text-[#555555] leading-relaxed font-light mb-4">
-                  {rev.comment}
-                </p>
-
-                <div className="flex items-center gap-2 text-[10px] font-sans text-[#888888]">
+                <div className="flex items-center gap-2 text-[10px] font-sans text-[#888888] pt-3 border-t border-black/5 mt-auto">
                   <span>Was this review helpful?</span>
-                  <button className="hover:text-[#1A1A1A] underline cursor-pointer">
+                  <button className="hover:text-[#1A1A1A] font-bold underline cursor-pointer">
                     Yes ({rev.helpfulCount || 0})
                   </button>
                 </div>
@@ -653,95 +768,81 @@ export default function ProductDetailsPage({
         </div>
       )}
 
-      {/* ── WRITE A REVIEW MODAL ── */}
-      {isReviewModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn"
-          onClick={() => setIsReviewModalOpen(false)}
-        >
-          <div
-            className="w-full max-w-lg bg-white rounded-2xl p-6 sm:p-8 shadow-2xl border border-black/10 text-[#1A1A1A]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between border-b border-black/10 pb-4 mb-4">
-              <h3 className="font-serif text-xl uppercase tracking-tight text-[#1A1A1A]">
-                Write a Customer Review
-              </h3>
+
+      {/* Simple & Modern Theme Toast Notification */}
+      {addedToast && (
+        <div className="fixed top-18 xs:top-20 sm:top-24 left-4 right-4 sm:left-auto sm:right-6 z-50 sm:w-96 max-w-md mx-auto sm:mx-0 bg-white text-[#111111] border border-black/10 shadow-[0_20px_40px_rgba(0,0,0,0.15)] rounded-2xl overflow-hidden animate-toastSlideIn transition-all">
+          <div className="p-4 sm:p-5">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-black/10 pb-3 mb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center font-bold text-xs shrink-0">
+                  ✓
+                </div>
+                <div>
+                  <span className="text-[9px] font-sans tracking-[0.2em] text-[#737373] uppercase font-bold block">
+                    MAISON LUNE
+                  </span>
+                  <h4 className="font-serif text-xs font-bold tracking-wider text-[#111111] uppercase">
+                    ADDED TO YOUR BAG
+                  </h4>
+                </div>
+              </div>
               <button
-                onClick={() => setIsReviewModalOpen(false)}
-                className="p-2 text-[#737373] hover:text-[#1A1A1A] text-lg font-bold"
+                onClick={() => setAddedToast(false)}
+                className="text-[#737373] hover:text-[#111111] p-1.5 rounded-full hover:bg-black/5 transition-colors cursor-pointer text-sm leading-none"
+                aria-label="Close notification"
               >
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handleAddReviewSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-sans font-bold uppercase tracking-wider text-[#1A1A1A] mb-1">
-                  Overall Rating:
-                </label>
-                <select
-                  value={newReview.rating}
-                  onChange={(e) => setNewReview({ ...newReview, rating: Number(e.target.value) })}
-                  className="w-full p-2.5 bg-[#F9F9FB] border border-black/20 rounded-xl text-xs font-sans text-[#1A1A1A] focus:outline-none"
-                >
-                  <option value={5}>★★★★★ (5/5 Excellent)</option>
-                  <option value={4}>★★★★☆ (4/5 Very Good)</option>
-                  <option value={3}>★★★☆☆ (3/5 Average)</option>
-                  <option value={2}>★★☆☆☆ (2/5 Below Average)</option>
-                  <option value={1}>★☆☆☆☆ (1/5 Poor)</option>
-                </select>
+            {/* Item Details */}
+            <div className="flex items-center gap-3.5 bg-[#F8F8F8] p-3 rounded-xl border border-black/5 mb-4">
+              <img
+                src={product.image}
+                alt={product.name}
+                className="w-14 h-16 object-contain mix-blend-multiply bg-white rounded-lg p-1 border border-black/5 shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <h5 className="font-serif text-sm font-bold text-[#111111] truncate uppercase">
+                  {product.name}
+                </h5>
+                <p className="font-sans text-[10px] text-[#737373] uppercase tracking-wider mt-0.5">
+                  QTY: {quantity} • 30 ML / 1.0 FL. OZ.
+                </p>
+                <p className="font-sans text-xs font-bold text-[#111111] mt-1">
+                  ${totalPrice.toFixed(2)} USD
+                </p>
               </div>
+            </div>
 
-              <div>
-                <label className="block text-xs font-sans font-bold uppercase tracking-wider text-[#1A1A1A] mb-1">
-                  Your Name:
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Vivienne Westwood"
-                  value={newReview.author}
-                  onChange={(e) => setNewReview({ ...newReview, author: e.target.value })}
-                  className="w-full p-2.5 bg-[#F9F9FB] border border-black/20 rounded-xl text-xs font-sans text-[#1A1A1A] focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-sans font-bold uppercase tracking-wider text-[#1A1A1A] mb-1">
-                  Review Headline:
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Exquisite fragrance with unparalleled elegance"
-                  value={newReview.title}
-                  onChange={(e) => setNewReview({ ...newReview, title: e.target.value })}
-                  className="w-full p-2.5 bg-[#F9F9FB] border border-black/20 rounded-xl text-xs font-sans text-[#1A1A1A] focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-sans font-bold uppercase tracking-wider text-[#1A1A1A] mb-1">
-                  Review Details:
-                </label>
-                <textarea
-                  rows={4}
-                  required
-                  placeholder="Share your experience regarding scent longevity, packaging, and notes..."
-                  value={newReview.comment}
-                  onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
-                  className="w-full p-2.5 bg-[#F9F9FB] border border-black/20 rounded-xl text-xs font-sans text-[#1A1A1A] focus:outline-none"
-                />
-              </div>
-
+            {/* Action Buttons */}
+            <div className="grid grid-cols-2 gap-2.5">
               <button
-                type="submit"
-                className="w-full py-3.5 bg-[#1A1A1A] text-white text-xs font-sans font-extrabold tracking-[0.25em] uppercase rounded-xl hover:bg-black transition-colors cursor-pointer shadow-lg"
+                onClick={() => setAddedToast(false)}
+                className="py-2.5 px-3 text-[10px] font-sans font-bold tracking-widest uppercase text-[#111111] bg-white hover:bg-black/5 rounded-xl border border-black/15 transition-all cursor-pointer text-center"
               >
-                SUBMIT REVIEW
+                KEEP BROWSING
               </button>
-            </form>
+              <button
+                onClick={() => {
+                  setAddedToast(false);
+                  setIsCartOpen(true);
+                }}
+                className="py-2.5 px-3 text-[10px] font-sans font-bold tracking-widest uppercase text-white bg-[#111111] hover:bg-black rounded-xl transition-all cursor-pointer text-center shadow-sm active:scale-95 flex items-center justify-center gap-1.5"
+              >
+                <span>VIEW BAG</span>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Clean Modern Progress Line */}
+          <div className="w-full bg-black/5 h-1">
+            <div className="bg-[#111111] h-full animate-toastProgress" />
           </div>
         </div>
       )}

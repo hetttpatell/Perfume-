@@ -72,7 +72,7 @@ export default function DiscountOfferModal() {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+        <div className="fixed inset-0 z-[100] flex items-start sm:items-center justify-center p-3 sm:p-6 pt-20 sm:pt-6 overflow-y-auto">
           {/* Light Glassmorphic Backdrop Overlay (Not Heavy Blackish) */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -89,11 +89,11 @@ export default function DiscountOfferModal() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94, y: 15 }}
             transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-            className="relative z-10 w-full max-w-sm sm:max-w-xl md:max-w-3xl max-h-[92vh] bg-[#FAF8F5] text-[#111111] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_25px_80px_rgba(0,0,0,0.25)] flex flex-col md:flex-row font-sans border border-black/15 select-none"
+            className="relative z-10 w-full max-w-sm sm:max-w-xl md:max-w-3xl max-h-[85vh] sm:max-h-[92vh] bg-[#FAF8F5] text-[#111111] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_25px_80px_rgba(0,0,0,0.25)] flex flex-col md:flex-row font-sans border border-black/15 select-none my-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Image Column (Top on Mobile, Left on Desktop) */}
-            <div className="relative w-full md:w-5/12 h-40 sm:h-52 md:h-auto min-h-[160px] md:min-h-[440px] overflow-hidden bg-[#111111] shrink-0">
+            <div className="relative w-full md:w-5/12 h-28 sm:h-52 md:h-auto min-h-[110px] sm:min-h-[160px] md:min-h-[440px] overflow-hidden bg-[#111111] shrink-0">
               <img
                 src={brandStoryImg}
                 alt="Lune Heritage"
@@ -101,35 +101,35 @@ export default function DiscountOfferModal() {
               />
 
               {/* Floating Gold Discount Badge */}
-              <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-black/85 backdrop-blur-md border border-amber-400/40 rounded-full shadow-md">
-                <span className="font-sans font-extrabold text-[9px] tracking-[0.2em] text-amber-300 uppercase">
+              <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-black/85 backdrop-blur-md border border-amber-400/40 rounded-full shadow-md">
+                <span className="font-sans font-extrabold text-[8px] sm:text-[9px] tracking-[0.15em] sm:tracking-[0.2em] text-amber-300 uppercase">
                   10% OFF PRIVILEGE
                 </span>
               </div>
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4 sm:p-6 text-white">
-                <span className="font-sans font-bold text-[8.5px] sm:text-[9px] tracking-[0.3em] uppercase text-white/70 mb-0.5">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-3 sm:p-6 text-white">
+                <span className="font-sans font-bold text-[8px] sm:text-[9px] tracking-[0.25em] sm:tracking-[0.3em] uppercase text-white/70 mb-0.5">
                   PARIS • 31 RUE CAMBON
                 </span>
-                <p className="font-serif font-light text-base sm:text-xl md:text-2xl tracking-tight uppercase text-white leading-tight">
+                <p className="font-serif font-light text-sm sm:text-xl md:text-2xl tracking-tight uppercase text-white leading-tight">
                   LE RITUEL DE PARFUM
                 </p>
               </div>
             </div>
 
             {/* Content & Form Column */}
-            <div className="relative w-full md:w-7/12 p-5 sm:p-7 md:p-9 flex flex-col justify-between bg-[#FAF8F5] overflow-y-auto">
+            <div className="relative w-full md:w-7/12 p-4 sm:p-7 md:p-9 flex flex-col justify-between bg-[#FAF8F5] overflow-y-auto">
               {/* Header: Clean Brand Logo + Close Button */}
-              <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-black/10 mb-4">
-                <div className="flex items-center gap-3.5 sm:gap-4 overflow-visible">
-                  {/* Prominent large brand logo matching Navbar scale */}
+              <div className="flex items-center justify-between pb-2.5 sm:pb-4 border-b border-black/10 mb-3 sm:mb-4">
+                <div className="flex items-center gap-2 sm:gap-4 overflow-visible">
+                  {/* Prominent brand logo */}
                   <img
                     src={logoImg}
                     alt="LUNE Fragrance Logo"
-                    className="h-12 sm:h-16 md:h-18 max-h-[75px] w-auto object-contain mix-blend-multiply scale-125 sm:scale-135 origin-left"
+                    className="h-8 sm:h-14 md:h-18 max-h-[75px] w-auto object-contain mix-blend-multiply scale-110 sm:scale-135 origin-left"
                   />
-                  <div className="h-6 w-[1px] bg-black/20" />
-                  <span className="font-sans font-extrabold text-[9.5px] sm:text-[10.5px] tracking-[0.25em] uppercase text-[#111111]">
+                  <div className="h-5 sm:h-6 w-[1px] bg-black/20" />
+                  <span className="font-sans font-extrabold text-[8.5px] sm:text-[10.5px] tracking-[0.2em] sm:tracking-[0.25em] uppercase text-[#111111]">
                     OFFICIAL PRIVILEGE
                   </span>
                 </div>

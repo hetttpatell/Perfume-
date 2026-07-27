@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Footer({ onScrollToTop }) {
   const [email, setEmail] = useState('');
@@ -141,27 +142,22 @@ export default function Footer({ onScrollToTop }) {
             </h4>
             <ul className="space-y-2.5 font-sans text-xs sm:text-sm text-[#555555]">
               <li>
-                <a href="#hero" className="hover:text-black transition-colors block">
+                <Link to="/" className="hover:text-black transition-colors block">
                   Home
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#story" className="hover:text-black transition-colors block">
+                <Link to="/about" className="hover:text-black transition-colors block font-semibold text-black">
                   About Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#services" className="hover:text-black transition-colors block">
-                  Services
-                </a>
+                <Link to="/collection" className="hover:text-black transition-colors block">
+                  Collection & Products
+                </Link>
               </li>
               <li>
-                <a href="#boutique" className="hover:text-black transition-colors block">
-                  Products
-                </a>
-              </li>
-              <li>
-                <a href="#boutiques" className="hover:text-black transition-colors block">
+                <a href="#contact" className="hover:text-black transition-colors block">
                   Contact
                 </a>
               </li>
