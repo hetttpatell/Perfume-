@@ -157,9 +157,9 @@ export default function Footer({ onScrollToTop }) {
                 </Link>
               </li>
               <li>
-                <a href="#contact" className="hover:text-black transition-colors block">
-                  Contact
-                </a>
+                <Link to="/contact" className="hover:text-black transition-colors block">
+                  Contact & Concierge
+                </Link>
               </li>
             </ul>
           </div>

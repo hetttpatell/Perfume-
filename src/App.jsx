@@ -5,6 +5,7 @@ import Collectionproducts from './components/Collectionproducts';
 import ProductDetailsPage from './components/ProductDetailsPage';
 import Navbar from './components/Navbar';
 import About from './components/About';
+import Contact from './components/Contact';
 import AccountModal from './components/AccountModal';
 import DiscountOfferModal from './components/DiscountOfferModal';
 import './App.css';
@@ -122,6 +123,18 @@ function App() {
               path="/about"
               element={
                 <About
+                  cartItems={cartItems}
+                  setCartItems={setCartItems}
+                  isCartOpen={isCartOpen}
+                  setIsCartOpen={setIsCartOpen}
+                  onOpenAccount={() => setIsAccountOpen(true)}
+                />
+              }
+            />
+            <Route
+              path="/contact"
+              element={
+                <Contact
                   cartItems={cartItems}
                   setCartItems={setCartItems}
                   isCartOpen={isCartOpen}

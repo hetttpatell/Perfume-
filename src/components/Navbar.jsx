@@ -16,7 +16,7 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
     { id: 'products', label: 'Collection', targetId: 'products', path: '/collection' },
     { id: 'about', label: 'About', targetId: 'about', path: '/about' },
     { id: 'gallery', label: 'Gallery', targetId: 'gallery', path: '/#gallery' },
-    { id: 'contact', label: 'Contact', targetId: 'contact', path: '/#contact' },
+    { id: 'contact', label: 'Contact', targetId: 'contact', path: '/contact' },
   ];
 
   // Lock background scrolling when mobile menu drawer is open
@@ -39,6 +39,8 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
       setActiveSection('products');
     } else if (location.pathname === '/about') {
       setActiveSection('about');
+    } else if (location.pathname === '/contact') {
+      setActiveSection('contact');
     }
 
     let ticking = false;
@@ -52,7 +54,7 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
           if (location.pathname === '/') {
             // Section tracking for active highlighting on Homepage
             const sections = navLinks
-              .filter(link => link.id !== 'products' && link.id !== 'about')
+              .filter(link => link.id !== 'products' && link.id !== 'about' && link.id !== 'contact')
               .map((link) => document.getElementById(link.targetId))
               .filter(Boolean);
             let currentActive = 'hero';
@@ -89,6 +91,12 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
 
     if (targetId === 'about') {
       navigate('/about');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (targetId === 'contact') {
+      navigate('/contact');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
