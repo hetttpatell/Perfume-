@@ -3,100 +3,59 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import Footer from './Footer';
 
-// Luxury High-Res Assets
-import contactHeroBg from '../assets/phlur_contact_hero.png';
-import parisBoutiqueImg from '../assets/phlur_paris_boutique.png';
-import nyBoutiqueImg from '../assets/brand_heritage_story.png';
-
 export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCartOpen, onOpenAccount }) {
   const navigate = useNavigate();
 
   // Contact Form State
-  const [selectedTopic, setSelectedTopic] = useState('Private Consultation');
+  const [selectedTopic, setSelectedTopic] = useState('General Inquiry');
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
-    phone: '',
     subject: '',
     message: '',
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [activeBoutiqueTab, setActiveBoutiqueTab] = useState('paris');
 
   // FAQ Accordion State
-  const [openFaq, setOpenFaq] = useState(null);
+  const [openFaq, setOpenFaq] = useState('faq-1');
 
   const topicOptions = [
-    { id: 'Private Consultation', label: '✨ Private Consultation', desc: 'Bespoke scent pairing with a Nose Specialist' },
-    { id: 'Order & Delivery', label: '📦 Order & White-Glove Shipping', desc: 'Tracking, express shipping & order support' },
-    { id: 'Boutique Appointment', label: '🏛️ Flagship Appointment', desc: 'Paris or New York salon reservations' },
-    { id: 'Press & Wholesale', label: '🤝 Press & Wholesale', desc: 'Media inquiries & haute retailer partnerships' },
-  ];
-
-  const services = [
-    {
-      title: 'Private Salon Consultations',
-      desc: '30-minute bespoke 1-on-1 scent pairing with our Master Nose Specialists in Paris, NY, or via virtual live concierge.',
-      icon: (
-        <svg className="w-6 h-6 text-[#C08A3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
-      ),
-    },
-    {
-      title: 'Bespoke Gold Engraving',
-      desc: 'Complimentary diamond-tip monogramming and gold-thread baudruchage sealing on all Extrait de Parfum flacons.',
-      icon: (
-        <svg className="w-6 h-6 text-[#C08A3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-        </svg>
-      ),
-    },
-    {
-      title: 'Discovery Sample Trios',
-      desc: 'Complimentary 2ml luxury discovery vials included with every full-size bottle order to test on skin first.',
-      icon: (
-        <svg className="w-6 h-6 text-[#C08A3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L5.6 15.12a2 2 0 00-1.022.547l-1.08 1.08a2 2 0 00-.585 1.414V19a2 2 0 002 2h14a2 2 0 002-2v-.939a2 2 0 00-.585-1.414l-1.08-1.08z" />
-        </svg>
-      ),
-    },
-    {
-      title: 'Carbon-Neutral Express Shipping',
-      desc: '100% climate-neutral express dispatch via specialized temperature-controlled courier worldwide.',
-      icon: (
-        <svg className="w-6 h-6 text-[#C08A3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2h1.5a2.5 2.5 0 002.5-2.5V7.414a2.5 2.5 0 00-.732-1.768l-2.464-2.464A2.5 2.5 0 0016.036 2.5H12A4 4 0 008 3.935z" />
-        </svg>
-      ),
-    },
+    'General Inquiry',
+    'Order Status',
+    'Boutique & Salon',
+    'Bespoke Engraving',
   ];
 
   const faqs = [
     {
       id: 'faq-1',
+      num: '01',
       question: 'How do I request complimentary fragrance discovery samples?',
-      answer: 'Every full-size 50ml or 100ml flacon order automatically includes two complimentary 2ml luxury discovery samples of your choice at checkout so you can experience new scents before opening your main bottle.',
+      answer: 'Every full-size 50ml or 100ml flacon order automatically includes two complimentary 2ml luxury discovery samples of your choice at checkout so you can test new scents on your skin before opening your main bottle.',
     },
     {
       id: 'faq-2',
+      num: '02',
       question: 'Is custom bottle engraving available for all flacons?',
-      answer: 'Yes! Custom diamond-tip monogramming (up to 3 initials or a special date) is available for all Extrait de Parfum and Eau de Parfum bottles upon request during checkout or at our Paris & New York boutiques.',
+      answer: 'Yes! Custom diamond-tip monogramming (up to 3 initials or a special date) and gold-thread baudruchage hand-sealing are available upon request during checkout or in-person at our Paris & New York flagship boutiques.',
     },
     {
       id: 'faq-3',
+      num: '03',
       question: 'What is your return policy for unopened fragrances?',
-      answer: 'We offer complimentary 30-day returns on all unopened items in their original FSC-certified packaging. Use the included 2ml sample to test the scent on your skin first.',
+      answer: 'We offer complimentary 30-day returns on all unopened items in their original FSC-certified packaging. Simply test your scent using the included 2ml sample first.',
     },
     {
       id: 'faq-4',
-      question: 'How can I schedule a 1-on-1 scent layering consultation?',
-      answer: 'You can book a complimentary 30-minute private consultation with one of our Haute Nose Specialists either in person at our Paris flagship boutique or virtually via live video concierge.',
+      num: '04',
+      question: 'What are your carbon-neutral shipping timelines?',
+      answer: 'Orders dispatch within 24 hours via temperature-controlled courier. Express European delivery arrives in 1-2 business days, and International Express arrives in 2-4 business days.',
     },
     {
       id: 'faq-5',
-      question: 'What are your carbon-neutral shipping timelines?',
-      answer: 'Orders are dispatched within 24 hours. Express European delivery arrives in 1-2 business days, and International Express arrives within 2-4 business days via carbon-neutral courier.',
+      num: '05',
+      question: 'How can I schedule a 1-on-1 private scent consultation?',
+      answer: 'You can reserve a 30-minute private consultation with one of our Haute Nose Specialists in person at our Paris or New York boutique, or virtually via live video concierge.',
     },
   ];
 
@@ -104,421 +63,277 @@ export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCart
     e.preventDefault();
     if (formData.fullName && formData.email && formData.message) {
       setIsSubmitted(true);
-      setFormData({ fullName: '', email: '', phone: '', subject: '', message: '' });
-      setTimeout(() => setIsSubmitted(false), 6000);
+      setFormData({ fullName: '', email: '', subject: '', message: '' });
+      setTimeout(() => setIsSubmitted(false), 5000);
     }
   };
 
   return (
-    <div className="w-full min-h-screen bg-white text-[#111111] font-sans pt-0 sm:pt-24 md:pt-28 pb-12 overflow-x-hidden selection:bg-black selection:text-white">
+    <div className="w-full min-h-screen bg-white text-[#111111] font-sans pt-20 sm:pt-28 md:pt-32 pb-12 overflow-x-hidden selection:bg-black selection:text-white">
       
-      {/* ── 1. ULTRA-LUXURY HERO BANNER ── */}
-      <section className="relative w-full overflow-hidden bg-[#0A0D10] text-white min-h-[380px] sm:min-h-[460px] lg:min-h-[520px] flex items-center border-b border-black/10 shadow-[0_20px_50px_rgba(0,0,0,0.2)]">
-        {/* Background Image */}
-        <img
-          src={contactHeroBg}
-          alt="LUNE Haute Concierge Luxury Ambient Background"
-          className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none opacity-80"
-        />
-        
-        {/* Rich Ambient Gradient & Glow Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/65 to-[#C08A3E]/20 pointer-events-none" />
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#C08A3E]/20 rounded-full blur-3xl pointer-events-none" />
-
-        {/* Content Wrapper */}
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 pt-24 sm:pt-32 md:pt-36 pb-12 sm:pb-20 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 25 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-            className="w-full md:w-9/12 lg:w-7/12 flex flex-col items-start gap-4"
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20">
-              <span className="w-2 h-2 rounded-full bg-[#C08A3E] animate-pulse" />
-              <span className="font-sans text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-[#F3E5AB]">
-                HAUTE CONCIERGE & PRIVATE SALONS
-              </span>
-            </div>
-
-            <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tight leading-[1.08] drop-shadow-md">
-              At Your Service. <br />
-              <span className="italic font-normal text-[#F3E5AB]">In Person or Confidential.</span>
-            </h1>
-
-            <p className="font-sans text-xs sm:text-sm md:text-base text-gray-300 font-light leading-relaxed max-w-xl drop-shadow-sm mt-1">
-              Private olfactory consultations, bespoke flacon monogramming, and white-glove courier assistance worldwide.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── 2. HAUTE SERVICES HIGHLIGHTS GRID ── */}
-      <section className="w-full bg-[#FDFBF7] border-b border-gray-200/80 py-12 sm:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-            {services.map((item, idx) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-50px' }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="p-6 rounded-2xl bg-white border border-gray-200/80 shadow-2xs flex flex-col gap-3 group hover:border-[#C08A3E]/40 hover:shadow-md transition-all duration-300"
-              >
-                <div className="p-3 rounded-xl bg-[#FBF9F5] border border-gray-200/60 w-fit group-hover:scale-105 transition-transform duration-300">
-                  {item.icon}
-                </div>
-                <h3 className="font-sans font-bold text-sm text-[#111111] tracking-wide mt-1">
-                  {item.title}
-                </h3>
-                <p className="font-sans text-xs text-[#666666] leading-relaxed">
-                  {item.desc}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 3. FLAGSHIP BOUTIQUES SHOWCASE ── */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 py-16 sm:py-24 border-b border-gray-100">
-        <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-12">
-          <span className="font-sans text-xs font-bold uppercase tracking-[0.3em] text-[#C08A3E] bg-[#C08A3E]/10 px-4 py-1.5 rounded-full border border-[#C08A3E]/20 mb-3">
-            WORLDWIDE BOUTIQUES
+      {/* ── 1. MINIMALIST EDITORIAL HEADER ── */}
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 pt-4 pb-8 sm:pb-12 text-center flex flex-col items-center">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="flex flex-col items-center gap-3 max-w-2xl"
+        >
+          <span className="font-sans text-[10px] sm:text-xs font-bold uppercase tracking-[0.35em] text-[#C08A3E] bg-[#C08A3E]/10 px-4 py-1.5 rounded-full border border-[#C08A3E]/20">
+            HAUTE PARFUMERIE CONCIERGE
           </span>
-          <h2 className="font-serif text-3xl sm:text-5xl font-bold text-[#111111]">
-            Visit Our Flagship Salons
-          </h2>
-          <p className="font-sans text-xs sm:text-sm text-[#666666] mt-3 max-w-xl leading-relaxed">
-            Experience our haute perfumerie collection in person. Private consultations and hand-sealed baudruchage flacon workshops available.
-          </p>
-        </div>
 
-        {/* 2 Column Boutique Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
+          <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl font-bold text-[#111111] tracking-tight leading-tight">
+            Concierge & Inquiries
+          </h1>
+
+          <p className="font-sans text-xs sm:text-sm text-[#555555] leading-relaxed max-w-lg">
+            Have a question about a formulation, order, or private salon consultation? Our concierge team is at your service.
+          </p>
+        </motion.div>
+      </section>
+
+      {/* ── 2. UNIQUE SPLIT LAYOUT (Form Left / Concierge & FAQs Right) ── */}
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 pb-16 sm:pb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
-          {/* Paris Flagship Card */}
+          {/* LEFT COLUMN: Luxury Contact Form Card */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7 }}
-            className="bg-white rounded-3xl overflow-hidden border border-gray-200 shadow-sm flex flex-col group hover:shadow-xl transition-all duration-300"
+            className="lg:col-span-7 bg-[#FDFBF7] p-6 sm:p-10 rounded-3xl border border-[#E5DFD3] shadow-sm flex flex-col gap-6 relative overflow-hidden"
           >
-            <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
-              <img
-                src={parisBoutiqueImg}
-                alt="Paris Flagship Boutique Interior"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80" />
-              <span className="absolute top-4 left-4 bg-white/95 backdrop-blur-md px-3.5 py-1 rounded-full text-[10px] font-sans font-bold uppercase tracking-widest text-[#111111]">
-                PARIS FLAGSHIP
-              </span>
-              <div className="absolute bottom-4 left-4 right-4 text-white">
-                <span className="font-serif text-xl font-bold block">31 Rue Cambon</span>
-                <span className="font-sans text-xs text-gray-200">Paris 75001, France</span>
-              </div>
+            {/* Subtle Gold Ambient Glow */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#C08A3E]/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div>
+              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#111111]">
+                Send a Message
+              </h2>
+              <p className="font-sans text-xs sm:text-sm text-[#666666] mt-1">
+                Select your topic and fill out your details below.
+              </p>
             </div>
 
-            <div className="p-6 sm:p-8 flex flex-col justify-between flex-1 gap-6">
-              <div className="flex flex-col gap-3 text-xs text-[#555555]">
-                <div className="flex items-center justify-between border-b border-gray-100 pb-2.5">
-                  <span className="font-semibold text-[#111111]">Concierge Telephone</span>
-                  <span>+33 (0)1 44 50 70 00</span>
-                </div>
-                <div className="flex items-center justify-between border-b border-gray-100 pb-2.5">
-                  <span className="font-semibold text-[#111111]">Direct Email</span>
-                  <span>paris@perfume.com</span>
-                </div>
-                <div className="flex items-center justify-between border-b border-gray-100 pb-2.5">
-                  <span className="font-semibold text-[#111111]">Operating Hours</span>
-                  <span>Mon – Sat: 10:00 – 19:00 CET</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-[#111111]">Specialties</span>
-                  <span className="text-[#C08A3E] font-medium">Baudruchage Gold Threading</span>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => {
-                  if (onOpenAccount) onOpenAccount();
-                }}
-                className="w-full py-3.5 px-4 bg-[#111111] hover:bg-[#C08A3E] text-white font-sans text-xs font-bold uppercase tracking-[0.2em] rounded-xl transition-colors duration-300 cursor-pointer active:scale-95 text-center"
-              >
-                RESERVE PARIS SALON APPOINTMENT
-              </button>
-            </div>
-          </motion.div>
-
-          {/* New York Boutique Card */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7 }}
-            className="bg-white rounded-3xl overflow-hidden border border-gray-200 shadow-sm flex flex-col group hover:shadow-xl transition-all duration-300"
-          >
-            <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
-              <img
-                src={nyBoutiqueImg}
-                alt="New York Boutique Interior"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80" />
-              <span className="absolute top-4 left-4 bg-white/95 backdrop-blur-md px-3.5 py-1 rounded-full text-[10px] font-sans font-bold uppercase tracking-widest text-[#111111]">
-                NEW YORK SALON
-              </span>
-              <div className="absolute bottom-4 left-4 right-4 text-white">
-                <span className="font-serif text-xl font-bold block">767 Fifth Avenue</span>
-                <span className="font-sans text-xs text-gray-200">New York, NY 10153</span>
-              </div>
-            </div>
-
-            <div className="p-6 sm:p-8 flex flex-col justify-between flex-1 gap-6">
-              <div className="flex flex-col gap-3 text-xs text-[#555555]">
-                <div className="flex items-center justify-between border-b border-gray-100 pb-2.5">
-                  <span className="font-semibold text-[#111111]">Concierge Telephone</span>
-                  <span>+1 (212) 555-0199</span>
-                </div>
-                <div className="flex items-center justify-between border-b border-gray-100 pb-2.5">
-                  <span className="font-semibold text-[#111111]">Direct Email</span>
-                  <span>ny@perfume.com</span>
-                </div>
-                <div className="flex items-center justify-between border-b border-gray-100 pb-2.5">
-                  <span className="font-semibold text-[#111111]">Operating Hours</span>
-                  <span>Mon – Sat: 10:00 – 19:00 EST</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-[#111111]">Specialties</span>
-                  <span className="text-[#C08A3E] font-medium">Diamond Monogram Engraving</span>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => {
-                  if (onOpenAccount) onOpenAccount();
-                }}
-                className="w-full py-3.5 px-4 bg-[#111111] hover:bg-[#C08A3E] text-white font-sans text-xs font-bold uppercase tracking-[0.2em] rounded-xl transition-colors duration-300 cursor-pointer active:scale-95 text-center"
-              >
-                RESERVE NY SALON APPOINTMENT
-              </button>
-            </div>
-          </motion.div>
-
-        </div>
-      </section>
-
-      {/* ── 4. MODERN LUXURY CONCIERGE CONTACT FORM SECTION ── */}
-      <section className="w-full max-w-5xl mx-auto px-4 sm:px-8 md:px-12 py-16 sm:py-24 border-b border-gray-100">
-        <div className="bg-[#FDFBF7] rounded-3xl p-6 sm:p-12 border border-[#C08A3E]/30 shadow-xl relative overflow-hidden">
-          {/* Ambient Glow */}
-          <div className="absolute top-0 right-0 w-80 h-80 bg-[#C08A3E]/10 rounded-full blur-3xl pointer-events-none" />
-
-          {/* Form Header */}
-          <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-10">
-            <span className="font-sans text-[11px] font-bold uppercase tracking-[0.3em] text-[#C08A3E] mb-2">
-              CONFIDENTIAL INQUIRY
-            </span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#111111]">
-              Send a Message to Concierge
-            </h2>
-            <p className="font-sans text-xs sm:text-sm text-[#666666] mt-2 leading-relaxed">
-              Our Haute Parfumerie concierge team responds to all inquiries within 24 business hours.
-            </p>
-          </div>
-
-          {/* Interactive Topic Tabs */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-            {topicOptions.map((topic) => {
-              const isSelected = selectedTopic === topic.id;
-              return (
+            {/* Topic Selector Pills */}
+            <div className="flex flex-wrap items-center gap-2">
+              {topicOptions.map((topic) => (
                 <button
-                  key={topic.id}
+                  key={topic}
                   type="button"
-                  onClick={() => setSelectedTopic(topic.id)}
-                  className={`p-3.5 rounded-2xl text-left transition-all duration-300 flex flex-col justify-between cursor-pointer border ${
-                    isSelected
-                      ? 'bg-[#111111] text-white border-black shadow-md scale-[1.02]'
-                      : 'bg-white text-[#444444] border-gray-200/80 hover:border-black/30'
+                  onClick={() => setSelectedTopic(topic)}
+                  className={`px-3.5 py-2 rounded-full font-sans text-xs font-semibold tracking-wider transition-all duration-300 cursor-pointer ${
+                    selectedTopic === topic
+                      ? 'bg-[#111111] text-white shadow-sm'
+                      : 'bg-white text-[#555555] border border-gray-200 hover:border-black/40'
                   }`}
                 >
-                  <span className="font-sans text-xs font-bold tracking-wider">
-                    {topic.label}
-                  </span>
-                  <span className={`font-sans text-[10px] mt-1 line-clamp-1 ${isSelected ? 'text-gray-300' : 'text-[#777777]'}`}>
-                    {topic.desc}
-                  </span>
+                  {topic}
                 </button>
-              );
-            })}
-          </div>
-
-          {/* Success Toast */}
-          <AnimatePresence>
-            {isSubmitted && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="mb-8 p-5 bg-emerald-900 text-white rounded-2xl text-xs sm:text-sm font-medium flex items-center gap-3 shadow-lg border border-emerald-700"
-              >
-                <div className="w-7 h-7 rounded-full bg-emerald-700 flex items-center justify-center text-white shrink-0 font-bold">
-                  ✓
-                </div>
-                <div>
-                  <span className="font-bold block">Inquiry Logged Successfully!</span>
-                  <span className="text-emerald-200 text-xs">
-                    Your confidential request regarding "{selectedTopic}" has been transmitted to our Paris Concierge Desk.
-                  </span>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Form Fields */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div className="flex flex-col gap-2">
-                <label className="font-sans text-[11px] font-bold uppercase tracking-widest text-[#222222]">
-                  Full Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  placeholder="e.g. Eleanor Vance"
-                  className="w-full px-4 py-3.5 bg-white border border-gray-300 rounded-xl text-xs sm:text-sm text-[#111111] focus:outline-none focus:border-[#C08A3E] focus:ring-1 focus:ring-[#C08A3E] transition-all"
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label className="font-sans text-[11px] font-bold uppercase tracking-widest text-[#222222]">
-                  Email Address *
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="concierge@example.com"
-                  className="w-full px-4 py-3.5 bg-white border border-gray-300 rounded-xl text-xs sm:text-sm text-[#111111] focus:outline-none focus:border-[#C08A3E] focus:ring-1 focus:ring-[#C08A3E] transition-all"
-                />
-              </div>
+              ))}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div className="flex flex-col gap-2">
-                <label className="font-sans text-[11px] font-bold uppercase tracking-widest text-[#222222]">
-                  Telephone (Optional)
-                </label>
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="+33 (0)6 12 34 56 78"
-                  className="w-full px-4 py-3.5 bg-white border border-gray-300 rounded-xl text-xs sm:text-sm text-[#111111] focus:outline-none focus:border-[#C08A3E] focus:ring-1 focus:ring-[#C08A3E] transition-all"
-                />
+            {/* Success Toast Notification */}
+            <AnimatePresence>
+              {isSubmitted && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="p-4 bg-emerald-900 text-white rounded-2xl text-xs sm:text-sm font-medium flex items-center gap-3 border border-emerald-700 shadow-md"
+                >
+                  <div className="w-6 h-6 rounded-full bg-emerald-700 flex items-center justify-center text-white shrink-0 font-bold text-xs">
+                    ✓
+                  </div>
+                  <div>
+                    <span className="font-bold block">Inquiry Submitted</span>
+                    <span className="text-emerald-200 text-xs">
+                      Your message regarding "{selectedTopic}" has been received by our concierge desk.
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="font-sans text-[11px] font-bold uppercase tracking-wider text-[#333333]">
+                    Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    placeholder="e.g. Eleanor Vance"
+                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm text-[#111111] focus:outline-none focus:border-[#C08A3E] focus:ring-1 focus:ring-[#C08A3E] transition-colors"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="font-sans text-[11px] font-bold uppercase tracking-wider text-[#333333]">
+                    Email Address *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="concierge@example.com"
+                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm text-[#111111] focus:outline-none focus:border-[#C08A3E] focus:ring-1 focus:ring-[#C08A3E] transition-colors"
+                  />
+                </div>
               </div>
 
-              <div className="flex flex-col gap-2">
-                <label className="font-sans text-[11px] font-bold uppercase tracking-widest text-[#222222]">
-                  Order Number / Subject (Optional)
+              <div className="flex flex-col gap-1.5">
+                <label className="font-sans text-[11px] font-bold uppercase tracking-wider text-[#333333]">
+                  Subject / Order Number (Optional)
                 </label>
                 <input
                   type="text"
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  placeholder="e.g. Order #LUNE-9842 or Custom Flacon"
-                  className="w-full px-4 py-3.5 bg-white border border-gray-300 rounded-xl text-xs sm:text-sm text-[#111111] focus:outline-none focus:border-[#C08A3E] focus:ring-1 focus:ring-[#C08A3E] transition-all"
+                  placeholder="e.g. Order #LUNE-9842 or Engraving Request"
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm text-[#111111] focus:outline-none focus:border-[#C08A3E] focus:ring-1 focus:ring-[#C08A3E] transition-colors"
                 />
               </div>
-            </div>
 
-            <div className="flex flex-col gap-2">
-              <label className="font-sans text-[11px] font-bold uppercase tracking-widest text-[#222222]">
-                Confidential Inquiry Message *
-              </label>
-              <textarea
-                rows={5}
-                required
-                value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                placeholder="Please describe how our Haute Parfumerie concierge team can assist you..."
-                className="w-full px-4 py-3.5 bg-white border border-gray-300 rounded-xl text-xs sm:text-sm text-[#111111] focus:outline-none focus:border-[#C08A3E] focus:ring-1 focus:ring-[#C08A3E] transition-all resize-none"
-              />
-            </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="font-sans text-[11px] font-bold uppercase tracking-wider text-[#333333]">
+                  Your Message *
+                </label>
+                <textarea
+                  rows={5}
+                  required
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  placeholder="How can our Haute Parfumerie concierge team assist you today?"
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm text-[#111111] focus:outline-none focus:border-[#C08A3E] focus:ring-1 focus:ring-[#C08A3E] transition-colors resize-none"
+                />
+              </div>
 
-            <div className="pt-2">
               <button
                 type="submit"
-                className="w-full py-4 bg-[#111111] hover:bg-[#C08A3E] text-white font-sans text-xs font-bold tracking-[0.25em] uppercase rounded-xl transition-all duration-300 shadow-lg cursor-pointer active:scale-[0.99] text-center"
+                className="mt-2 w-full py-4 bg-[#111111] hover:bg-[#C08A3E] text-white font-sans text-xs font-bold tracking-[0.2em] uppercase rounded-xl transition-all duration-300 shadow-md cursor-pointer active:scale-[0.99] text-center"
               >
-                TRANSMIT CONCIERGE REQUEST
+                SUBMIT CONCIERGE INQUIRY
               </button>
-            </div>
-          </form>
-        </div>
-      </section>
+            </form>
+          </motion.div>
 
-      {/* ── 5. FAQ ACCORDION SECTION ── */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 py-16 sm:py-24 border-b border-gray-100">
-        <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-12">
-          <span className="font-sans text-xs font-bold uppercase tracking-[0.3em] text-[#C08A3E] bg-[#C08A3E]/10 px-4 py-1.5 rounded-full border border-[#C08A3E]/20 mb-3">
-            FREQUENTLY ASKED QUESTIONS
-          </span>
-          <h2 className="font-serif text-3xl sm:text-5xl font-bold text-[#111111]">
-            Concierge Assistance FAQ
-          </h2>
-          <p className="font-sans text-xs sm:text-sm text-[#666666] mt-3">
-            Quick answers regarding sample orders, engraving, returns, and private salon consultations.
-          </p>
-        </div>
-
-        <div className="max-w-4xl mx-auto flex flex-col gap-4">
-          {faqs.map((faq) => {
-            const isOpen = openFaq === faq.id;
-            return (
-              <div
-                key={faq.id}
-                className="bg-white border border-gray-200/80 rounded-2xl overflow-hidden transition-all shadow-2xs hover:border-[#C08A3E]/40"
-              >
-                <button
-                  onClick={() => setOpenFaq(isOpen ? null : faq.id)}
-                  className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 font-sans font-bold text-sm sm:text-base text-[#111111] cursor-pointer"
-                >
-                  <span>{faq.question}</span>
-                  <span className={`w-8 h-8 rounded-full bg-[#FBF9F5] border border-gray-200 flex items-center justify-center text-xs transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180 bg-[#111111] text-white border-black' : ''}`}>
-                    ↓
-                  </span>
-                </button>
-
-                <AnimatePresence>
-                  {isOpen && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="px-5 sm:px-6 pb-6 pt-1 border-t border-gray-100 font-sans text-xs sm:text-sm text-[#555555] leading-relaxed">
-                        {faq.answer}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+          {/* RIGHT COLUMN: Concierge Channels & Unique Styled FAQ Accordion */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7 }}
+            className="lg:col-span-5 flex flex-col gap-6"
+          >
+            {/* Direct Concierge Contact Box */}
+            <div className="bg-[#111111] text-white p-6 sm:p-8 rounded-3xl flex flex-col gap-5 border border-black shadow-md">
+              <div className="flex items-center justify-between border-b border-white/15 pb-4">
+                <span className="font-sans text-[10px] font-bold uppercase tracking-[0.25em] text-[#C08A3E]">
+                  DIRECT CHANNELS
+                </span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               </div>
-            );
-          })}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div>
+                  <span className="text-gray-400 block text-[10px] uppercase tracking-wider">Email Concierge</span>
+                  <a href="mailto:concierge@perfume.com" className="font-semibold text-white hover:text-[#C08A3E] transition-colors">
+                    concierge@perfume.com
+                  </a>
+                </div>
+
+                <div>
+                  <span className="text-gray-400 block text-[10px] uppercase tracking-wider">Telephone</span>
+                  <a href="tel:+33144507000" className="font-semibold text-white hover:text-[#C08A3E] transition-colors">
+                    +33 (0)1 44 50 70 00
+                  </a>
+                </div>
+
+                <div>
+                  <span className="text-gray-400 block text-[10px] uppercase tracking-wider">Paris Flagship</span>
+                  <span className="text-gray-200">31 Rue Cambon, 75001</span>
+                </div>
+
+                <div>
+                  <span className="text-gray-400 block text-[10px] uppercase tracking-wider">New York Salon</span>
+                  <span className="text-gray-200">767 Fifth Avenue, NY</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Unique Styled Luxury FAQ Accordion */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-200 shadow-2xs flex flex-col gap-5">
+              <div className="flex flex-col gap-1 border-b border-gray-100 pb-4">
+                <span className="font-sans text-[10px] font-bold uppercase tracking-[0.25em] text-[#C08A3E]">
+                  HELPFUL ANSWERS
+                </span>
+                <h3 className="font-serif text-xl font-bold text-[#111111]">
+                  Frequently Asked Questions
+                </h3>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                {faqs.map((faq) => {
+                  const isOpen = openFaq === faq.id;
+                  return (
+                    <div
+                      key={faq.id}
+                      className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
+                        isOpen
+                          ? 'bg-[#FDFBF7] border-[#C08A3E]/40 shadow-2xs'
+                          : 'bg-white border-gray-200/80 hover:border-gray-300'
+                      }`}
+                    >
+                      <button
+                        onClick={() => setOpenFaq(isOpen ? null : faq.id)}
+                        className="w-full p-4 text-left flex items-center justify-between gap-3 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className={`font-sans text-xs font-bold tracking-widest ${isOpen ? 'text-[#C08A3E]' : 'text-gray-400'}`}>
+                            {faq.num}
+                          </span>
+                          <span className="font-sans font-bold text-xs sm:text-sm text-[#111111]">
+                            {faq.question}
+                          </span>
+                        </div>
+                        <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180 bg-[#111111] text-white' : 'bg-gray-100 text-[#555555]'}`}>
+                          ↓
+                        </span>
+                      </button>
+
+                      <AnimatePresence>
+                        {isOpen && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.25 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="px-4 pb-4 pt-1 pl-10 text-xs text-[#555555] leading-relaxed border-t border-gray-200/40">
+                              {faq.answer}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+          </motion.div>
+
         </div>
       </section>
 
-      {/* ── 6. GLOBAL FOOTER ── */}
+      {/* ── 3. GLOBAL FOOTER ── */}
       <Footer />
 
     </div>
