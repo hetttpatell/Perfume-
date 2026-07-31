@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import FragranceDetails from './FragranceDetails';
 import SensoryRitual from './SensoryRitual';
@@ -8,6 +9,7 @@ import Navbar from './Navbar';
 import Loader from './Loader';
 import AccountModal from './AccountModal';
 import { SLIDES } from '../utils/slidesData';
+import { fetchHeroProducts } from '../services/api';
 const HERO_SVG = '/SVGs/Perfume-SVG.png';
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -62,7 +64,7 @@ function FloatingNotes({ slideData }) {
 // ──────────────────────────────────────────────────────────────────────────────
 // SVG Product Image Hero Component - Clean Presentation with Responsive Motion
 // ──────────────────────────────────────────────────────────────────────────────
-function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirection }) {
+function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirection, slidesList = SLIDES }) {
   const currentBottleRef = useRef(null);
   const incomingBottleRef = useRef(null);
   const activeSlideRef = useRef(currentSlide);
@@ -218,8 +220,8 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
     }
   }, [currentSlide, slideDirection]);
 
-  const currentData = SLIDES[currentSlideIdx] || SLIDES[0];
-  const incomingData = SLIDES[incomingSlideIdx] || SLIDES[0];
+  const currentData = slidesList[currentSlideIdx] || slidesList[0];
+  const incomingData = slidesList[incomingSlideIdx] || slidesList[0];
 
   return (
     <div className="relative w-full h-full flex items-center justify-center pointer-events-none select-none">
@@ -271,6 +273,8 @@ export default function HeroSlider({
   onLoaderComplete,
   onReplayLoader,
 }) {
+  const navigate = useNavigate();
+  const [slidesList, setSlidesList] = useState(SLIDES);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slideDirection, setSlideDirection] = useState('next');
   const [displayedSlideIndex, setDisplayedSlideIndex] = useState(0);
@@ -297,7 +301,40 @@ export default function HeroSlider({
   const touchStartXRef = useRef(0);
   const touchStartYRef = useRef(0);
 
-  const activeSlideData = SLIDES[displayedSlideIndex];
+  useEffect(() => {
+    let isMounted = true;
+    fetchHeroProducts().then((heroProds) => {
+      if (isMounted && heroProds && heroProds.length > 0) {
+        const dynamicSlides = heroProds.map((prod, index) => ({
+          id: String(index + 1).padStart(2, '0'),
+          productId: prod.id,
+          shortTitle: prod.heroTitle || prod.name.split(' ')[0],
+          stepLabel: prod.heroSubtitle || prod.subtitle || prod.category,
+          title: prod.heroTitle || prod.name,
+          subtitle: prod.heroSubtitle || prod.frenchName || prod.subtitle,
+          oneLiner: prod.heroQuote || prod.description,
+          tagline: prod.badge || 'HAUTE COUTURE',
+          description: prod.description,
+          bg: '#FFFFFF',
+          text: '#111111',
+          secondaryText: '#555555',
+          accent: '#C08A3E',
+          noteCategory: prod.category,
+          keyNotes: [
+            prod.heroNote1 || prod.notes?.top?.split(',')[0] || 'Galbanum',
+            prod.heroNote2 || prod.notes?.heart?.split(',')[0] || 'Iris Pallida',
+            prod.heroNote3 || prod.notes?.base?.split(',')[0] || 'Vetiver'
+          ],
+          image: prod.image,
+          pose: { rotation: [0, 0, 0] }
+        }));
+        setSlidesList(dynamicSlides);
+      }
+    });
+    return () => { isMounted = false; };
+  }, []);
+
+  const activeSlideData = slidesList[displayedSlideIndex] || slidesList[0];
 
   // Ref to prevent double-triggering the entrance animation
   const hasAnimatedRef = useRef(false);
@@ -663,6 +700,7 @@ export default function HeroSlider({
               currentSlide={currentSlide}
               isTransitioning={isTransitioning}
               slideDirection={slideDirection}
+              slidesList={slidesList}
             />
           </div>
 
@@ -709,7 +747,11 @@ export default function HeroSlider({
 
               {/* Separate Page Details CTA Button (Black & White Hover) */}
               <button
-                onClick={() => setShowDetailsPage(true)}
+                onClick={() => {
+                  const targetId = activeSlideData?.productId || activeSlideData?.id || 'p1';
+                  navigate(`/product/${targetId}`);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
                 className="px-5 sm:px-6 py-2.5 sm:py-3 text-[10.5px] sm:text-xs font-sans font-extrabold tracking-[0.2em] uppercase text-[#111111] hover:bg-[#111111] hover:text-white bg-white border border-black/20 rounded-full transition-all duration-200 cursor-pointer active:scale-95 flex items-center justify-center gap-2 shadow-2xs group min-h-[40px] sm:min-h-[44px]"
               >
                 <span>EXPLORE DETAILS</span>

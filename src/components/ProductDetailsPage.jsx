@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { BOUTIQUE_PRODUCTS } from '../data/boutiqueProducts';
+import { fetchProductById, apiClient } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import Footer from './Footer';
 import CartDrawer from './CartDrawer';
 import RecommendationProduct from './RecommendationProduct';
@@ -10,16 +11,28 @@ export default function ProductDetailsPage({
   setCartItems,
   isCartOpen,
   setIsCartOpen,
+  onOpenAccount,
 }) {
+  const { isLoggedIn, promptLoginRequired } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Find product by URL param id, or default to the first product (n19-extrait)
-  const product = useMemo(() => {
-    if (!id) return BOUTIQUE_PRODUCTS[0];
-    const found = BOUTIQUE_PRODUCTS.find((p) => p.id === id);
-    return found || BOUTIQUE_PRODUCTS[0];
+  const [dbProduct, setDbProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    if (id) {
+      fetchProductById(id).then((p) => {
+        if (p) setDbProduct(p);
+        setLoading(false);
+      });
+    } else {
+      setLoading(false);
+    }
   }, [id]);
+
+  const product = dbProduct;
 
   // Product Selection States
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -34,12 +47,30 @@ export default function ProductDetailsPage({
   // Reviews Drawer / Inline Form state
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
   const [newReview, setNewReview] = useState({ rating: 5, author: '', title: '', comment: '' });
-  const [localReviews, setLocalReviews] = useState(product.reviews || []);
+  const [localReviews, setLocalReviews] = useState([]);
 
-  const gallery = product.galleryImages || [product.image];
+  // Sync live reviews from database when product loads
+  useEffect(() => {
+    if (product?.reviews && product.reviews.length > 0) {
+      setLocalReviews(product.reviews.map(r => ({
+        id: r.id,
+        author: r.author || 'Anonymous',
+        rating: r.rating || 5,
+        date: r.created_at ? new Date(r.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Recent',
+        title: r.title || '',
+        comment: r.comment || '',
+        verified: r.verified || false,
+        helpfulCount: r.helpful_count || 0,
+      })));
+    } else {
+      setLocalReviews([]);
+    }
+  }, [product]);
+
+  const gallery = product?.galleryImages || [product?.image].filter(Boolean);
 
   // Fixed unit price
-  const unitPrice = product.price;
+  const unitPrice = product?.price || 0;
   const totalPrice = unitPrice * quantity;
 
   // Auto-dismiss added toast after 4 seconds
@@ -53,6 +84,12 @@ export default function ProductDetailsPage({
   }, [addedToast]);
 
   const handleAddToCart = () => {
+    if (!isLoggedIn) {
+      promptLoginRequired('Please sign in or create an account to add items to your shopping bag.');
+      if (onOpenAccount) onOpenAccount();
+      return;
+    }
+
     setCartItems((prev) => {
       const existingIdx = prev.findIndex((i) => i.product.id === product.id);
       if (existingIdx > -1) {
@@ -83,25 +120,54 @@ export default function ProductDetailsPage({
     }
   };
 
-  const handleAddReviewSubmit = (e) => {
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+
+  const handleAddReviewSubmit = async (e) => {
     e.preventDefault();
     if (!newReview.author || !newReview.title || !newReview.comment) return;
 
-    const created = {
-      id: `rev-${Date.now()}`,
-      author: newReview.author,
-      rating: Number(newReview.rating),
-      date: 'Just now',
-      title: newReview.title,
-      comment: newReview.comment,
-      verified: true,
-      helpfulCount: 0,
-    };
+    setReviewSubmitting(true);
+    try {
+      const token = localStorage.getItem('lune_token');
+      const res = await apiClient.post('/reviews/add', {
+        productId: product.id,
+        author: newReview.author,
+        rating: Number(newReview.rating),
+        title: newReview.title,
+        comment: newReview.comment,
+      }, token ? { headers: { Authorization: `Bearer ${token}` } } : {});
 
-    setLocalReviews((prev) => [created, ...prev]);
+      if (res.data.success) {
+        const r = res.data.review;
+        setLocalReviews((prev) => [{
+          id: r.id,
+          author: r.author,
+          rating: r.rating,
+          date: 'Just now',
+          title: r.title,
+          comment: r.comment,
+          verified: r.verified || false,
+          helpfulCount: 0,
+        }, ...prev]);
+      }
+    } catch (err) {
+      console.error('Failed to submit review:', err);
+    }
+    setReviewSubmitting(false);
     setNewReview({ rating: 5, author: '', title: '', comment: '' });
     setIsReviewFormOpen(false);
   };
+
+  if (loading || !product) {
+    return (
+      <div className="w-full min-h-screen bg-white text-[#1A1A1A] font-sans pt-28 sm:pt-36 lg:pt-40 pb-12 flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-10 h-10 border-2 border-black/20 border-t-black rounded-full animate-spin mx-auto" />
+          <p className="text-xs font-sans tracking-[0.2em] uppercase text-[#737373] font-bold">Loading Product...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-screen bg-white text-[#1A1A1A] font-sans pt-28 sm:pt-36 lg:pt-40 pb-12 overflow-x-hidden">
@@ -662,46 +728,70 @@ export default function ProductDetailsPage({
           )}
 
           {/* Rating Breakdown Overview Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12 items-center bg-white p-6 sm:p-8 rounded-2xl border border-black/10 shadow-xs">
-            <div className="md:col-span-4 text-center md:border-r md:border-black/10 pr-0 md:pr-6">
-              <div className="text-5xl font-serif text-[#1A1A1A] font-light mb-1">
-                {product.rating}
-              </div>
-              <div className="flex justify-center text-[#C08A3E] text-base mb-1">
-                {'★'.repeat(5)}
-              </div>
-              <p className="text-xs font-sans text-[#737373] uppercase tracking-wider font-semibold">
-                Based on {localReviews.length} verified reviews
-              </p>
-            </div>
+          {(() => {
+            const avgRating = localReviews.length > 0
+              ? (localReviews.reduce((sum, r) => sum + (r.rating || 0), 0) / localReviews.length).toFixed(1)
+              : '—';
+            const filledStars = localReviews.length > 0 ? Math.round(parseFloat(avgRating)) : 0;
 
-            <div className="md:col-span-8 space-y-2">
-              {[5, 4, 3, 2, 1].map((stars) => {
-                const count = localReviews.filter((r) => Math.round(r.rating) === stars).length;
-                const percentage = localReviews.length ? (count / localReviews.length) * 100 : 0;
-                return (
-                  <div key={stars} className="flex items-center gap-3 text-xs font-sans">
-                    <span className="w-12 text-right font-semibold text-[#1A1A1A]">{stars} ★</span>
-                    <div className="flex-1 bg-black/10 h-2 rounded-full overflow-hidden">
-                      <div
-                        className="bg-[#C08A3E] h-full rounded-full transition-all duration-500"
-                        style={{ width: `${percentage}%` }}
-                      />
-                    </div>
-                    <span className="w-10 text-right text-[#737373] font-medium">{count}</span>
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12 items-center bg-white p-6 sm:p-8 rounded-2xl border border-black/10 shadow-xs">
+                <div className="md:col-span-4 text-center md:border-r md:border-black/10 pr-0 md:pr-6">
+                  <div className="text-5xl font-serif text-[#1A1A1A] font-light mb-1">
+                    {avgRating}
                   </div>
-                );
-              })}
-            </div>
-          </div>
+                  <div className="flex justify-center text-base mb-1">
+                    <span className="text-[#C08A3E]">{'★'.repeat(filledStars)}</span>
+                    <span className="text-black/15">{'★'.repeat(5 - filledStars)}</span>
+                  </div>
+                  <p className="text-xs font-sans text-[#737373] uppercase tracking-wider font-semibold">
+                    {localReviews.length > 0
+                      ? `Based on ${localReviews.length} verified review${localReviews.length !== 1 ? 's' : ''}`
+                      : 'No reviews yet'}
+                  </p>
+                </div>
 
-          {/* Reviews 2x2 Responsive Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            {localReviews.map((rev) => (
-              <div
-                key={rev.id}
-                className="p-4 sm:p-6 bg-white border border-black/10 rounded-2xl shadow-xs transition-all hover:border-black/25 flex flex-col justify-between"
+                <div className="md:col-span-8 space-y-2">
+                  {[5, 4, 3, 2, 1].map((stars) => {
+                    const count = localReviews.filter((r) => Math.round(r.rating) === stars).length;
+                    const percentage = localReviews.length ? (count / localReviews.length) * 100 : 0;
+                    return (
+                      <div key={stars} className="flex items-center gap-3 text-xs font-sans">
+                        <span className="w-12 text-right font-semibold text-[#1A1A1A]">{stars} ★</span>
+                        <div className="flex-1 bg-black/10 h-2 rounded-full overflow-hidden">
+                          <div
+                            className="bg-[#C08A3E] h-full rounded-full transition-all duration-500"
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                        <span className="w-10 text-right text-[#737373] font-medium">{count}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Reviews Grid or Empty State */}
+          {localReviews.length === 0 ? (
+            <div className="py-12 text-center bg-white border border-dashed border-black/15 rounded-2xl">
+              <p className="font-serif text-lg text-[#555555] uppercase mb-1">No Reviews Yet</p>
+              <p className="font-sans text-xs text-[#777777] mb-4">Be the first to share your experience with this creation.</p>
+              <button
+                onClick={() => setIsReviewFormOpen(true)}
+                className="px-6 py-2.5 bg-[#1A1A1A] text-white text-[10px] font-sans font-extrabold tracking-[0.2em] uppercase rounded-xl hover:bg-black transition-colors cursor-pointer shadow-md"
               >
+                WRITE THE FIRST REVIEW
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              {localReviews.map((rev) => (
+                <div
+                  key={rev.id}
+                  className="p-4 sm:p-6 bg-white border border-black/10 rounded-2xl shadow-xs transition-all hover:border-black/25 flex flex-col justify-between"
+                >
                 <div>
                   <div className="flex flex-wrap items-center justify-between gap-2 mb-3 border-b border-black/5 pb-2.5">
                     <div className="flex items-center gap-2">
@@ -739,8 +829,9 @@ export default function ProductDetailsPage({
                   </button>
                 </div>
               </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
         </div>
       </section>

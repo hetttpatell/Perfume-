@@ -1,20 +1,35 @@
-import { useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BOUTIQUE_PRODUCTS } from '../data/boutiqueProducts';
+import { fetchProducts } from '../services/api';
 
 /**
  * RecommendationProduct — shows related products based on the currently
  * viewed product. Matches by shared category first, then fills with other
  * products so the user always sees recommendations. Excludes the current product.
+ * Uses LIVE database products instead of hardcoded data.
  */
 export default function RecommendationProduct({ currentProductId }) {
   const navigate = useNavigate();
+  const [allProducts, setAllProducts] = useState([]);
+
+  // Fetch live products from database
+  useEffect(() => {
+    let isMounted = true;
+    fetchProducts().then((data) => {
+      if (isMounted && data && data.length > 0) {
+        setAllProducts(data);
+      }
+    });
+    return () => { isMounted = false; };
+  }, []);
 
   const recommendations = useMemo(() => {
-    const current = BOUTIQUE_PRODUCTS.find((p) => p.id === currentProductId);
-    if (!current) return BOUTIQUE_PRODUCTS.filter((p) => p.id !== currentProductId).slice(0, 3);
+    if (allProducts.length === 0) return [];
 
-    const others = BOUTIQUE_PRODUCTS.filter((p) => p.id !== currentProductId);
+    const current = allProducts.find((p) => p.id === currentProductId);
+    if (!current) return allProducts.filter((p) => p.id !== currentProductId).slice(0, 3);
+
+    const others = allProducts.filter((p) => p.id !== currentProductId);
 
     // 1. Same category products first (strongest relevance)
     const sameCategory = others.filter((p) => p.category === current.category);
@@ -41,7 +56,7 @@ export default function RecommendationProduct({ currentProductId }) {
 
     // Merge in priority order, cap at 3
     return [...sameCategory, ...noteMatches, ...rest].slice(0, 3);
-  }, [currentProductId]);
+  }, [currentProductId, allProducts]);
 
   if (recommendations.length === 0) return null;
 
@@ -89,14 +104,14 @@ export default function RecommendationProduct({ currentProductId }) {
                 <img
                   src={product.image}
                   alt={product.name}
-                  className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105 group-hover:opacity-0"
+                  className="w-full h-full object-cover transition-all duration-500 group-hover:opacity-0"
                 />
 
                 {/* Hover Sub-Image (Secondary Gallery View) */}
                 <img
                   src={product.galleryImages?.[1] || product.galleryImages?.[0] || product.image}
                   alt={`${product.name} alternate view`}
-                  className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                  className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-all duration-500"
                 />
               </div>
 

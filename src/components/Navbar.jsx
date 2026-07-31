@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import logoImg from '../assets/Logo.png';
+import { useAuth } from '../context/AuthContext';
 
 export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpenCart, onOpenAccount }) {
+  const { isLoggedIn, user } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -205,20 +207,37 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
 
           {/* RIGHT SECTION: Minimal Luxury Bag & Desktop Account */}
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-            <button
-              onClick={onOpenAccount}
-              className="hidden xl:flex items-center gap-2 text-[11px] xl:text-[12px] font-sans font-medium tracking-[0.14em] uppercase text-[#1A1A1A] hover:text-[#C08A3E] transition-colors duration-300 cursor-pointer"
-            >
-              <svg className="w-3.5 h-3.5 text-[#C08A3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                />
-              </svg>
-              <span>Account</span>
-            </button>
+            {!isLoggedIn ? (
+              <button
+                onClick={onOpenAccount}
+                className="hidden xl:flex items-center gap-2 px-4 py-1.5 rounded-full border border-black/15 bg-white/40 hover:bg-[#111111] text-[#111111] hover:text-white hover:border-[#111111] transition-all duration-300 cursor-pointer text-[10.5px] font-sans font-extrabold tracking-[0.2em] uppercase active:scale-95 shadow-2xs group"
+              >
+                <svg
+                  className="w-3.5 h-3.5 text-[#C08A3E] group-hover:text-white transition-colors duration-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.8}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+                <span>SIGN IN</span>
+              </button>
+            ) : (
+              <button
+                onClick={onOpenAccount}
+                className="hidden xl:flex items-center gap-2 text-[11px] xl:text-[12px] font-sans font-medium tracking-[0.14em] uppercase text-[#1A1A1A] hover:text-[#C08A3E] transition-colors duration-300 cursor-pointer"
+              >
+                <div className="w-5 h-5 rounded-full bg-[#111111] text-white text-[9.5px] font-serif font-black flex items-center justify-center">
+                  {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || 'L'}
+                </div>
+                <span>ACCOUNT</span>
+              </button>
+            )}
 
             <button
               onClick={onOpenCart}
@@ -347,11 +366,11 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        strokeWidth={1.5}
+                        strokeWidth={1.8}
                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                       />
                     </svg>
-                    <span>ACCOUNT</span>
+                    <span>{isLoggedIn ? 'ACCOUNT' : 'SIGN IN'}</span>
                   </button>
 
                   <button

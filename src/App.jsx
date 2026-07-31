@@ -7,6 +7,7 @@ import Navbar from './components/Navbar';
 import About from './components/About';
 import Contact from './components/Contact';
 import AccountModal from './components/AccountModal';
+import AdminLayout from './Admin/AdminLayout';
 import DiscountOfferModal from './components/DiscountOfferModal';
 import './App.css';
 
@@ -19,11 +20,13 @@ function ScrollToTop() {
   return null;
 }
 
-function App() {
+function MainApp() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
   const [loaderKey, setLoaderKey] = useState(0);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [loaderState, setLoaderState] = useState(() => {
-    // Only play smooth loader on initial website visit, skip on page refresh
     try {
       return sessionStorage.getItem('perfume_has_visited') ? 'completed' : 'loading';
     } catch {
@@ -31,10 +34,11 @@ function App() {
     }
   });
 
-  // Global E-commerce Cart & Account State
+  // Global E-commerce Cart, Account & Admin State
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
 
   const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -69,106 +73,118 @@ function App() {
   }, []);
 
   return (
-    <BrowserRouter>
-      <ScrollToTop />
-      <main className="relative min-h-screen w-full bg-white flex flex-col justify-between overflow-x-hidden">
-        {/* Global Floating Luxury Navbar */}
+    <main className="relative min-h-screen w-full bg-white flex flex-col justify-between overflow-x-hidden">
+      {/* Global Floating Luxury Navbar - Hidden on Admin routes */}
+      {!isAdminRoute && (
         <Navbar
           loaderState={loaderState}
           cartCount={totalCartCount}
           onOpenCart={() => setIsCartOpen(true)}
           onOpenAccount={() => setIsAccountOpen(true)}
         />
+      )}
 
-        {/* Global Account Drawer Modal */}
-        <AccountModal
-          isOpen={isAccountOpen}
-          onClose={() => setIsAccountOpen(false)}
-          onOpenCart={() => setIsCartOpen(true)}
-        />
+      {/* Global Account Drawer Modal */}
+      <AccountModal
+        isOpen={isAccountOpen}
+        onClose={() => setIsAccountOpen(false)}
+        onOpenCart={() => setIsCartOpen(true)}
+        onOpenAdmin={() => setIsAdminOpen(true)}
+      />
 
-        <div className="w-full min-h-screen z-10">
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <HeroSlider
-                  loaderKey={loaderKey}
-                  loaderState={loaderState}
-                  isModelLoaded={isModelLoaded}
-                  onModelLoaded={handleModelLoaded}
-                  onLoaderStartExit={handleLoaderStartExit}
-                  onLoaderComplete={handleLoaderComplete}
-                  onReplayLoader={handleReplayLoader}
-                  cartItems={cartItems}
-                  setCartItems={setCartItems}
-                  isCartOpen={isCartOpen}
-                  setIsCartOpen={setIsCartOpen}
-                />
-              }
-            />
-            <Route
-              path="/collection"
-              element={
-                <Collectionproducts
-                  cartItems={cartItems}
-                  setCartItems={setCartItems}
-                  isCartOpen={isCartOpen}
-                  setIsCartOpen={setIsCartOpen}
-                  onOpenAccount={() => setIsAccountOpen(true)}
-                />
-              }
-            />
-            <Route
-              path="/about"
-              element={
-                <About
-                  cartItems={cartItems}
-                  setCartItems={setCartItems}
-                  isCartOpen={isCartOpen}
-                  setIsCartOpen={setIsCartOpen}
-                  onOpenAccount={() => setIsAccountOpen(true)}
-                />
-              }
-            />
-            <Route
-              path="/contact"
-              element={
-                <Contact
-                  cartItems={cartItems}
-                  setCartItems={setCartItems}
-                  isCartOpen={isCartOpen}
-                  setIsCartOpen={setIsCartOpen}
-                  onOpenAccount={() => setIsAccountOpen(true)}
-                />
-              }
-            />
-            <Route
-              path="/product"
-              element={
-                <ProductDetailsPage
-                  cartItems={cartItems}
-                  setCartItems={setCartItems}
-                  isCartOpen={isCartOpen}
-                  setIsCartOpen={setIsCartOpen}
-                />
-              }
-            />
-            <Route
-              path="/product/:id"
-              element={
-                <ProductDetailsPage
-                  cartItems={cartItems}
-                  setCartItems={setCartItems}
-                  isCartOpen={isCartOpen}
-                  setIsCartOpen={setIsCartOpen}
-                />
-              }
-            />
-          </Routes>
-          <DiscountOfferModal />
-        </div>
-      </main>
+      <div className="w-full min-h-screen z-10">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <HeroSlider
+                loaderKey={loaderKey}
+                loaderState={loaderState}
+                isModelLoaded={isModelLoaded}
+                onModelLoaded={handleModelLoaded}
+                onLoaderStartExit={handleLoaderStartExit}
+                onLoaderComplete={handleLoaderComplete}
+                onReplayLoader={handleReplayLoader}
+                cartItems={cartItems}
+                setCartItems={setCartItems}
+                isCartOpen={isCartOpen}
+                setIsCartOpen={setIsCartOpen}
+              />
+            }
+          />
+          <Route
+            path="/collection"
+            element={
+              <Collectionproducts
+                cartItems={cartItems}
+                setCartItems={setCartItems}
+                isCartOpen={isCartOpen}
+                setIsCartOpen={setIsCartOpen}
+                onOpenAccount={() => setIsAccountOpen(true)}
+              />
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <About
+                cartItems={cartItems}
+                setCartItems={setCartItems}
+                isCartOpen={isCartOpen}
+                setIsCartOpen={setIsCartOpen}
+                onOpenAccount={() => setIsAccountOpen(true)}
+              />
+            }
+          />
+          <Route
+            path="/contact"
+            element={
+              <Contact
+                cartItems={cartItems}
+                setCartItems={setCartItems}
+                isCartOpen={isCartOpen}
+                setIsCartOpen={setIsCartOpen}
+                onOpenAccount={() => setIsAccountOpen(true)}
+              />
+            }
+          />
+          <Route
+            path="/product"
+            element={
+              <ProductDetailsPage
+                cartItems={cartItems}
+                setCartItems={setCartItems}
+                isCartOpen={isCartOpen}
+                setIsCartOpen={setIsCartOpen}
+                onOpenAccount={() => setIsAccountOpen(true)}
+              />
+            }
+          />
+          <Route
+            path="/product/:id"
+            element={
+              <ProductDetailsPage
+                cartItems={cartItems}
+                setCartItems={setCartItems}
+                isCartOpen={isCartOpen}
+                setIsCartOpen={setIsCartOpen}
+                onOpenAccount={() => setIsAccountOpen(true)}
+              />
+            }
+          />
+          <Route path="/admin/*" element={<AdminLayout />} />
+        </Routes>
+        {!isAdminRoute && <DiscountOfferModal />}
+      </div>
+    </main>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <ScrollToTop />
+      <MainApp />
     </BrowserRouter>
   );
 }

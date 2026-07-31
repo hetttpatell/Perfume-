@@ -617,7 +617,7 @@ export default function Scene({ currentSlide, slideData, loaderState, onModelLoa
       {/* Poster fallback — shows instantly while WebGL canvas loads the 3D model */}
       {IS_MOBILE && !modelReady && (
         <img
-          src="/models/perfume-poster.png"
+          src="/SVGs/Perfume-SVG.png"
           alt="Perfume preview"
           className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none z-[1]"
           style={{
