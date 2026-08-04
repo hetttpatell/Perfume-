@@ -167,6 +167,7 @@ export const loginUser = async ({ email, password }) => {
     const response = await apiClient.post('/auth/login', { email, password });
     if (response.data.success && response.data.session) {
       localStorage.setItem('lune_token', response.data.session.access_token);
+      localStorage.setItem('lune_refresh_token', response.data.session.refresh_token);
       localStorage.setItem('lune_user', JSON.stringify(response.data.user));
     }
     return response.data;
@@ -183,11 +184,37 @@ export const registerUser = async ({ email, password, fullName }) => {
     const response = await apiClient.post('/auth/register', { email, password, fullName });
     if (response.data.success && response.data.session) {
       localStorage.setItem('lune_token', response.data.session.access_token);
+      localStorage.setItem('lune_refresh_token', response.data.session.refresh_token);
       localStorage.setItem('lune_user', JSON.stringify(response.data.user));
     }
     return response.data;
   } catch (error) {
     return { success: false, error: error.response?.data?.error || 'Registration failed' };
+  }
+};
+
+/**
+ * Refresh expired access token using stored refresh token
+ */
+export const refreshSessionToken = async () => {
+  try {
+    const refreshToken = localStorage.getItem('lune_refresh_token');
+    if (!refreshToken) return null;
+
+    const response = await apiClient.post('/auth/refresh', { refreshToken });
+    if (response.data.success && response.data.session) {
+      localStorage.setItem('lune_token', response.data.session.access_token);
+      localStorage.setItem('lune_refresh_token', response.data.session.refresh_token);
+      localStorage.setItem('lune_user', JSON.stringify(response.data.user));
+      return response.data.session.access_token;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error refreshing token:', error);
+    localStorage.removeItem('lune_token');
+    localStorage.removeItem('lune_refresh_token');
+    localStorage.removeItem('lune_user');
+    return null;
   }
 };
 
@@ -463,3 +490,35 @@ export const deleteDiscount = async (id) => {
     return { success: false, error: error.response?.data?.error || 'Failed to delete coupon' };
   }
 };
+
+// Response interceptor to handle token expiration & automatic silent refreshes
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Check if error is 401 Unauthorized, and we haven't retried yet
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      // Don't loop on refresh or login endpoints
+      if (originalRequest.url?.includes('/auth/refresh') || originalRequest.url?.includes('/auth/login')) {
+        return Promise.reject(error);
+      }
+
+      originalRequest._retry = true;
+      try {
+        const newToken = await refreshSessionToken();
+        if (newToken) {
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          // Also rebuild headers on subsequent requests using config
+          if (originalRequest.headers) {
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          }
+          return apiClient(originalRequest);
+        }
+      } catch (refreshErr) {
+        console.error('Session refresh failed:', refreshErr);
+      }
+    }
+    return Promise.reject(error);
+  }
+);

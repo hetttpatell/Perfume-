@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { fetchProductById, apiClient } from '../services/api';
+import { fetchProductById, apiClient, toggleWishlistItem, fetchUserWishlist } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import Footer from './Footer';
 import CartDrawer from './CartDrawer';
@@ -38,8 +38,36 @@ export default function ProductDetailsPage({
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
   const [copiedShare, setCopiedShare] = useState(false);
   const [addedToast, setAddedToast] = useState(false);
+
+  // Hydrate wishlist state from database on mount / product change
+  useEffect(() => {
+    if (!isLoggedIn || !product?.id) return;
+    let cancelled = false;
+    fetchUserWishlist().then((items) => {
+      if (cancelled) return;
+      const found = items.some((item) => item.id === product.id);
+      setIsWishlisted(found);
+    });
+    return () => { cancelled = true; };
+  }, [isLoggedIn, product?.id]);
+
+  // Professional wishlist toggle — persists to Supabase via backend API
+  const handleWishlistToggle = async () => {
+    if (!isLoggedIn) {
+      promptLoginRequired('Please sign in to save items to your wishlist.');
+      return;
+    }
+    if (wishlistLoading) return;
+    setWishlistLoading(true);
+    const success = await toggleWishlistItem(product.id, isWishlisted);
+    if (success) {
+      setIsWishlisted(!isWishlisted);
+    }
+    setWishlistLoading(false);
+  };
 
   // Lightbox Zoom state
   const [zoomImage, setZoomImage] = useState(null);
@@ -204,8 +232,9 @@ export default function ProductDetailsPage({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setIsWishlisted(!isWishlisted);
+                      handleWishlistToggle();
                     }}
+                    disabled={wishlistLoading}
                     className="w-9 h-9 rounded-full bg-white/90 backdrop-blur-md border border-black/10 flex items-center justify-center shadow-xs hover:bg-white transition-all cursor-pointer"
                     title="Add to Wishlist"
                   >
@@ -274,7 +303,8 @@ export default function ProductDetailsPage({
                 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setIsWishlisted(!isWishlisted)}
+                    onClick={handleWishlistToggle}
+                    disabled={wishlistLoading}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F5F5F7] hover:bg-[#EBEBEF] text-xs font-sans font-semibold text-[#1A1A1A] transition-all cursor-pointer border border-black/5"
                   >
                     <svg

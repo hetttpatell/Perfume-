@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { fetchCategories, createCategory, updateCategory, deleteCategory, fetchProducts, updateProduct } from '../services/api';
+import { useConfirm } from '../components/ConfirmModal';
 
 function ToggleSwitch({ checked, onChange, disabled }) {
   return (
@@ -21,6 +22,7 @@ function ToggleSwitch({ checked, onChange, disabled }) {
 }
 
 export default function CategoriesManager() {
+  const { confirm } = useConfirm();
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -146,7 +148,12 @@ export default function CategoriesManager() {
   };
 
   const handleDelete = async (cat) => {
-    if (!window.confirm(`Are you sure you want to delete category "${cat.name}"?`)) return;
+    const ok = await confirm(`Are you sure you want to delete category "${cat.name}"? This action cannot be undone.`, {
+      title: 'Delete Category',
+      confirmLabel: 'DELETE',
+      danger: true
+    });
+    if (!ok) return;
 
     const res = await deleteCategory(cat.id);
     if (res.success) {

@@ -9,6 +9,7 @@ import Contact from './components/Contact';
 import AccountModal from './components/AccountModal';
 import AdminLayout from './Admin/AdminLayout';
 import DiscountOfferModal from './components/DiscountOfferModal';
+import { ConfirmProvider } from './components/ConfirmModal';
 import './App.css';
 
 // Automatically scroll to top of page on route changes
@@ -183,8 +184,10 @@ function MainApp() {
 function App() {
   return (
     <BrowserRouter>
-      <ScrollToTop />
-      <MainApp />
+      <ConfirmProvider>
+        <ScrollToTop />
+        <MainApp />
+      </ConfirmProvider>
     </BrowserRouter>
   );
 }

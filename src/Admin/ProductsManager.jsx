@@ -5,8 +5,10 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
-  toggleProductStockStatus
+  toggleProductStockStatus,
+  fetchCategories
 } from '../services/api';
+import { useConfirm } from '../components/ConfirmModal';
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
@@ -32,8 +34,14 @@ function ToggleSwitch({ checked, onChange, disabled, activeColor = 'bg-[#111111]
 }
 
 export default function ProductsManager() {
+  const { confirm } = useConfirm();
   const [products, setProducts] = useState([]);
+  const [dbCategories, setDbCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const categoriesList = dbCategories.length > 0
+    ? dbCategories.map(c => c.name.toUpperCase())
+    : ['EXTRAIT DE PARFUM', 'EAU DE PARFUM', 'BODY CARE'];
   const [actionLoadingId, setActionLoadingId] = useState(null);
   
   // Pop-Up Toast Notification State
@@ -78,8 +86,13 @@ export default function ProductsManager() {
 
   const loadProducts = async () => {
     setLoading(true);
-    const data = await fetchProducts();
-    setProducts(data);
+    try {
+      const [prodsData, catsData] = await Promise.all([fetchProducts(), fetchCategories()]);
+      setProducts(prodsData);
+      setDbCategories(catsData);
+    } catch (error) {
+      console.error('Failed to load products/categories:', error);
+    }
     setLoading(false);
   };
 
@@ -93,7 +106,7 @@ export default function ProductsManager() {
       id: '',
       name: '',
       frenchName: '',
-      category: 'EXTRAIT DE PARFUM',
+      category: categoriesList[0] || 'EXTRAIT DE PARFUM',
       subtitle: '',
       price: '',
       inStock: true,
@@ -125,7 +138,7 @@ export default function ProductsManager() {
       id: p.id,
       name: p.name || '',
       frenchName: p.frenchName || '',
-      category: p.category || 'EXTRAIT DE PARFUM',
+      category: p.category || categoriesList[0] || 'EXTRAIT DE PARFUM',
       subtitle: p.subtitle || '',
       price: p.price || '',
       inStock: p.inStock !== false && p.in_stock !== false,
@@ -184,7 +197,12 @@ export default function ProductsManager() {
   };
 
   const handleDelete = async (product) => {
-    if (!window.confirm(`Are you sure you want to delete "${product.name}"?`)) return;
+    const ok = await confirm(`Are you sure you want to delete "${product.name}"? This action cannot be undone.`, {
+      title: 'Delete Product',
+      confirmLabel: 'DELETE',
+      danger: true
+    });
+    if (!ok) return;
 
     setActionLoadingId(product.id);
     const res = await deleteProduct(product.id);
@@ -411,7 +429,7 @@ export default function ProductsManager() {
             <span className="text-[9px] font-sans font-extrabold text-[#C08A3E] tracking-widest uppercase mr-2">
               CATEGORY:
             </span>
-            {['ALL', 'EXTRAIT DE PARFUM', 'EAU DE PARFUM', 'BODY CARE'].map(cat => (
+            {['ALL', ...categoriesList].map(cat => (
               <button
                 key={cat}
                 onClick={() => setCategoryFilter(cat)}
@@ -697,9 +715,9 @@ export default function ProductsManager() {
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                       className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-xs font-bold text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 uppercase"
                     >
-                      <option value="EXTRAIT DE PARFUM">EXTRAIT DE PARFUM</option>
-                      <option value="EAU DE PARFUM">EAU DE PARFUM</option>
-                      <option value="BODY CARE">BODY CARE</option>
+                      {categoriesList.map(catName => (
+                        <option key={catName} value={catName}>{catName}</option>
+                      ))}
                     </select>
                   </div>
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { fetchDiscounts, createDiscount, updateDiscount, deleteDiscount } from '../services/api';
+import { useConfirm } from '../components/ConfirmModal';
 
 function ToggleSwitch({ checked, onChange, disabled }) {
   return (
@@ -21,6 +22,7 @@ function ToggleSwitch({ checked, onChange, disabled }) {
 }
 
 export default function DiscountsManager() {
+  const { confirm } = useConfirm();
   const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -120,7 +122,12 @@ export default function DiscountsManager() {
   };
 
   const handleDelete = async (coupon) => {
-    if (!window.confirm(`Are you sure you want to delete coupon "${coupon.code}"?`)) return;
+    const ok = await confirm(`Are you sure you want to delete coupon "${coupon.code}"? This action cannot be undone.`, {
+      title: 'Delete Coupon',
+      confirmLabel: 'DELETE',
+      danger: true
+    });
+    if (!ok) return;
 
     const res = await deleteDiscount(coupon.id);
     if (res.success) {

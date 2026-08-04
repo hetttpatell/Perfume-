@@ -283,9 +283,10 @@ export default function Collectionproducts({
       <CartDrawer
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
-        items={cartItems}
+        cartItems={cartItems}
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
+        onCheckout={() => setCartItems([])}
       />
 
       <Footer />

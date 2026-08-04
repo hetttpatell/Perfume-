@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchProducts, toggleProductFlags } from '../services/api';
+import { useConfirm } from './ConfirmModal';
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
 
 export default function AdminPanelModal({ isOpen, onClose }) {
+  const { alert: showAlertModal } = useConfirm();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [togglingId, setTogglingId] = useState(null);
@@ -42,7 +44,7 @@ export default function AdminPanelModal({ isOpen, onClose }) {
       setStatusMessage(`Updated ${product.name} showcase flags.`);
       setTimeout(() => setStatusMessage(''), 3000);
     } catch (err) {
-      alert('Failed to update showcase flags');
+      showAlertModal('Failed to update showcase flags');
     } finally {
       setTogglingId(null);
     }
@@ -71,7 +73,7 @@ export default function AdminPanelModal({ isOpen, onClose }) {
         loadCatalog();
       }
     } catch (err) {
-      alert('Image upload failed: ' + (err.response?.data?.error || err.message));
+      showAlertModal('Image upload failed: ' + (err.response?.data?.error || err.message));
     } finally {
       setUploadingId(null);
       setTimeout(() => setStatusMessage(''), 4000);

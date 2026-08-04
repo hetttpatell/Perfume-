@@ -4,32 +4,35 @@ import { loginUser, registerUser, fetchUserProfile } from '../services/api';
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
+  // Initialize auth state synchronously from localStorage so protected routes
+  // don't flash-redirect to home on page refresh before hydration completes.
+  const [user, setUser] = useState(() => {
+    try {
+      const stored = localStorage.getItem('lune_user');
+      return stored ? JSON.parse(stored) : null;
+    } catch { return null; }
+  });
+  const [token, setToken] = useState(() => localStorage.getItem('lune_token') || null);
   const [authRequiredNotice, setAuthRequiredNotice] = useState('');
 
-  // Hydrate auth state from localStorage on mount & refresh latest user role from DB
+  // Async: sync latest profile & role from the database after mount
   useEffect(() => {
-    const storedToken = localStorage.getItem('lune_token');
-    const storedUser = localStorage.getItem('lune_user');
-    if (storedToken && storedUser) {
-      try {
-        const parsed = JSON.parse(storedUser);
-        setToken(storedToken);
-        setUser(parsed);
+    if (!token || !user) return;
 
-        // Sync latest database profile & role (e.g. admin status)
-        fetchUserProfile().then(profile => {
-          if (profile && profile.role) {
-            const updatedUser = { ...parsed, role: profile.role, profile };
-            setUser(updatedUser);
-            localStorage.setItem('lune_user', JSON.stringify(updatedUser));
-          }
-        });
-      } catch (err) {
-        console.error('Failed to parse stored user data:', err);
+    fetchUserProfile().then(profile => {
+      if (profile && profile.role) {
+        const updatedUser = { ...user, role: profile.role, profile };
+        setUser(updatedUser);
+        localStorage.setItem('lune_user', JSON.stringify(updatedUser));
+
+        // Also sync the react token state if it got silently refreshed
+        const currentToken = localStorage.getItem('lune_token');
+        if (currentToken && currentToken !== token) {
+          setToken(currentToken);
+        }
       }
-    }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const login = async ({ email, password }) => {
@@ -54,6 +57,7 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     localStorage.removeItem('lune_token');
+    localStorage.removeItem('lune_refresh_token');
     localStorage.removeItem('lune_user');
     setUser(null);
     setToken(null);

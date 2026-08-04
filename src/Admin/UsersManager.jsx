@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useConfirm } from '../components/ConfirmModal';
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
 
 export default function UsersManager() {
+  const { confirm } = useConfirm();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -38,7 +40,11 @@ export default function UsersManager() {
 
   const handleRoleToggle = async (user) => {
     const newRole = user.role === 'admin' ? 'customer' : 'admin';
-    if (!window.confirm(`Are you sure you want to change ${user.full_name || user.email}'s role to ${newRole.toUpperCase()}?`)) return;
+    const ok = await confirm(`Are you sure you want to change ${user.full_name || user.email}'s role to ${newRole.toUpperCase()}?`, {
+      title: 'Change User Role',
+      confirmLabel: 'CHANGE ROLE'
+    });
+    if (!ok) return;
 
     try {
       const token = localStorage.getItem('lune_token');
