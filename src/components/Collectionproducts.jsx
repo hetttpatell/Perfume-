@@ -238,15 +238,15 @@ export default function Collectionproducts({
                 className="group cursor-pointer bg-white border border-black/10 hover:border-black/30 rounded-2xl p-3 sm:p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-xl"
               >
                 <div>
-                  {/* Image Container */}
-                  <div className="relative w-full aspect-square bg-[#F9F9FB] rounded-xl overflow-hidden mb-3 p-3 flex items-center justify-center">
+                  {/* Image Container — Full Edge-to-Edge Image */}
+                  <div className="relative w-full aspect-square bg-[#F9F9FB] rounded-xl overflow-hidden mb-3 flex items-center justify-center">
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-full object-contain object-center transition-transform duration-500"
+                      className="w-full h-full object-cover object-center transition-all duration-500 group-hover:scale-105"
                     />
                     {product.badge && (
-                      <span className="absolute top-2 left-2 px-2 py-0.5 bg-[#111111] text-white text-[8px] font-sans font-extrabold tracking-wider uppercase rounded-full">
+                      <span className="absolute top-2.5 left-2.5 z-10 px-2 py-0.5 bg-[#111111]/85 backdrop-blur-sm text-white text-[8px] font-sans font-extrabold tracking-wider uppercase rounded-full shadow-sm">
                         {product.badge}
                       </span>
                     )}
