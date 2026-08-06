@@ -97,16 +97,19 @@ export const normalizeProduct = (p) => {
     return url;
   };
 
-  const rawMain = images.find(img => img.is_primary)?.image_url || p.image_url || p.image;
+  // Separate hero section image records from standard product catalog photos
+  const heroRec = (images || []).find(img => img.alt_text === 'hero_image');
+  const standardImages = (images || []).filter(img => img.alt_text !== 'hero_image');
+
+  const rawMain = standardImages.find(img => img.is_primary)?.image_url || p.image_url || p.image;
   const mainImage = resolveImgPath(rawMain);
 
-  // Merge images from product_images table rows AND gallery_images JSON column,
-  // then deduplicate so every uploaded sub-image appears in the gallery.
-  // Primary/main image is always placed first.
-  const fromTable = images.map(img => img.image_url).filter(Boolean);
+  // Merge standard images for product page gallery (excluding hero showcase image)
+  const fromTable = standardImages.map(img => img.image_url).filter(Boolean);
   const fromColumn = Array.isArray(p.gallery_images) ? p.gallery_images : (Array.isArray(p.galleryImages) ? p.galleryImages : []);
   const merged = [...new Set([...fromTable, ...fromColumn])];
-  const subImages = merged.filter(url => url !== rawMain);
+  const heroUrl = p.hero_image_url || p.heroImageUrl || heroRec?.image_url || '';
+  const subImages = merged.filter(url => url !== rawMain && url !== heroUrl);
   const rawGallery = rawMain ? [rawMain, ...subImages] : (merged.length > 0 ? merged : [rawMain]);
   const gallery = rawGallery.map(resolveImgPath);
 
