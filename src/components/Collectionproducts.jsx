@@ -235,37 +235,48 @@ export default function Collectionproducts({
               <div
                 key={product.id}
                 onClick={() => navigate(`/product/${product.id}`)}
-                className="group cursor-pointer bg-white border border-black/10 hover:border-black/30 rounded-2xl p-3 sm:p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-xl"
+                className="group cursor-pointer bg-[#F4F4F6] border border-black/10 flex flex-col justify-between overflow-hidden transition-all duration-300 hover:shadow-lg rounded-none"
               >
                 <div>
-                  {/* Image Container — Full Edge-to-Edge Image */}
-                  <div className="relative w-full aspect-square bg-[#F9F9FB] rounded-xl overflow-hidden mb-3 flex items-center justify-center">
+                  {/* Image Container — 100% Full Edge-to-Edge Image with Sub-Image Hover */}
+                  <div className="relative w-full aspect-square bg-[#F5F5F7] overflow-hidden rounded-none border-b border-black/5">
+                    {/* Primary Image */}
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-full object-cover object-center transition-all duration-500 group-hover:scale-105"
+                      className="w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-0"
                     />
+
+                    {/* Secondary Hover Sub-Image */}
+                    <img
+                      src={product.galleryImages?.[1] || product.galleryImages?.[0] || product.image}
+                      alt={`${product.name} alternate view`}
+                      className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    />
+
                     {product.badge && (
-                      <span className="absolute top-2.5 left-2.5 z-10 px-2 py-0.5 bg-[#111111]/85 backdrop-blur-sm text-white text-[8px] font-sans font-extrabold tracking-wider uppercase rounded-full shadow-sm">
+                      <span className="absolute top-2.5 left-2.5 z-10 px-2 py-0.5 bg-[#111111]/85 backdrop-blur-md text-white text-[8px] font-sans font-extrabold tracking-wider uppercase rounded-none shadow-xs">
                         {product.badge}
                       </span>
                     )}
                   </div>
 
-                  {/* Title & Subtitle */}
-                  <span className="text-[9px] font-sans font-extrabold text-[#C08A3E] tracking-widest uppercase block mb-0.5">
-                    {product.category}
-                  </span>
-                  <h3 className="font-serif font-black text-sm sm:text-base text-[#111111] tracking-tight uppercase line-clamp-1">
-                    {product.name}
-                  </h3>
-                  <p className="text-[11px] font-sans text-gray-500 font-medium line-clamp-1 mb-2">
-                    {product.frenchName || product.subtitle || 'Extrait de Parfum'}
-                  </p>
+                  {/* Title & Subtitle Info */}
+                  <div className="p-3 sm:p-4 pb-0">
+                    <span className="text-[9px] font-sans font-extrabold text-[#C08A3E] tracking-widest uppercase block mb-0.5">
+                      {product.category}
+                    </span>
+                    <h3 className="font-serif font-black text-sm sm:text-base text-[#111111] tracking-tight uppercase line-clamp-1">
+                      {product.name}
+                    </h3>
+                    <p className="text-[11px] font-sans text-gray-500 font-medium line-clamp-1">
+                      {product.frenchName || product.subtitle || 'Extrait de Parfum'}
+                    </p>
+                  </div>
                 </div>
 
-                {/* Price & Action */}
-                <div className="pt-3 border-t border-black/10 flex items-center justify-between mt-2">
+                {/* Price & Action Footer */}
+                <div className="p-3 sm:p-4 pt-3 border-t border-black/10 flex items-center justify-between mt-2">
                   <span className="font-serif font-black text-sm text-[#111111]">
                     $ {product.price}
                   </span>
