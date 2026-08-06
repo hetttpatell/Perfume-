@@ -235,8 +235,8 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
       >
         <FloatingNotes slideData={currentData} />
         <img
-          src={HERO_SVG}
-          alt="Lune Perfume Flacon"
+          src={currentData?.image || HERO_SVG}
+          alt={currentData?.title || "Lune Perfume Flacon"}
           className="w-auto h-[44vh] sm:h-[50vh] md:h-[58vh] lg:h-[65vh] xl:h-[70vh] max-h-[720px] object-contain drop-shadow-[0_30px_45px_rgba(0,0,0,0.15)] select-none pointer-events-none"
           draggable={false}
         />
@@ -252,8 +252,8 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
       >
         <FloatingNotes slideData={incomingData} />
         <img
-          src={HERO_SVG}
-          alt="Lune Perfume Flacon"
+          src={incomingData?.image || HERO_SVG}
+          alt={incomingData?.title || "Lune Perfume Flacon"}
           className="w-auto h-[44vh] sm:h-[50vh] md:h-[58vh] lg:h-[65vh] xl:h-[70vh] max-h-[720px] object-contain drop-shadow-[0_30px_45px_rgba(0,0,0,0.15)] select-none pointer-events-none"
           draggable={false}
         />
@@ -325,7 +325,7 @@ export default function HeroSlider({
             prod.heroNote2 || prod.notes?.heart?.split(',')[0] || 'Iris Pallida',
             prod.heroNote3 || prod.notes?.base?.split(',')[0] || 'Vetiver'
           ],
-          image: prod.image,
+          image: prod.heroImageUrl || prod.image,
           pose: { rotation: [0, 0, 0] }
         }));
         setSlidesList(dynamicSlides);
@@ -342,23 +342,6 @@ export default function HeroSlider({
   const prevLoaderStateRef = useRef(null);
 
   // Unified entrance animation — single GSAP timeline for frame-locked synchronization.
-  //
-  // Previously this waited for loaderState === 'exiting' before starting, so
-  // it was racing the curtain: the curtain's yPercent:-100 lift uncovers the
-  // viewport progressively from the BOTTOM edge upward (its own bottom edge
-  // is the first thing to clear the screen), which means the footer/stepper
-  // bar becomes physically visible within the first moments of the lift —
-  // while the old timeline didn't animate the stepper in until ~0.75s later.
-  // That gap between "uncovered" and "actually faded in" is what read as lag.
-  //
-  // Fix: the curtain is fully opaque (z-50) the entire time it's covering the
-  // screen, so there's nothing to lose by having the hero compose itself
-  // WHILE STILL HIDDEN, starting as soon as the loader mounts in 'loading'
-  // rather than waiting for the exit signal. The full entrance sequence below
-  // takes well under the ~1.6s the loader's counter already runs for, so by
-  // the time the curtain starts lifting the hero is fully settled — the lift
-  // then just reveals a scene that's already there, with nothing left to
-  // catch up on regardless of which edge is uncovered first.
   useEffect(() => {
     const allElements = [
       watermarkRef.current,
@@ -495,24 +478,25 @@ export default function HeroSlider({
   // Function to switch slides safely with GSAP timeline
   const goToSlide = useCallback(
     (targetIndex) => {
-      if (isTransitioning || targetIndex === currentSlide) return;
-      if (targetIndex < 0 || targetIndex >= SLIDES.length) return;
+      const len = slidesList.length;
+      if (len === 0 || isTransitioning || targetIndex === currentSlide) return;
+      if (targetIndex < 0 || targetIndex >= len) return;
 
       const isNext = targetIndex > currentSlide 
-        ? (currentSlide === 0 && targetIndex === SLIDES.length - 1 ? false : true)
-        : (currentSlide === SLIDES.length - 1 && targetIndex === 0 ? true : false);
+        ? (currentSlide === 0 && targetIndex === len - 1 ? false : true)
+        : (currentSlide === len - 1 && targetIndex === 0 ? true : false);
 
       setSlideDirection(isNext ? 'next' : 'prev');
       setIsTransitioning(true);
       setCurrentSlide(targetIndex);
 
-      const targetSlideData = SLIDES[targetIndex];
+      const targetSlideData = slidesList[targetIndex];
 
       // 1. GSAP Background Color Morph Transition
-      if (containerRef.current) {
+      if (containerRef.current && targetSlideData) {
         gsap.to(containerRef.current, {
-          backgroundColor: targetSlideData.bg,
-          color: targetSlideData.text,
+          backgroundColor: targetSlideData.bg || '#FFFFFF',
+          color: targetSlideData.text || '#111111',
           duration: 0.8,
           ease: 'power2.inOut',
         });
@@ -590,20 +574,24 @@ export default function HeroSlider({
         ease: 'power2.in',
       });
     },
-    [currentSlide, isTransitioning]
+    [currentSlide, isTransitioning, slidesList]
   );
 
   const handleNext = useCallback(() => {
+    const len = slidesList.length;
+    if (len === 0) return;
     setSlideDirection('next');
-    const nextIndex = (currentSlide + 1) % SLIDES.length;
+    const nextIndex = (currentSlide + 1) % len;
     goToSlide(nextIndex);
-  }, [currentSlide, goToSlide]);
+  }, [currentSlide, goToSlide, slidesList]);
 
   const handlePrev = useCallback(() => {
+    const len = slidesList.length;
+    if (len === 0) return;
     setSlideDirection('prev');
-    const prevIndex = (currentSlide - 1 + SLIDES.length) % SLIDES.length;
+    const prevIndex = (currentSlide - 1 + len) % len;
     goToSlide(prevIndex);
-  }, [currentSlide, goToSlide]);
+  }, [currentSlide, goToSlide, slidesList]);
 
   const handleTouchStart = (e) => {
     touchStartXRef.current = e.touches[0].clientX;
@@ -642,13 +630,15 @@ export default function HeroSlider({
         goToSlide(0);
       } else if (e.key === 'End') {
         e.preventDefault();
-        goToSlide(SLIDES.length - 1);
+        if (slidesList.length > 0) goToSlide(slidesList.length - 1);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleNext, handlePrev, goToSlide, showDetailsPage]);
+  }, [handleNext, handlePrev, goToSlide, showDetailsPage, slidesList]);
+
+  if (!activeSlideData) return null;
 
   return (
     <div className="w-full flex flex-col">
@@ -669,7 +659,7 @@ export default function HeroSlider({
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         className="relative w-full min-h-[100dvh] md:min-h-screen flex flex-col justify-between overflow-hidden select-none transition-colors duration-300 touch-pan-y"
-        style={{ backgroundColor: SLIDES[0].bg, color: SLIDES[0].text }}
+        style={{ backgroundColor: activeSlideData.bg || '#FFFFFF', color: activeSlideData.text || '#111111' }}
         aria-label="Lune Interactive Fragrance Showcase"
       >
         {/* Large Background Watermark Text — Continuous Unbroken Display */}
@@ -681,13 +671,6 @@ export default function HeroSlider({
             {activeSlideData.shortTitle}
           </h1>
         </div>
-
-        {/* ──────────────────────────────────────────────────────────── */}
-        {/* 3D WebGL Canvas Layer — COMMENTED OUT (client requested     */}
-        {/* SVG product image). Uncomment below + the Scene import      */}
-        {/* at top of file to restore the WebGL 3D model.               */}
-        {/* ──────────────────────────────────────────────────────────── */}
-        {/* <Scene currentSlide={currentSlide} slideData={SLIDES[currentSlide]} loaderState={loaderState} onModelLoaded={onModelLoaded} /> */}
 
         {/* Main Split Screen Content Area */}
         <div className="relative z-10 w-full flex-1 max-w-7xl mx-auto px-4 sm:px-8 md:px-10 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8 md:gap-6 pt-20 sm:pt-24 md:pt-28 lg:pt-20 pb-4 sm:pb-6 md:pb-10 pointer-events-none">
@@ -739,7 +722,7 @@ export default function HeroSlider({
                 onClick={handleNext}
                 className="px-5 sm:px-6.5 py-2.5 sm:py-3 text-[10.5px] sm:text-xs font-sans font-extrabold tracking-[0.2em] uppercase text-white bg-[#111111] hover:bg-black rounded-full transition-all duration-200 cursor-pointer active:scale-95 flex items-center justify-center gap-2 shadow-xs min-h-[40px] sm:min-h-[44px]"
               >
-                <span>{currentSlide === SLIDES.length - 1 ? 'REPLAY STORY' : 'NEXT NOTE'}</span>
+                <span>{currentSlide === slidesList.length - 1 ? 'REPLAY STORY' : 'NEXT NOTE'}</span>
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
@@ -781,7 +764,7 @@ export default function HeroSlider({
             </button>
 
             <span className="font-sans text-[11px] sm:text-xs tracking-[0.2em] font-semibold text-[#1A1A1A] px-1">
-              {activeSlideData.id} / 0{SLIDES.length}
+              {activeSlideData.id} / {String(slidesList.length || 1).padStart(2, '0')}
             </span>
 
             <button

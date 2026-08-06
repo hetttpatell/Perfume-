@@ -30,6 +30,10 @@ export function AuthProvider({ children }) {
         if (currentToken && currentToken !== token) {
           setToken(currentToken);
         }
+      } else if (!localStorage.getItem('lune_token')) {
+        // Token was invalid/expired and could not be refreshed - reset state cleanly
+        setUser(null);
+        setToken(null);
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -43,6 +43,7 @@ export default function ProductsManager() {
     ? dbCategories.map(c => c.name.toUpperCase())
     : ['EXTRAIT DE PARFUM', 'EAU DE PARFUM', 'BODY CARE'];
   const [actionLoadingId, setActionLoadingId] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Pop-Up Toast Notification State
   const [toast, setToast] = useState({ open: false, message: '', type: 'info' });
@@ -67,6 +68,7 @@ export default function ProductsManager() {
     badge: 'HAUTE COUTURE',
     description: '',
     imageUrl: '',
+    heroImageUrl: '',
     galleryImages: [],
     topNotes: '',
     heartNotes: '',
@@ -84,8 +86,8 @@ export default function ProductsManager() {
     setTimeout(() => setToast({ open: false, message: '', type: 'info' }), 4000);
   };
 
-  const loadProducts = async () => {
-    setLoading(true);
+  const loadProducts = async (showLoader = true) => {
+    if (showLoader) setLoading(true);
     try {
       const [prodsData, catsData] = await Promise.all([fetchProducts(), fetchCategories()]);
       setProducts(prodsData);
@@ -93,11 +95,11 @@ export default function ProductsManager() {
     } catch (error) {
       console.error('Failed to load products/categories:', error);
     }
-    setLoading(false);
+    if (showLoader) setLoading(false);
   };
 
   useEffect(() => {
-    loadProducts();
+    loadProducts(true);
   }, []);
 
   const openAddModal = () => {
@@ -113,6 +115,7 @@ export default function ProductsManager() {
       badge: 'HAUTE COUTURE',
       description: '',
       imageUrl: '',
+      heroImageUrl: '',
       galleryImages: [],
       topNotes: '',
       heartNotes: '',
@@ -145,6 +148,7 @@ export default function ProductsManager() {
       badge: p.badge || 'HAUTE COUTURE',
       description: p.description || '',
       imageUrl: mainImg,
+      heroImageUrl: p.heroImageUrl || p.hero_image_url || '',
       galleryImages: allImgs,
       topNotes: p.scentDetails?.top_notes || p.topNotes || '',
       heartNotes: p.scentDetails?.heart_notes || p.heartNotes || '',
@@ -166,33 +170,40 @@ export default function ProductsManager() {
       return;
     }
 
-    const mainImageToSave = formData.imageUrl || (formData.galleryImages && formData.galleryImages[0]) || '';
-    const subImagesToSave = (formData.galleryImages || []).filter(img => img !== mainImageToSave);
+    setIsSubmitting(true);
+    try {
+      const mainImageToSave = formData.imageUrl || (formData.galleryImages && formData.galleryImages[0]) || '';
+      const subImagesToSave = (formData.galleryImages || []).filter(img => img !== mainImageToSave);
 
-    const payload = {
-      ...formData,
-      imageUrl: mainImageToSave,
-      galleryImages: subImagesToSave
-    };
+      const payload = {
+        ...formData,
+        imageUrl: mainImageToSave,
+        galleryImages: subImagesToSave
+      };
 
-    if (editingProduct) {
-      const res = await updateProduct({ ...payload, id: editingProduct.id });
-      if (res.success) {
-        showToast(`Product "${formData.name}" updated successfully!`);
-        setIsModalOpen(false);
-        loadProducts();
+      if (editingProduct) {
+        const res = await updateProduct({ ...payload, id: editingProduct.id });
+        if (res.success) {
+          showToast(`Product "${formData.name}" updated successfully!`);
+          setIsModalOpen(false);
+          await loadProducts(false);
+        } else {
+          showToast(res.error || 'Failed to update product', 'error');
+        }
       } else {
-        showToast(res.error || 'Failed to update product', 'error');
+        const res = await createProduct(payload);
+        if (res.success) {
+          showToast(`New creation "${formData.name}" added to catalog!`);
+          setIsModalOpen(false);
+          await loadProducts(false);
+        } else {
+          showToast(res.error || 'Failed to create product', 'error');
+        }
       }
-    } else {
-      const res = await createProduct(payload);
-      if (res.success) {
-        showToast(`New creation "${formData.name}" added to catalog!`);
-        setIsModalOpen(false);
-        loadProducts();
-      } else {
-        showToast(res.error || 'Failed to create product', 'error');
-      }
+    } catch (err) {
+      showToast(err.message || 'Failed to process product action', 'error');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -328,6 +339,40 @@ export default function ProductsManager() {
         galleryImages: newGallery
       };
     });
+  };
+
+  const handleHeroImageUpload = async (file) => {
+    if (!file) return;
+    const token = localStorage.getItem('lune_token');
+    const payload = new FormData();
+    payload.append('image', file);
+    payload.append('productId', editingProduct?.id || formData.id || 'temp-product');
+
+    showToast('Converting image to .webp Base64 format for Hero Section...', 'info');
+
+    try {
+      let response;
+      try {
+        response = await axios.post(`${API_BASE_URL}/admin/images/upload-hero`, payload, {
+          headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` }
+        });
+      } catch (e1) {
+        response = await axios.post(`${API_BASE_URL}/products/upload-hero`, payload, {
+          headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` }
+        });
+      }
+
+      if (response.data.success && response.data.image) {
+        const webpBase64Url = response.data.image.public_url;
+        setFormData(prev => ({
+          ...prev,
+          heroImageUrl: webpBase64Url
+        }));
+        showToast('Hero section showcase image converted to .WEBP Base64 and saved!');
+      }
+    } catch (err) {
+      showToast('Hero image upload failed: ' + (err.response?.data?.error || err.message), 'error');
+    }
   };
 
   const filteredProducts = products.filter(p => {
@@ -467,8 +512,55 @@ export default function ProductsManager() {
 
       {/* Clean Column-Wise Product Table */}
       {loading ? (
-        <div className="py-24 text-center text-sm font-sans text-[#555555]">
-          Loading products catalog...
+        <div className="bg-white border border-black/10 rounded-2xl shadow-sm overflow-hidden animate-pulse">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse font-sans">
+              <thead>
+                <tr className="bg-[#F8F8FA] border-b border-black/10 text-[9px] font-extrabold text-[#555555] tracking-[0.2em] uppercase">
+                  <th className="py-4 px-4 text-center w-24">MAIN IMAGE</th>
+                  <th className="py-4 px-5">PRODUCT NAME & SUBTITLE</th>
+                  <th className="py-4 px-4">CATEGORY</th>
+                  <th className="py-4 px-4 text-center">PRICE</th>
+                  <th className="py-4 px-4 text-center">ACTIVE STATUS</th>
+                  <th className="py-4 px-4 text-center">HERO SLIDER</th>
+                  <th className="py-4 px-4 text-center">FEATURED</th>
+                  <th className="py-4 px-5 text-right">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-black/10">
+                {[1, 2, 3, 4, 5].map((idx) => (
+                  <tr key={idx} className="bg-white">
+                    <td className="py-4 px-4 text-center">
+                      <div className="w-14 h-14 bg-gray-200/80 rounded-xl mx-auto animate-pulse" />
+                    </td>
+                    <td className="py-4 px-5 space-y-2">
+                      <div className="w-20 h-3 bg-gray-200/80 rounded animate-pulse" />
+                      <div className="w-48 h-4 bg-gray-300/80 rounded animate-pulse" />
+                      <div className="w-32 h-3 bg-gray-200/80 rounded animate-pulse" />
+                    </td>
+                    <td className="py-4 px-4">
+                      <div className="w-28 h-6 bg-gray-200/80 rounded-full animate-pulse" />
+                    </td>
+                    <td className="py-4 px-4 text-center">
+                      <div className="w-16 h-4 bg-gray-200/80 rounded mx-auto animate-pulse" />
+                    </td>
+                    <td className="py-4 px-4 text-center">
+                      <div className="w-10 h-5 bg-gray-200/80 rounded-full mx-auto animate-pulse" />
+                    </td>
+                    <td className="py-4 px-4 text-center">
+                      <div className="w-10 h-5 bg-gray-200/80 rounded-full mx-auto animate-pulse" />
+                    </td>
+                    <td className="py-4 px-4 text-center">
+                      <div className="w-10 h-5 bg-gray-200/80 rounded-full mx-auto animate-pulse" />
+                    </td>
+                    <td className="py-4 px-5 text-right">
+                      <div className="w-20 h-8 bg-gray-200/80 rounded-xl ml-auto animate-pulse" />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : filteredProducts.length === 0 ? (
         <div className="py-16 text-center bg-[#F4F4F6] rounded-2xl border border-black/10 space-y-2">
@@ -849,14 +941,105 @@ export default function ProductsManager() {
                 <div className="border-b border-gray-200 pb-3">
                   <h4 className="text-xs font-extrabold text-[#111111] uppercase tracking-widest flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-[#111111] text-white flex items-center justify-center text-[10px]">3</span>
-                    HERO SLIDER SHOWCASE OVERLAYS
+                    HERO SLIDER SHOWCASE & DEDICATED HERO IMAGE
                   </h4>
                   <p className="text-[11px] text-gray-600 font-medium mt-0.5">
-                    Customize titles, sensory quotes, and floating scent notes displayed on the main hero slider.
+                    Customize titles, sensory quotes, floating notes, and upload a dedicated hero section image.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                {/* DEDICATED HERO SECTION IMAGE INPUT */}
+                <div className="space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <label className="block text-[11px] font-extrabold uppercase text-gray-900 tracking-wider">
+                      HERO SECTION SHOWCASE IMAGE
+                    </label>
+                    <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <svg className="w-3 h-3 text-amber-600 fill-current" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z"/></svg>
+                      Auto-Converts Any Format to .WEBP Base64
+                    </span>
+                  </div>
+                  
+                  <p className="text-[11px] text-gray-500">
+                    Select any photo from your computer (PNG, JPG, WEBP, GIF, etc.). The backend will automatically convert it into optimized .WEBP Base64 format and store it directly in the database.
+                  </p>
+
+                  {formData.heroImageUrl ? (
+                    <div className="relative bg-white border-2 border-gray-200 rounded-2xl p-4 flex flex-col sm:flex-row items-center gap-4 shadow-xs">
+                      <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 shrink-0">
+                        <img
+                          src={formData.heroImageUrl}
+                          alt="Hero Showcase Preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-1 right-1 bg-emerald-600 text-white text-[8px] font-black uppercase px-1.5 py-0.5 rounded shadow">
+                          WEBP
+                        </div>
+                      </div>
+
+                      <div className="flex-1 space-y-2 text-center sm:text-left">
+                        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                          <span className="text-[10px] font-black uppercase px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg flex items-center gap-1">
+                            <svg className="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/></svg>
+                            WEBP BASE64 STORED IN DATABASE
+                          </span>
+                        </div>
+                        <p className="text-[11px] font-mono text-gray-500 truncate max-w-xs sm:max-w-md">
+                          {formData.heroImageUrl.startsWith('data:image/webp;base64,')
+                            ? `data:image/webp;base64,... (${(formData.heroImageUrl.length / 1024).toFixed(1)} KB)`
+                            : formData.heroImageUrl}
+                        </p>
+
+                        <div className="flex items-center justify-center sm:justify-start gap-2 pt-1">
+                          <label className="px-3 py-1.5 bg-[#111111] hover:bg-black text-white text-[11px] font-bold rounded-lg cursor-pointer transition-colors shadow-xs">
+                            CHANGE HERO IMAGE
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => e.target.files[0] && handleHeroImageUpload(e.target.files[0])}
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, heroImageUrl: '' }))}
+                            className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 text-[11px] font-bold rounded-lg border border-red-200 transition-colors"
+                          >
+                            REMOVE
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="border-2 border-dashed border-gray-300 hover:border-gray-900 bg-white rounded-2xl p-6 text-center transition-colors">
+                      <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-amber-50 text-[#C08A3E] flex items-center justify-center">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <p className="text-xs font-bold text-gray-900 mb-1">
+                        Upload Custom Image for Hero Showcase
+                      </p>
+                      <p className="text-[11px] text-gray-500 mb-3">
+                        Select any image file. Backend automatically converts it into .WEBP Base64 format.
+                      </p>
+                      <label className="inline-flex items-center gap-2 px-4 py-2 bg-[#111111] hover:bg-black text-white text-xs font-black uppercase tracking-wider rounded-xl cursor-pointer transition-all shadow-md hover:shadow-lg">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        SELECT HERO IMAGE FILE
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => e.target.files[0] && handleHeroImageUpload(e.target.files[0])}
+                        />
+                      </label>
+                    </div>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-2 border-t border-gray-200">
                   <div>
                     <label className="block text-[11px] font-extrabold uppercase text-gray-900 mb-1.5 tracking-wider">
                       HERO TITLE OVERLAY
@@ -992,17 +1175,29 @@ export default function ProductsManager() {
             <div className="px-6 py-4 border-t border-gray-200 bg-white/95 backdrop-blur-md flex items-center justify-end gap-4 shrink-0">
               <button
                 type="button"
+                disabled={isSubmitting}
                 onClick={() => setIsModalOpen(false)}
-                className="px-6 py-3 border border-gray-300 text-gray-800 font-extrabold text-xs tracking-widest uppercase rounded-xl hover:bg-gray-100 transition-all cursor-pointer"
+                className="px-6 py-3 border border-gray-300 text-gray-800 font-extrabold text-xs tracking-widest uppercase rounded-xl hover:bg-gray-100 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 CANCEL
               </button>
               <button
                 type="submit"
                 form="product-form"
-                className="px-8 py-3 bg-[#111111] hover:bg-black text-white font-extrabold text-xs tracking-[0.2em] uppercase rounded-xl transition-all cursor-pointer shadow-lg active:scale-95 border border-black/20"
+                disabled={isSubmitting}
+                className="px-8 py-3 bg-[#111111] hover:bg-black text-white font-extrabold text-xs tracking-[0.2em] uppercase rounded-xl transition-all cursor-pointer shadow-lg active:scale-95 border border-black/20 flex items-center gap-2.5 disabled:opacity-80 disabled:cursor-not-allowed"
               >
-                {editingProduct ? 'SAVE CHANGES' : 'CREATE PRODUCT'}
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin -ml-1 h-4 w-4 text-[#C08A3E]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>{editingProduct ? 'SAVING CHANGES...' : 'CREATING PRODUCT...'}</span>
+                  </>
+                ) : (
+                  <span>{editingProduct ? 'SAVE CHANGES' : 'CREATE PRODUCT'}</span>
+                )}
               </button>
             </div>
           </div>

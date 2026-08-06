@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { submitContactMessage } from '../services/api';
 import Footer from './Footer';
 
 export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCartOpen, onOpenAccount }) {
@@ -11,6 +12,7 @@ export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCart
     message: '',
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // FAQ Accordion State
   const [openFaq, setOpenFaq] = useState('faq-1');
@@ -48,12 +50,17 @@ export default function Contact({ cartItems, setCartItems, isCartOpen, setIsCart
     },
   ];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.fullName && formData.email && formData.message) {
-      setIsSubmitted(true);
-      setFormData({ fullName: '', email: '', subject: '', message: '' });
-      setTimeout(() => setIsSubmitted(false), 5000);
+      setIsSubmitting(true);
+      const result = await submitContactMessage(formData);
+      setIsSubmitting(false);
+      if (result.success) {
+        setIsSubmitted(true);
+        setFormData({ fullName: '', email: '', subject: '', message: '' });
+        setTimeout(() => setIsSubmitted(false), 5000);
+      }
     }
   };
 

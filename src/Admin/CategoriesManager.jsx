@@ -39,6 +39,7 @@ export default function CategoriesManager() {
     description: '',
     isActive: true
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedProductIds, setSelectedProductIds] = useState([]);
 
   const showToast = (message, type = 'success') => {
@@ -46,16 +47,16 @@ export default function CategoriesManager() {
     setTimeout(() => setToast({ open: false, message: '', type: 'info' }), 4000);
   };
 
-  const loadData = async () => {
-    setLoading(true);
+  const loadData = async (showLoader = true) => {
+    if (showLoader) setLoading(true);
     const [catsData, prodsData] = await Promise.all([fetchCategories(), fetchProducts()]);
     setCategories(catsData);
     setProducts(prodsData);
-    setLoading(false);
+    if (showLoader) setLoading(false);
   };
 
   useEffect(() => {
-    loadData();
+    loadData(true);
   }, []);
 
   const openAddModal = () => {
@@ -103,37 +104,44 @@ export default function CategoriesManager() {
       return;
     }
 
-    const categoryName = formData.name.toUpperCase();
-    let catRes;
+    setIsSubmitting(true);
+    try {
+      const categoryName = formData.name.toUpperCase();
+      let catRes;
 
-    if (editingCategory) {
-      catRes = await updateCategory(formData);
-    } else {
-      catRes = await createCategory(formData);
-    }
-
-    if (!catRes.success) {
-      showToast(catRes.error || 'Failed to save category', 'error');
-      return;
-    }
-
-    // Link products to this category in Supabase
-    showToast(`Linking selected products to ${categoryName}...`);
-    for (let p of products) {
-      const isChecked = selectedProductIds.includes(p.id);
-      const isCurrentlyInCat = p.category?.toUpperCase() === categoryName;
-
-      if (isChecked && !isCurrentlyInCat) {
-        await updateProduct({ id: p.id, category: categoryName });
-      } else if (!isChecked && isCurrentlyInCat) {
-        // Reassign to default if unchecked
-        await updateProduct({ id: p.id, category: 'EXTRAIT DE PARFUM' });
+      if (editingCategory) {
+        catRes = await updateCategory(formData);
+      } else {
+        catRes = await createCategory(formData);
       }
-    }
 
-    showToast(`Category "${categoryName}" & assigned products saved successfully!`);
-    setIsModalOpen(false);
-    loadData();
+      if (!catRes.success) {
+        showToast(catRes.error || 'Failed to save category', 'error');
+        return;
+      }
+
+      // Link products to this category in Supabase
+      showToast(`Linking selected products to ${categoryName}...`);
+      for (let p of products) {
+        const isChecked = selectedProductIds.includes(p.id);
+        const isCurrentlyInCat = p.category?.toUpperCase() === categoryName;
+
+        if (isChecked && !isCurrentlyInCat) {
+          await updateProduct({ id: p.id, category: categoryName });
+        } else if (!isChecked && isCurrentlyInCat) {
+          // Reassign to default if unchecked
+          await updateProduct({ id: p.id, category: 'EXTRAIT DE PARFUM' });
+        }
+      }
+
+      showToast(`Category "${categoryName}" & assigned products saved successfully!`);
+      setIsModalOpen(false);
+      await loadData(false);
+    } catch (err) {
+      showToast(err.message || 'Failed to save category', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleToggleActive = async (cat) => {
@@ -445,17 +453,29 @@ export default function CategoriesManager() {
             <div className="pt-4 flex items-center justify-end gap-3 border-t border-gray-200 shrink-0">
               <button
                 type="button"
+                disabled={isSubmitting}
                 onClick={() => setIsModalOpen(false)}
-                className="px-5 py-2.5 border border-gray-300 text-gray-800 font-extrabold text-xs tracking-wider uppercase rounded-xl"
+                className="px-5 py-2.5 border border-gray-300 text-gray-800 font-extrabold text-xs tracking-wider uppercase rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 CANCEL
               </button>
               <button
                 type="submit"
                 form="category-form"
-                className="px-7 py-2.5 bg-[#111111] hover:bg-black text-white font-extrabold text-xs tracking-[0.15em] uppercase rounded-xl shadow-md cursor-pointer"
+                disabled={isSubmitting}
+                className="px-7 py-2.5 bg-[#111111] hover:bg-black text-white font-extrabold text-xs tracking-[0.15em] uppercase rounded-xl shadow-md cursor-pointer flex items-center gap-2 disabled:opacity-80 disabled:cursor-not-allowed"
               >
-                {editingCategory ? 'SAVE & LINK PRODUCTS' : 'CREATE CATEGORY & LINK'}
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4 text-[#C08A3E]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>SAVING CATEGORY...</span>
+                  </>
+                ) : (
+                  <span>{editingCategory ? 'SAVE & LINK PRODUCTS' : 'CREATE CATEGORY & LINK'}</span>
+                )}
               </button>
             </div>
           </div>

@@ -9,6 +9,78 @@ export const apiClient = axios.create({
   }
 });
 
+// Response interceptor to automatically handle 401 Unauthorized errors & refresh tokens
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, newToken = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(newToken);
+    }
+  });
+  failedQueue = [];
+};
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Do not attempt token refresh for login, register, or refresh calls themselves
+    if (
+      originalRequest?.url?.includes('/auth/refresh') ||
+      originalRequest?.url?.includes('/auth/login') ||
+      originalRequest?.url?.includes('/auth/register')
+    ) {
+      return Promise.reject(error);
+    }
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(newToken => {
+          originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+          return apiClient(originalRequest);
+        }).catch(err => Promise.reject(err));
+      }
+
+      isRefreshing = true;
+
+      try {
+        const newToken = await refreshSessionToken();
+        isRefreshing = false;
+
+        if (newToken) {
+          processQueue(null, newToken);
+          originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+          return apiClient(originalRequest);
+        } else {
+          processQueue(new Error('Token refresh failed'), null);
+          localStorage.removeItem('lune_token');
+          localStorage.removeItem('lune_refresh_token');
+          localStorage.removeItem('lune_user');
+          return Promise.reject(error);
+        }
+      } catch (refreshErr) {
+        isRefreshing = false;
+        processQueue(refreshErr, null);
+        localStorage.removeItem('lune_token');
+        localStorage.removeItem('lune_refresh_token');
+        localStorage.removeItem('lune_user');
+        return Promise.reject(refreshErr);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 // Helper to normalize database fields to frontend component expectations
 export const normalizeProduct = (p) => {
   if (!p) return null;
@@ -54,6 +126,11 @@ export const normalizeProduct = (p) => {
     image: mainImage,
     galleryImages: gallery,
     imagesList: images,
+    heroImageUrl: (() => {
+      const heroRec = (images || []).find(img => img.alt_text === 'hero_image');
+      const rawHero = p.hero_image_url || p.heroImageUrl || heroRec?.image_url || '';
+      return rawHero ? resolveImgPath(rawHero) : '';
+    })(),
     heroTitle: p.hero_title || p.name,
     heroSubtitle: p.hero_subtitle || p.french_name || p.subtitle,
     heroQuote: p.hero_quote || p.description,
@@ -116,7 +193,12 @@ export const fetchProducts = async (filters = {}) => {
  * Fetch products flagged for Hero Section
  */
 export const fetchHeroProducts = async () => {
-  return await fetchProducts({ isHero: true });
+  const heroProds = await fetchProducts({ isHero: true });
+  if (heroProds && heroProds.length > 0) {
+    return heroProds;
+  }
+  // Fallback to all live products from database if no specific hero flag set
+  return await fetchProducts();
 };
 
 /**
@@ -237,6 +319,8 @@ export const fetchUserProfile = async () => {
   } catch (error) {
     if (error.response?.status === 401) {
       localStorage.removeItem('lune_token');
+      localStorage.removeItem('lune_refresh_token');
+      localStorage.removeItem('lune_user');
       return null;
     }
     console.error('Error fetching user profile:', error);
@@ -491,34 +575,91 @@ export const deleteDiscount = async (id) => {
   }
 };
 
-// Response interceptor to handle token expiration & automatic silent refreshes
-apiClient.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    // Check if error is 401 Unauthorized, and we haven't retried yet
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      // Don't loop on refresh or login endpoints
-      if (originalRequest.url?.includes('/auth/refresh') || originalRequest.url?.includes('/auth/login')) {
-        return Promise.reject(error);
-      }
-
-      originalRequest._retry = true;
-      try {
-        const newToken = await refreshSessionToken();
-        if (newToken) {
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          // Also rebuild headers on subsequent requests using config
-          if (originalRequest.headers) {
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          }
-          return apiClient(originalRequest);
-        }
-      } catch (refreshErr) {
-        console.error('Session refresh failed:', refreshErr);
-      }
-    }
-    return Promise.reject(error);
+/**
+ * Admin: Fetch ALL reviews across all products
+ */
+export const fetchAllReviews = async () => {
+  try {
+    const token = localStorage.getItem('lune_token');
+    const response = await apiClient.post('/admin/reviews/list', {}, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data.reviews || [];
+  } catch (error) {
+    console.error('Error fetching reviews:', error);
+    return [];
   }
-);
+};
+
+/**
+ * Admin: Delete a review by ID
+ */
+export const deleteReviewById = async (id) => {
+  try {
+    const token = localStorage.getItem('lune_token');
+    const response = await apiClient.post('/admin/reviews/delete', { id }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    return { success: false, error: error.response?.data?.error || 'Failed to delete review' };
+  }
+};
+
+/**
+ * Public: Submit a contact/support message
+ */
+export const submitContactMessage = async ({ fullName, email, subject, message }) => {
+  try {
+    const response = await apiClient.post('/contact/submit', { fullName, email, subject, message });
+    return response.data;
+  } catch (error) {
+    return { success: false, error: error.response?.data?.error || 'Failed to send message' };
+  }
+};
+
+/**
+ * Admin: Fetch all contact/support messages
+ */
+export const fetchContactMessages = async () => {
+  try {
+    const token = localStorage.getItem('lune_token');
+    const response = await apiClient.post('/admin/contacts/list', {}, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data.messages || [];
+  } catch (error) {
+    console.error('Error fetching contact messages:', error);
+    return [];
+  }
+};
+
+/**
+ * Admin: Update contact message status
+ */
+export const updateContactStatus = async (id, status) => {
+  try {
+    const token = localStorage.getItem('lune_token');
+    const response = await apiClient.post('/admin/contacts/update-status', { id, status }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    return { success: false, error: error.response?.data?.error || 'Failed to update status' };
+  }
+};
+
+/**
+ * Admin: Delete a contact message
+ */
+export const deleteContactMsg = async (id) => {
+  try {
+    const token = localStorage.getItem('lune_token');
+    const response = await apiClient.post('/admin/contacts/delete', { id }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    return { success: false, error: error.response?.data?.error || 'Failed to delete message' };
+  }
+};
