@@ -1,31 +1,72 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { fetchProducts, toggleProductFlags } from '../services/api';
+import { fetchProducts, toggleProductFlags, fetchAllOrdersAdmin, updateOrderStatusAdmin } from '../services/api';
 import { useConfirm } from './ConfirmModal';
+import CustomStageSelect from './CustomStageSelect';
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
 
+const ORDER_STAGES = [
+  { value: 'ordered', label: '1. ORDERED', badgeBg: 'bg-amber-500/10 text-amber-800 border-amber-500/25' },
+  { value: 'dispatched', label: '2. DISPATCHED', badgeBg: 'bg-blue-500/10 text-blue-800 border-blue-500/25' },
+  { value: 'out_for_delivery', label: '3. OUT FOR DELIVERY', badgeBg: 'bg-purple-500/10 text-purple-800 border-purple-500/25' },
+  { value: 'delivered', label: '4. DELIVERED', badgeBg: 'bg-emerald-500/10 text-emerald-800 border-emerald-500/25' }
+];
+
 export default function AdminPanelModal({ isOpen, onClose }) {
   const { alert: showAlertModal } = useConfirm();
+  const [activeTab, setActiveTab] = useState('orders'); // 'orders' or 'products'
   const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [togglingId, setTogglingId] = useState(null);
   const [uploadingId, setUploadingId] = useState(null);
+  const [updatingOrderId, setUpdatingOrderId] = useState(null);
   const [statusMessage, setStatusMessage] = useState('');
 
-  const loadCatalog = async () => {
+  const loadData = async () => {
     setLoading(true);
-    const data = await fetchProducts();
-    setProducts(data);
-    setLoading(false);
+    try {
+      const [prodsData, ordersData] = await Promise.all([
+        fetchProducts(),
+        fetchAllOrdersAdmin()
+      ]);
+      setProducts(prodsData || []);
+      setOrders(ordersData || []);
+    } catch (err) {
+      console.error('Error loading admin panel data:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     if (isOpen) {
-      loadCatalog();
+      loadData();
     }
   }, [isOpen]);
+
+  const handleUpdateOrderStatus = async (orderId, newStatus) => {
+    setUpdatingOrderId(orderId);
+    try {
+      const res = await updateOrderStatusAdmin(orderId, newStatus);
+      if (res.success) {
+        setOrders(prev =>
+          prev.map(o => (o.id === orderId ? { ...o, status: newStatus } : o))
+        );
+        const stageObj = ORDER_STAGES.find(s => s.value === newStatus) || { label: newStatus };
+        setStatusMessage(`Order #${orderId.slice(0, 8).toUpperCase()} updated to "${stageObj.label}". Saved to database.`);
+        setTimeout(() => setStatusMessage(''), 4000);
+      } else {
+        showAlertModal(res.error || 'Failed to update order status');
+      }
+    } catch (err) {
+      showAlertModal('Failed to update status: ' + err.message);
+    } finally {
+      setUpdatingOrderId(null);
+    }
+  };
 
   const handleToggle = async (product, flagType) => {
     setTogglingId(product.id);
@@ -70,7 +111,7 @@ export default function AdminPanelModal({ isOpen, onClose }) {
 
       if (response.data.success) {
         setStatusMessage('Image converted to WebP & uploaded successfully!');
-        loadCatalog();
+        loadData();
       }
     } catch (err) {
       showAlertModal('Image upload failed: ' + (err.response?.data?.error || err.message));
@@ -106,7 +147,7 @@ export default function AdminPanelModal({ isOpen, onClose }) {
                   MAISON LUNE • ADMIN CONTROL CENTER
                 </span>
                 <h2 className="font-serif font-black text-xl sm:text-2xl uppercase tracking-tight">
-                  PRODUCT SHOWCASE & WEBP IMAGE MANAGER
+                  LIVE ORDER STAGES & CATALOG MANAGEMENT
                 </h2>
               </div>
 
@@ -120,6 +161,26 @@ export default function AdminPanelModal({ isOpen, onClose }) {
               </button>
             </div>
 
+            {/* Admin Tabs */}
+            <div className="flex border-b border-black/10 bg-[#F4F4F6] px-6 shrink-0">
+              <button
+                onClick={() => setActiveTab('orders')}
+                className={`py-3.5 px-5 text-xs font-sans font-extrabold tracking-[0.2em] uppercase transition-all cursor-pointer border-b-2 ${
+                  activeTab === 'orders' ? 'border-[#111111] text-[#111111] bg-white' : 'border-transparent text-[#737373] hover:text-[#111111]'
+                }`}
+              >
+                📦 ORDER STAGE MANAGER ({orders.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('products')}
+                className={`py-3.5 px-5 text-xs font-sans font-extrabold tracking-[0.2em] uppercase transition-all cursor-pointer border-b-2 ${
+                  activeTab === 'products' ? 'border-[#111111] text-[#111111] bg-white' : 'border-transparent text-[#737373] hover:text-[#111111]'
+                }`}
+              >
+                🖼 CATALOG & WEBP SHOWCASE ({products.length})
+              </button>
+            </div>
+
             {/* Notification Banner */}
             {statusMessage && (
               <div className="bg-[#ECFDF5] border-b border-[#10B981]/30 px-6 py-2.5 text-xs text-[#065F46] font-medium flex items-center gap-2 shrink-0">
@@ -128,13 +189,130 @@ export default function AdminPanelModal({ isOpen, onClose }) {
               </div>
             )}
 
-            {/* Product List */}
+            {/* Scrollable Main Area */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#F8F8FA]">
               {loading ? (
                 <div className="py-20 text-center text-sm font-sans text-[#555555]">
-                  Loading catalog products...
+                  Loading admin dashboard data...
                 </div>
+              ) : activeTab === 'orders' ? (
+                /* TAB 1: ORDER STAGE MANAGER */
+                orders.length === 0 ? (
+                  <div className="py-16 text-center text-sm font-sans text-[#737373] bg-white rounded-2xl border border-black/10">
+                    No customer orders found in database.
+                  </div>
+                ) : (
+                  orders.map((order) => {
+                    const currentStatus = (order.status || 'ordered').toLowerCase();
+
+                    return (
+                      <div
+                        key={order.id}
+                        className="bg-white border border-black/10 rounded-3xl p-5 sm:p-6 shadow-xs hover:shadow-md transition-all space-y-4"
+                      >
+                        {/* Top Row: Order Details & Stage Select */}
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3.5 border-b border-black/10">
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-mono font-extrabold text-sm text-[#111111] tracking-wider">
+                                ORDER #{order.id.slice(0, 8).toUpperCase()}
+                              </span>
+                              <span className="text-[11px] text-[#737373] font-semibold">
+                                • {new Date(order.created_at).toLocaleString()}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3 shrink-0">
+                            <label className="text-[10px] font-sans font-extrabold tracking-widest text-[#111111] uppercase">
+                              STAGE STATUS:
+                            </label>
+                            <CustomStageSelect
+                              value={currentStatus === 'pending' ? 'ordered' : currentStatus === 'received' ? 'delivered' : currentStatus}
+                              disabled={updatingOrderId === order.id}
+                              onChange={(newStatus) => handleUpdateOrderStatus(order.id, newStatus)}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Customer Address Details Card */}
+                        {order.shipping_address && (
+                          <div className="bg-[#F8F8FA] border border-black/5 rounded-2xl p-4 text-xs font-sans grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                              <span className="text-[9.5px] font-bold text-[#C08A3E] uppercase tracking-wider block">CLIENT CONTACT</span>
+                              <p className="font-extrabold text-[#111111] text-xs">{order.shipping_address.fullName || 'Valued Client'}</p>
+                              <p className="text-[#555555] font-semibold text-[11px]">{order.shipping_address.phone || 'No phone'}</p>
+                            </div>
+                            <div>
+                              <span className="text-[9.5px] font-bold text-[#C08A3E] uppercase tracking-wider block">SHIPPING ADDRESS</span>
+                              <p className="font-medium text-[#111111] text-[11px] leading-relaxed">
+                                {order.shipping_address.street || ''}, {order.shipping_address.city || ''}, {order.shipping_address.country || ''}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Product Items Breakdown with Photos */}
+                        <div className="space-y-2.5 pt-1">
+                          <span className="text-[10px] font-sans font-bold text-[#C08A3E] uppercase tracking-wider block">
+                            CREATIONS INCLUDED ({order.items?.length || 0})
+                          </span>
+
+                          <div className="space-y-2">
+                            {order.items && order.items.length > 0 ? (
+                              order.items.map((it, idx) => {
+                                const prodImg = it.product?.image_url || it.product?.image || '/SVGs/Perfume-SVG.png';
+                                const prodName = it.product?.name || 'Maison Lune Fragrance';
+                                const frenchName = it.product?.french_name || '';
+
+                                return (
+                                  <div key={idx} className="flex items-center gap-3.5 p-3 bg-[#F9F9FB] rounded-2xl border border-black/5">
+                                    <img
+                                      src={prodImg}
+                                      alt={prodName}
+                                      className="w-14 h-14 object-contain bg-white rounded-xl p-1 border border-black/10 shrink-0 shadow-2xs"
+                                    />
+                                    <div className="flex-1 min-w-0">
+                                      <h4 className="font-serif text-xs font-extrabold text-[#111111] uppercase truncate">
+                                        {prodName}
+                                      </h4>
+                                      {frenchName && <p className="text-[10px] text-[#737373] italic truncate">{frenchName}</p>}
+                                      <div className="flex items-center gap-2 mt-0.5 text-[10.5px] text-[#555555]">
+                                        <span className="font-semibold">SIZE: <strong className="text-[#111111]">{it.size || '50 ml'}</strong></span>
+                                        <span>•</span>
+                                        <span className="font-semibold">QTY: <strong className="text-[#111111]">{it.quantity}</strong></span>
+                                      </div>
+                                      {it.engraving_text && (
+                                        <span className="inline-block mt-1 px-2 py-0.5 bg-[#C08A3E]/10 text-[#9A6B29] border border-[#C08A3E]/20 text-[9px] font-bold rounded-full uppercase tracking-wider">
+                                          ✨ ENGRAVING: "{it.engraving_text}"
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="text-right shrink-0">
+                                      <span className="font-serif font-black text-xs text-[#111111]">
+                                        ${((Number(it.unit_price) || 0) * (it.quantity || 1)).toFixed(2)} USD
+                                      </span>
+                                    </div>
+                                  </div>
+                                );
+                              })
+                            ) : (
+                              <p className="text-xs text-[#737373] italic">No item details available.</p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Total Paid Footer */}
+                        <div className="pt-3 border-t border-black/10 flex items-center justify-between font-sans">
+                          <span className="text-xs font-extrabold text-[#555555] uppercase tracking-wider">TOTAL PAID</span>
+                          <span className="font-serif font-black text-base text-[#111111]">${Number(order.total || 0).toFixed(2)} USD</span>
+                        </div>
+                      </div>
+                    );
+                  })
+                )
               ) : (
+                /* TAB 2: PRODUCT CATALOG & WEBP MANAGER */
                 products.map((product) => (
                   <div
                     key={product.id}
@@ -162,7 +340,6 @@ export default function AdminPanelModal({ isOpen, onClose }) {
 
                     {/* Middle: Hero & Featured Toggles */}
                     <div className="flex items-center gap-3 w-full md:w-auto justify-start md:justify-end">
-                      {/* Hero Toggle */}
                       <button
                         disabled={togglingId === product.id}
                         onClick={() => handleToggle(product, 'hero')}
@@ -176,7 +353,6 @@ export default function AdminPanelModal({ isOpen, onClose }) {
                         <span>HERO SHOWCASE {product.isHero ? '(ACTIVE)' : ''}</span>
                       </button>
 
-                      {/* Featured Toggle */}
                       <button
                         disabled={togglingId === product.id}
                         onClick={() => handleToggle(product, 'featured')}

@@ -3,13 +3,16 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import HeroSlider from './components/HeroSlider';
 import Collectionproducts from './components/Collectionproducts';
 import ProductDetailsPage from './components/ProductDetailsPage';
+import Checkout from './components/Checkout';
 import Navbar from './components/Navbar';
 import About from './components/About';
 import Contact from './components/Contact';
 import AccountModal from './components/AccountModal';
+import CartDrawer from './components/CartDrawer';
 import AdminLayout from './Admin/AdminLayout';
 import DiscountOfferModal from './components/DiscountOfferModal';
 import { ConfirmProvider } from './components/ConfirmModal';
+import { useCart } from './context/CartContext';
 import './App.css';
 
 // Automatically scroll to top of page on route changes
@@ -25,6 +28,9 @@ function MainApp() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
 
+  const { cartItems, setCartItems, totalCartCount, isCartOpen, setIsCartOpen, updateQuantity, removeItem } = useCart();
+
+
   const [loaderKey, setLoaderKey] = useState(0);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [loaderState, setLoaderState] = useState(() => {
@@ -35,13 +41,9 @@ function MainApp() {
     }
   });
 
-  // Global E-commerce Cart, Account & Admin State
-  const [cartItems, setCartItems] = useState([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  // Global E-commerce Account & Admin State
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
-
-  const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleModelLoaded = useCallback(() => {
     setIsModelLoaded(true);
@@ -73,6 +75,15 @@ function MainApp() {
     });
   }, []);
 
+  const [accountTab, setAccountTab] = useState('orders');
+
+  const handleOpenAccount = (tab = 'orders') => {
+    if (typeof tab === 'string') {
+      setAccountTab(tab);
+    }
+    setIsAccountOpen(true);
+  };
+
   return (
     <main className="relative min-h-screen w-full bg-white flex flex-col justify-between overflow-x-hidden">
       {/* Global Floating Luxury Navbar - Hidden on Admin routes */}
@@ -81,17 +92,27 @@ function MainApp() {
           loaderState={loaderState}
           cartCount={totalCartCount}
           onOpenCart={() => setIsCartOpen(true)}
-          onOpenAccount={() => setIsAccountOpen(true)}
+          onOpenAccount={handleOpenAccount}
         />
       )}
+
+      {/* Global Shopping Bag Drawer */}
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        onCheckout={() => setIsCartOpen(false)}
+      />
+
 
       {/* Global Account Drawer Modal */}
       <AccountModal
         isOpen={isAccountOpen}
+        initialTab={accountTab}
         onClose={() => setIsAccountOpen(false)}
         onOpenCart={() => setIsCartOpen(true)}
         onOpenAdmin={() => setIsAdminOpen(true)}
       />
+
 
       <div className="w-full min-h-screen z-10">
         <Routes>
@@ -121,7 +142,7 @@ function MainApp() {
                 setCartItems={setCartItems}
                 isCartOpen={isCartOpen}
                 setIsCartOpen={setIsCartOpen}
-                onOpenAccount={() => setIsAccountOpen(true)}
+                onOpenAccount={handleOpenAccount}
               />
             }
           />
@@ -133,7 +154,7 @@ function MainApp() {
                 setCartItems={setCartItems}
                 isCartOpen={isCartOpen}
                 setIsCartOpen={setIsCartOpen}
-                onOpenAccount={() => setIsAccountOpen(true)}
+                onOpenAccount={handleOpenAccount}
               />
             }
           />
@@ -145,7 +166,7 @@ function MainApp() {
                 setCartItems={setCartItems}
                 isCartOpen={isCartOpen}
                 setIsCartOpen={setIsCartOpen}
-                onOpenAccount={() => setIsAccountOpen(true)}
+                onOpenAccount={handleOpenAccount}
               />
             }
           />
@@ -157,7 +178,7 @@ function MainApp() {
                 setCartItems={setCartItems}
                 isCartOpen={isCartOpen}
                 setIsCartOpen={setIsCartOpen}
-                onOpenAccount={() => setIsAccountOpen(true)}
+                onOpenAccount={handleOpenAccount}
               />
             }
           />
@@ -169,11 +190,22 @@ function MainApp() {
                 setCartItems={setCartItems}
                 isCartOpen={isCartOpen}
                 setIsCartOpen={setIsCartOpen}
-                onOpenAccount={() => setIsAccountOpen(true)}
+                onOpenAccount={handleOpenAccount}
+              />
+            }
+          />
+          <Route
+            path="/checkout"
+            element={
+              <Checkout
+                cartItems={cartItems}
+                setCartItems={setCartItems}
+                onOpenAccount={handleOpenAccount}
               />
             }
           />
           <Route path="/admin/*" element={<AdminLayout />} />
+
         </Routes>
         {!isAdminRoute && <DiscountOfferModal />}
       </div>

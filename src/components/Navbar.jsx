@@ -13,6 +13,13 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
   const navigate = useNavigate();
   const location = useLocation();
 
+  const isAdmin = 
+    user?.role === 'admin' || 
+    user?.profile?.role === 'admin' || 
+    user?.user_metadata?.role === 'admin' || 
+    user?.email?.toLowerCase().includes('admin') ||
+    user?.email === 'hetpatel140505@gmail.com';
+
   const navLinks = [
     { id: 'hero', label: 'Homepage', targetId: 'hero', path: '/' },
     { id: 'products', label: 'Collection', targetId: 'products', path: '/collection' },
@@ -315,7 +322,7 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.05 + idx * 0.04, duration: 0.25, ease: 'easeOut' }}
                         onClick={() => scrollToSection(link.targetId)}
-                        className={`group relative text-left px-4 py-3.5 rounded-2xl transition-colors duration-200 flex items-center justify-between cursor-pointer ${
+                        className={`group relative text-left px-4 py-3 rounded-2xl transition-colors duration-200 flex items-center justify-between cursor-pointer ${
                           isActive
                             ? 'bg-[#1A1A1A] text-white shadow-md'
                             : 'text-[#1A1A1A] hover:bg-black/5 hover:translate-x-1.5'
@@ -353,12 +360,73 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
               </div>
 
               {/* Bottom Luxury Action Footer */}
-              <div className="flex flex-col gap-4 pt-6 border-t border-black/10">
-                <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-col gap-4 pt-5 border-t border-black/10">
+                {/* 06 ORDERS & 07 WISHLIST (Bottom of drawer in iPad and Mobile) */}
+                <div className="flex flex-col gap-1.5">
+                  <motion.button
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2, duration: 0.25, ease: 'easeOut' }}
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      if (onOpenAccount) onOpenAccount('orders');
+                    }}
+                    className="group relative text-left px-4 py-2.5 rounded-2xl transition-colors duration-200 flex items-center justify-between cursor-pointer text-[#1A1A1A] hover:bg-black/5 hover:translate-x-1.5"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="font-sans text-[10px] font-bold tracking-widest text-[#8A8A8A] group-hover:text-[#C08A3E]">
+                        06
+                      </span>
+                      <span className="font-sans text-xs font-bold tracking-[0.2em] uppercase">
+                        ORDERS
+                      </span>
+                    </div>
+                    <svg
+                      className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 text-[#C08A3E]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </motion.button>
+
+                  <motion.button
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.24, duration: 0.25, ease: 'easeOut' }}
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      if (onOpenAccount) onOpenAccount('saved');
+                    }}
+                    className="group relative text-left px-4 py-2.5 rounded-2xl transition-colors duration-200 flex items-center justify-between cursor-pointer text-[#1A1A1A] hover:bg-black/5 hover:translate-x-1.5"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="font-sans text-[10px] font-bold tracking-widest text-[#8A8A8A] group-hover:text-[#C08A3E]">
+                        07
+                      </span>
+                      <span className="font-sans text-xs font-bold tracking-[0.2em] uppercase">
+                        WISHLIST
+                      </span>
+                    </div>
+                    <svg
+                      className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 text-[#C08A3E]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </motion.button>
+
+                </div>
+
+                {/* ACCOUNT & BAG Buttons */}
+                <div className="flex items-center justify-between gap-3 pt-1 border-t border-black/5">
                   <button
                     onClick={() => {
                       setMobileMenuOpen(false);
-                      if (onOpenAccount) onOpenAccount();
+                      if (onOpenAccount) onOpenAccount('profile');
                     }}
                     className="flex-1 py-3 text-xs font-sans font-bold tracking-widest uppercase bg-black/5 hover:bg-black hover:text-white text-[#1A1A1A] rounded-xl border border-black/10 transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 active:scale-95"
                   >

@@ -2,8 +2,10 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchProducts, fetchCategories } from '../services/api';
+import { useCart } from '../context/CartContext';
 import CartDrawer from './CartDrawer';
 import Footer from './Footer';
+
 
 import luminousHeroBg from '../assets/lune_luminous_hero_bg.png';
 import mobileHeroBg from '../assets/lune_hero_mobile.png';
@@ -102,6 +104,7 @@ export default function Collectionproducts({
   setIsCartOpen: parentSetIsCartOpen,
 }) {
   const navigate = useNavigate();
+  const { cartItems: contextCartItems, setCartItems: contextSetCartItems, isCartOpen: contextIsCartOpen, setIsCartOpen: contextSetIsCartOpen } = useCart();
   const [activeCategory, setActiveCategory] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('recommended');
@@ -109,14 +112,10 @@ export default function Collectionproducts({
   const [dbCategories, setDbCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fallbacks if props aren't provided directly
-  const [localCartItems, setLocalCartItems] = useState([]);
-  const [localIsCartOpen, setLocalIsCartOpen] = useState(false);
-
-  const cartItems = parentCartItems !== undefined ? parentCartItems : localCartItems;
-  const setCartItems = parentSetCartItems || setLocalCartItems;
-  const isCartOpen = parentIsCartOpen !== undefined ? parentIsCartOpen : localIsCartOpen;
-  const setIsCartOpen = parentSetIsCartOpen || setLocalIsCartOpen;
+  const cartItems = parentCartItems !== undefined ? parentCartItems : contextCartItems;
+  const setCartItems = parentSetCartItems || contextSetCartItems;
+  const isCartOpen = parentIsCartOpen !== undefined ? parentIsCartOpen : contextIsCartOpen;
+  const setIsCartOpen = parentSetIsCartOpen || contextSetIsCartOpen;
 
   useEffect(() => {
     let isMounted = true;

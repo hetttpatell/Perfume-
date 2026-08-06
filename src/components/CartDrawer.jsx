@@ -1,6 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
-export function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantity, onRemoveItem, onCheckout }) {
+export function CartDrawer({ isOpen, onClose, onCheckout }) {
+  const navigate = useNavigate();
+  const { cartItems, updateQuantity, removeItem } = useCart();
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
 
   if (!isOpen) return null;
@@ -8,16 +12,30 @@ export function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantity, onRem
   const totalCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
-  const handleCompleteCheckout = () => {
-    setCheckoutSuccess(true);
-    setTimeout(() => {
-      onCheckout();
-      setCheckoutSuccess(false);
-      onClose();
-    }, 2800);
+  const handleUpdateQty = (idx, newQty) => {
+    const item = cartItems[idx];
+    if (item) {
+      updateQuantity(item.dbId || item.id || idx, newQty);
+    }
   };
 
+  const handleRemove = (idx) => {
+    const item = cartItems[idx];
+    if (item) {
+      removeItem(item.dbId || item.id || idx);
+    }
+  };
+
+  const handleCompleteCheckout = () => {
+    onClose();
+    if (onCheckout) onCheckout();
+    navigate('/checkout');
+  };
+
+
   return (
+
+
     <div
       className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-xs transition-opacity animate-fadeIn"
       onClick={onClose}
@@ -134,7 +152,7 @@ export function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantity, onRem
                     <div className="flex items-center gap-3 mt-2.5">
                       <div className="flex items-center border border-black/20 rounded-lg bg-white text-xs overflow-hidden shadow-xs">
                         <button
-                          onClick={() => onUpdateQuantity(idx, item.quantity - 1)}
+                          onClick={() => handleUpdateQty(idx, item.quantity - 1)}
                           className="w-8 h-8 font-bold hover:bg-black/10 cursor-pointer flex items-center justify-center text-sm text-[#1A1A1A] active:bg-black/20 transition-colors"
                           aria-label="Decrease quantity"
                         >
@@ -142,7 +160,7 @@ export function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantity, onRem
                         </button>
                         <span className="px-3 font-semibold text-xs text-[#1A1A1A]">{item.quantity}</span>
                         <button
-                          onClick={() => onUpdateQuantity(idx, item.quantity + 1)}
+                          onClick={() => handleUpdateQty(idx, item.quantity + 1)}
                           className="w-8 h-8 font-bold hover:bg-black/10 cursor-pointer flex items-center justify-center text-sm text-[#1A1A1A] active:bg-black/20 transition-colors"
                           aria-label="Increase quantity"
                         >
@@ -151,12 +169,13 @@ export function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantity, onRem
                       </div>
 
                       <button
-                        onClick={() => onRemoveItem(idx)}
+                        onClick={() => handleRemove(idx)}
                         className="text-[10px] font-sans font-bold text-red-600 hover:text-red-800 uppercase tracking-wider cursor-pointer ml-auto transition-colors py-1 px-2 hover:bg-red-50 rounded"
                       >
                         REMOVE
                       </button>
                     </div>
+
                   </div>
                 </div>
               ))}

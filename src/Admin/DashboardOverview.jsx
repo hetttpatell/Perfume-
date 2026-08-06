@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import CustomStageSelect from '../components/CustomStageSelect';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
 
@@ -232,9 +233,22 @@ export default function DashboardOverview({ onNavigate }) {
                     <span className="font-serif font-black text-sm text-gray-900 block">
                       $ {ord.total_amount || 0}
                     </span>
-                    <span className="text-[9px] font-extrabold uppercase text-[#10B981] bg-[#10B981]/10 px-2 py-0.5 rounded-full">
-                      {ord.status || 'PAID'}
-                    </span>
+                    <div className="mt-1">
+                      <CustomStageSelect
+                        value={(ord.status || 'ordered').toLowerCase() === 'pending' ? 'ordered' : (ord.status || 'ordered').toLowerCase()}
+                        onChange={async (newStatus) => {
+                          try {
+                            const token = localStorage.getItem('lune_token');
+                            await axios.post(`${API_BASE_URL}/admin/orders/update-status`, { orderId: ord.id, status: newStatus }, {
+                              headers: { Authorization: `Bearer ${token}` }
+                            });
+                            setRecentOrders(prev => prev.map(o => o.id === ord.id ? { ...o, status: newStatus } : o));
+                          } catch (err) {
+                            console.error('Error updating order status:', err);
+                          }
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               ))}

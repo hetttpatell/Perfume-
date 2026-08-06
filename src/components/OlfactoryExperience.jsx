@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchProducts, fetchCategories } from '../services/api';
+import { useCart } from '../context/CartContext';
 import CartDrawer from './CartDrawer';
 import Testimonials from './Testimonials';
 import BrandLocationsMap from './BrandLocationsMap';
@@ -14,6 +15,7 @@ export default function OlfactoryExperience({
   setIsCartOpen: parentSetIsCartOpen,
 }) {
   const navigate = useNavigate();
+  const { cartItems: contextCartItems, isCartOpen: contextIsCartOpen, setIsCartOpen: contextSetIsCartOpen } = useCart();
   const [activeCategory, setActiveCategory] = useState('ALL');
   const [productsList, setProductsList] = useState([]);
   const [dbCategories, setDbCategories] = useState([]);
@@ -35,14 +37,10 @@ export default function OlfactoryExperience({
     return () => { isMounted = false; };
   }, []);
 
-  // Local fallbacks if parent state is not supplied
-  const [localCartItems, setLocalCartItems] = useState([]);
-  const [localIsCartOpen, setLocalIsCartOpen] = useState(false);
+  const cartItems = (parentCartItems && parentCartItems.length > 0) ? parentCartItems : contextCartItems;
+  const isCartOpen = parentIsCartOpen !== undefined ? parentIsCartOpen : contextIsCartOpen;
+  const setIsCartOpen = parentSetIsCartOpen || contextSetIsCartOpen;
 
-  const cartItems = parentCartItems !== undefined ? parentCartItems : localCartItems;
-  const setCartItems = parentSetCartItems || setLocalCartItems;
-  const isCartOpen = parentIsCartOpen !== undefined ? parentIsCartOpen : localIsCartOpen;
-  const setIsCartOpen = parentSetIsCartOpen || setLocalIsCartOpen;
 
   // Dynamic category tabs from live database + a fixed "ALL" and "FEATURED" tab
   const categories = [

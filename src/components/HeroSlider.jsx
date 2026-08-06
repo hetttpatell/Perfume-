@@ -10,7 +10,9 @@ import Loader from './Loader';
 import AccountModal from './AccountModal';
 import { SLIDES } from '../utils/slidesData';
 import { fetchHeroProducts } from '../services/api';
+import { useCart } from '../context/CartContext';
 const HERO_SVG = '/SVGs/Perfume-SVG.png';
+
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Floating Fragrance Notes Badges Subcomponent
@@ -281,12 +283,10 @@ export default function HeroSlider({
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showDetailsPage, setShowDetailsPage] = useState(false);
 
-  // E-commerce state shared across top Navbar and Boutique
-  const [cartItems, setCartItems] = useState([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  // E-commerce state shared across top Navbar and Boutique via live CartContext
+  const { cartItems, setCartItems, isCartOpen, setIsCartOpen, totalCartCount } = useCart();
   const [isAccountOpen, setIsAccountOpen] = useState(false);
 
-  const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const containerRef = useRef(null);
   const watermarkRef = useRef(null);

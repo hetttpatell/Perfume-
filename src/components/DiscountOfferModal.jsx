@@ -26,10 +26,10 @@ export default function DiscountOfferModal() {
       // Ignore storage errors
     }
 
-    // Set 10-second timer: only show if user stays > 10 seconds and hasn't given email
+    // Set 40-second timer: only show if user stays > 40 seconds and hasn't given email
     const timer = setTimeout(() => {
       setIsOpen(true);
-    }, 10000);
+    }, 40000);
 
     return () => clearTimeout(timer);
   }, []);

@@ -2,20 +2,27 @@ import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { fetchProductById, apiClient, toggleWishlistItem, fetchUserWishlist } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 import Footer from './Footer';
 import CartDrawer from './CartDrawer';
 import RecommendationProduct from './RecommendationProduct';
 
 export default function ProductDetailsPage({
-  cartItems,
+  cartItems: propsCartItems,
   setCartItems,
-  isCartOpen,
-  setIsCartOpen,
+  isCartOpen: propsIsCartOpen,
+  setIsCartOpen: propsSetIsCartOpen,
   onOpenAccount,
 }) {
   const { isLoggedIn, promptLoginRequired } = useAuth();
+  const { cartItems: contextCartItems, addItemToCart, isCartOpen: contextIsCartOpen, setIsCartOpen: contextSetIsCartOpen } = useCart();
   const { id } = useParams();
   const navigate = useNavigate();
+
+  const cartItems = (propsCartItems && propsCartItems.length > 0) ? propsCartItems : contextCartItems;
+  const isCartOpen = propsIsCartOpen !== undefined ? propsIsCartOpen : contextIsCartOpen;
+  const setIsCartOpen = propsSetIsCartOpen || contextSetIsCartOpen;
+
 
   const [dbProduct, setDbProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -37,10 +44,22 @@ export default function ProductDetailsPage({
   // Product Selection States
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [engravingText, setEngravingText] = useState('');
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [copiedShare, setCopiedShare] = useState(false);
   const [addedToast, setAddedToast] = useState(false);
+
+  // Sync default selected size when product changes
+  useEffect(() => {
+    if (product && product.sizes && product.sizes.length > 0) {
+      setSelectedSize(product.sizes[0]);
+    } else if (product) {
+      setSelectedSize({ size: '50 ml / 1.7 FL. OZ.', price: product.price });
+    }
+  }, [product]);
+
 
   // Hydrate wishlist state from database on mount / product change
   useEffect(() => {
@@ -54,6 +73,18 @@ export default function ProductDetailsPage({
     return () => { cancelled = true; };
   }, [isLoggedIn, product?.id]);
 
+  const [wishlistToast, setWishlistToast] = useState({ open: false, action: 'added' });
+
+  // Auto-dismiss wishlist toast after 4 seconds
+  useEffect(() => {
+    if (wishlistToast.open) {
+      const timer = setTimeout(() => {
+        setWishlistToast({ open: false, action: 'added' });
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [wishlistToast.open]);
+
   // Professional wishlist toggle — persists to Supabase via backend API
   const handleWishlistToggle = async () => {
     if (!isLoggedIn) {
@@ -62,9 +93,11 @@ export default function ProductDetailsPage({
     }
     if (wishlistLoading) return;
     setWishlistLoading(true);
-    const success = await toggleWishlistItem(product.id, isWishlisted);
+    const wasWishlisted = isWishlisted;
+    const success = await toggleWishlistItem(product.id, wasWishlisted);
     if (success) {
-      setIsWishlisted(!isWishlisted);
+      setIsWishlisted(!wasWishlisted);
+      setWishlistToast({ open: true, action: !wasWishlisted ? 'added' : 'removed' });
     }
     setWishlistLoading(false);
   };
@@ -97,8 +130,8 @@ export default function ProductDetailsPage({
 
   const gallery = product?.galleryImages || [product?.image].filter(Boolean);
 
-  // Fixed unit price
-  const unitPrice = product?.price || 0;
+  // Dynamic unit price based on selected size
+  const unitPrice = selectedSize?.price || product?.price || 0;
   const totalPrice = unitPrice * quantity;
 
   // Auto-dismiss added toast after 4 seconds
@@ -118,27 +151,13 @@ export default function ProductDetailsPage({
       return;
     }
 
-    setCartItems((prev) => {
-      const existingIdx = prev.findIndex((i) => i.product.id === product.id);
-      if (existingIdx > -1) {
-        const updated = [...prev];
-        updated[existingIdx].quantity += quantity;
-        return updated;
-      }
-      return [
-        ...prev,
-        {
-          product,
-          size: { size: '30 ml / 1.0 FL. OZ.', price: unitPrice },
-          quantity,
-          price: unitPrice,
-          totalPrice,
-        },
-      ];
-    });
-
+    const defaultFlaconObj = { size: product?.frenchName || product?.subtitle || 'Full Size Flacon', price: unitPrice };
+    addItemToCart(product, defaultFlaconObj, quantity, engravingText);
     setAddedToast(true);
   };
+
+
+
 
   const handleShare = () => {
     if (navigator.clipboard) {
@@ -428,7 +447,7 @@ export default function ProductDetailsPage({
             {/* 3. PRICING & PURCHASE ACTIONS */}
             <div className="mb-6 pb-6 border-b border-black/10">
               <span className="text-[10px] font-sans tracking-[0.2em] uppercase text-[#737373] font-bold block mb-1">
-                PRICE (30 ML / 1.0 FL. OZ.)
+                PRICE ({product?.frenchName || product?.subtitle || 'HAUTE PARFUMERIE'})
               </span>
               <div className="flex items-baseline gap-2 mb-4">
                 <span className="text-3xl font-sans font-extrabold text-[#1A1A1A]">
@@ -438,6 +457,8 @@ export default function ProductDetailsPage({
                   USD | Inclusive of all taxes
                 </span>
               </div>
+
+
 
               {/* QUANTITY & ADD TO CART CTA */}
               <div className="flex items-center gap-2 sm:gap-3 mb-4 w-full">
@@ -892,26 +913,26 @@ export default function ProductDetailsPage({
 
       {/* Simple & Modern Theme Toast Notification */}
       {addedToast && (
-        <div className="fixed top-18 xs:top-20 sm:top-24 left-4 right-4 sm:left-auto sm:right-6 z-50 sm:w-96 max-w-md mx-auto sm:mx-0 bg-white text-[#111111] border border-black/10 shadow-[0_20px_40px_rgba(0,0,0,0.15)] rounded-2xl overflow-hidden animate-toastSlideIn transition-all">
-          <div className="p-4 sm:p-5">
+        <div className="fixed top-24 sm:top-28 right-3.5 sm:right-6 left-3.5 sm:left-auto w-[90vw] sm:w-96 max-w-[340px] sm:max-w-md ml-auto z-50 bg-white text-[#111111] border border-black/10 shadow-[0_20px_40px_rgba(0,0,0,0.15)] rounded-2xl overflow-hidden animate-toastSlideIn transition-all">
+          <div className="p-3.5 sm:p-5">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-black/10 pb-3 mb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center font-bold text-xs shrink-0">
+            <div className="flex items-center justify-between border-b border-black/10 pb-2.5 mb-2.5 sm:pb-3 sm:mb-3">
+              <div className="flex items-center gap-2 sm:gap-2.5">
+                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center font-bold text-[10px] sm:text-xs shrink-0">
                   ✓
                 </div>
                 <div>
-                  <span className="text-[9px] font-sans tracking-[0.2em] text-[#737373] uppercase font-bold block">
+                  <span className="text-[8px] sm:text-[9px] font-sans tracking-[0.2em] text-[#737373] uppercase font-bold block">
                     MAISON LUNE
                   </span>
-                  <h4 className="font-serif text-xs font-bold tracking-wider text-[#111111] uppercase">
+                  <h4 className="font-serif text-[11px] sm:text-xs font-bold tracking-wider text-[#111111] uppercase">
                     ADDED TO YOUR BAG
                   </h4>
                 </div>
               </div>
               <button
                 onClick={() => setAddedToast(false)}
-                className="text-[#737373] hover:text-[#111111] p-1.5 rounded-full hover:bg-black/5 transition-colors cursor-pointer text-sm leading-none"
+                className="text-[#737373] hover:text-[#111111] p-1 sm:p-1.5 rounded-full hover:bg-black/5 transition-colors cursor-pointer text-xs sm:text-sm leading-none"
                 aria-label="Close notification"
               >
                 ✕
@@ -919,30 +940,30 @@ export default function ProductDetailsPage({
             </div>
 
             {/* Item Details */}
-            <div className="flex items-center gap-3.5 bg-[#F8F8F8] p-3 rounded-xl border border-black/5 mb-4">
+            <div className="flex items-center gap-2.5 sm:gap-3.5 bg-[#F8F8F8] p-2.5 sm:p-3 rounded-xl border border-black/5 mb-3 sm:mb-4">
               <img
                 src={product.image}
                 alt={product.name}
-                className="w-14 h-16 object-contain mix-blend-multiply bg-white rounded-lg p-1 border border-black/5 shrink-0"
+                className="w-11 h-13 sm:w-14 sm:h-16 object-contain mix-blend-multiply bg-white rounded-lg p-1 border border-black/5 shrink-0"
               />
               <div className="flex-1 min-w-0">
-                <h5 className="font-serif text-sm font-bold text-[#111111] truncate uppercase">
+                <h5 className="font-serif text-xs sm:text-sm font-bold text-[#111111] truncate uppercase">
                   {product.name}
                 </h5>
-                <p className="font-sans text-[10px] text-[#737373] uppercase tracking-wider mt-0.5">
+                <p className="font-sans text-[9px] sm:text-[10px] text-[#737373] uppercase tracking-wider mt-0.5">
                   QTY: {quantity} • 30 ML / 1.0 FL. OZ.
                 </p>
-                <p className="font-sans text-xs font-bold text-[#111111] mt-1">
+                <p className="font-sans text-[11px] sm:text-xs font-bold text-[#111111] mt-0.5 sm:mt-1">
                   ${totalPrice.toFixed(2)} USD
                 </p>
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="grid grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
               <button
                 onClick={() => setAddedToast(false)}
-                className="py-2.5 px-3 text-[10px] font-sans font-bold tracking-widest uppercase text-[#111111] bg-white hover:bg-black/5 rounded-xl border border-black/15 transition-all cursor-pointer text-center"
+                className="py-2 sm:py-2.5 px-2 sm:px-3 text-[9px] sm:text-[10px] font-sans font-bold tracking-widest uppercase text-[#111111] bg-white hover:bg-black/5 rounded-xl border border-black/15 transition-all cursor-pointer text-center"
               >
                 KEEP BROWSING
               </button>
@@ -951,10 +972,10 @@ export default function ProductDetailsPage({
                   setAddedToast(false);
                   setIsCartOpen(true);
                 }}
-                className="py-2.5 px-3 text-[10px] font-sans font-bold tracking-widest uppercase text-white bg-[#111111] hover:bg-black rounded-xl transition-all cursor-pointer text-center shadow-sm active:scale-95 flex items-center justify-center gap-1.5"
+                className="py-2 sm:py-2.5 px-2 sm:px-3 text-[9px] sm:text-[10px] font-sans font-bold tracking-widest uppercase text-white bg-[#111111] hover:bg-black rounded-xl transition-all cursor-pointer text-center shadow-sm active:scale-95 flex items-center justify-center gap-1.5"
               >
                 <span>VIEW BAG</span>
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </button>
@@ -964,6 +985,88 @@ export default function ProductDetailsPage({
           {/* Clean Modern Progress Line */}
           <div className="w-full bg-black/5 h-1">
             <div className="bg-[#111111] h-full animate-toastProgress" />
+          </div>
+        </div>
+      )}
+
+      {/* Maison Lune Luxury Wishlist Toast Notification */}
+      {wishlistToast.open && (
+        <div className="fixed top-24 sm:top-28 right-3.5 sm:right-6 left-3.5 sm:left-auto w-[90vw] sm:w-96 max-w-[340px] sm:max-w-md ml-auto z-50 bg-white text-[#111111] border border-black/10 shadow-[0_20px_40px_rgba(0,0,0,0.15)] rounded-2xl overflow-hidden animate-toastSlideIn transition-all">
+          <div className="p-3.5 sm:p-5">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-black/10 pb-2.5 mb-2.5 sm:pb-3 sm:mb-3">
+              <div className="flex items-center gap-2 sm:gap-2.5">
+                <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center font-bold text-[10px] sm:text-xs shrink-0 ${
+                  wishlistToast.action === 'added' 
+                    ? 'bg-rose-50 text-rose-600 border border-rose-200' 
+                    : 'bg-gray-100 text-gray-600 border border-gray-200'
+                }`}>
+                  ♥
+                </div>
+                <div>
+                  <span className="text-[8px] sm:text-[9px] font-sans tracking-[0.2em] text-[#737373] uppercase font-bold block">
+                    MAISON LUNE
+                  </span>
+                  <h4 className="font-serif text-[11px] sm:text-xs font-bold tracking-wider text-[#111111] uppercase">
+                    {wishlistToast.action === 'added' ? 'SAVED TO YOUR WISHLIST' : 'REMOVED FROM WISHLIST'}
+                  </h4>
+                </div>
+              </div>
+              <button
+                onClick={() => setWishlistToast({ open: false, action: 'added' })}
+                className="text-[#737373] hover:text-[#111111] p-1 sm:p-1.5 rounded-full hover:bg-black/5 transition-colors cursor-pointer text-xs sm:text-sm leading-none"
+                aria-label="Close notification"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Item Details */}
+            <div className="flex items-center gap-2.5 sm:gap-3.5 bg-[#F8F8F8] p-2.5 sm:p-3 rounded-xl border border-black/5 mb-3 sm:mb-4">
+              <img
+                src={product.image}
+                alt={product.name}
+                className="w-11 h-13 sm:w-14 sm:h-16 object-contain mix-blend-multiply bg-white rounded-lg p-1 border border-black/5 shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <h5 className="font-serif text-xs sm:text-sm font-bold text-[#111111] truncate uppercase">
+                  {product.name}
+                </h5>
+                <p className="font-sans text-[9px] sm:text-[10px] text-[#737373] uppercase tracking-wider mt-0.5">
+                  HAUTE FRAGRANCE CREATION
+                </p>
+                <p className="font-sans text-[11px] sm:text-xs font-bold text-[#111111] mt-0.5 sm:mt-1">
+                  ${unitPrice.toFixed(2)} USD
+                </p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
+              <button
+                onClick={() => setWishlistToast({ open: false, action: 'added' })}
+                className="py-2 sm:py-2.5 px-2 sm:px-3 text-[9px] sm:text-[10px] font-sans font-bold tracking-widest uppercase text-[#111111] bg-white hover:bg-black/5 rounded-xl border border-black/15 transition-all cursor-pointer text-center"
+              >
+                KEEP BROWSING
+              </button>
+              <button
+                onClick={() => {
+                  setWishlistToast({ open: false, action: 'added' });
+                  if (onOpenAccount) onOpenAccount('saved');
+                }}
+                className="py-2 sm:py-2.5 px-2 sm:px-3 text-[9px] sm:text-[10px] font-sans font-bold tracking-widest uppercase text-white bg-[#111111] hover:bg-black rounded-xl transition-all cursor-pointer text-center shadow-sm active:scale-95 flex items-center justify-center gap-1.5"
+              >
+                <span>VIEW WISHLIST</span>
+                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#C08A3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Clean Modern Progress Line */}
+          <div className="w-full bg-black/5 h-1">
+            <div className="bg-[#C08A3E] h-full animate-toastProgress" />
           </div>
         </div>
       )}
