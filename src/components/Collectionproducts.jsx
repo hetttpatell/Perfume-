@@ -203,6 +203,31 @@ export default function Collectionproducts({
     return result;
   }, [productsList, activeCategory, searchQuery, sortBy]);
 
+  const tabsContainerRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScroll = () => {
+    if (tabsContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = tabsContainerRef.current;
+      setCanScrollLeft(scrollLeft > 5);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 5);
+    }
+  };
+
+  useEffect(() => {
+    checkScroll();
+    window.addEventListener('resize', checkScroll);
+    return () => window.removeEventListener('resize', checkScroll);
+  }, [categoriesTabs]);
+
+  const scrollTabs = (direction) => {
+    if (tabsContainerRef.current) {
+      const scrollAmount = direction === 'left' ? -220 : 220;
+      tabsContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
   const handleUpdateQuantity = (index, newQty) => {
     if (newQty <= 0) {
       handleRemoveItem(index);
@@ -252,43 +277,82 @@ export default function Collectionproducts({
         </div>
       </section>
 
-      {/* ── 2. Dynamic Category Navigation Bar ── */}
+      {/* ── 2. Dynamic Category Navigation Bar (Scrollable for Infinite Future Categories) ── */}
       <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-5">
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between border-b border-black/10 pb-4 gap-4 sm:gap-6">
-          {/* Dynamic Category Tabs */}
-          <div className="flex items-center gap-5 sm:gap-8 overflow-x-auto no-scrollbar pb-2 md:pb-0 scroll-smooth">
-            {categoriesTabs.map((cat) => {
-              const isActive = activeCategory === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
-                  className={`relative pb-3 text-[10.5px] sm:text-xs font-sans font-extrabold tracking-[0.22em] uppercase transition-colors duration-200 whitespace-nowrap cursor-pointer flex items-center gap-2 ${
-                    isActive ? 'text-[#111111]' : 'text-[#777777] hover:text-[#111111]'
-                  }`}
-                >
-                  <span>{cat.label}</span>
-                  {cat.count > 0 && (
-                    <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full transition-colors ${
-                      isActive ? 'bg-[#111111] text-white' : 'bg-[#EAEAEA] text-[#666666]'
-                    }`}>
-                      {cat.count}
-                    </span>
-                  )}
-                  {isActive && (
-                    <motion.span
-                      layoutId="collectionTabLine"
-                      className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#111111]"
-                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                    />
-                  )}
-                </button>
-              );
-            })}
+          
+          {/* Category Tabs Wrapper with Left/Right Overflow Scroll Controls */}
+          <div className="relative flex-1 min-w-0 flex items-center">
+            {/* Scroll Left Button */}
+            {canScrollLeft && (
+              <button
+                type="button"
+                onClick={() => scrollTabs('left')}
+                className="absolute left-0 z-20 p-1.5 bg-white/95 backdrop-blur-sm border border-black/15 shadow-md text-[#111111] hover:bg-[#111111] hover:text-white transition-all cursor-pointer rounded-full -translate-x-2"
+                aria-label="Scroll categories left"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            )}
+
+            {/* Dynamic Category Tabs Container */}
+            <div
+              ref={tabsContainerRef}
+              onScroll={checkScroll}
+              className="flex items-center gap-5 sm:gap-8 overflow-x-auto no-scrollbar pb-2 md:pb-0 scroll-smooth w-full select-none"
+            >
+              {categoriesTabs.map((cat) => {
+                const isActive = activeCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={(e) => {
+                      setActiveCategory(cat.id);
+                      e.currentTarget.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                    }}
+                    className={`relative pb-3 text-[10.5px] sm:text-xs font-sans font-extrabold tracking-[0.22em] uppercase transition-colors duration-200 whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-2 ${
+                      isActive ? 'text-[#111111]' : 'text-[#777777] hover:text-[#111111]'
+                    }`}
+                  >
+                    <span>{cat.label}</span>
+                    {cat.count > 0 && (
+                      <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full transition-colors ${
+                        isActive ? 'bg-[#111111] text-white' : 'bg-[#EAEAEA] text-[#666666]'
+                      }`}>
+                        {cat.count}
+                      </span>
+                    )}
+                    {isActive && (
+                      <motion.span
+                        layoutId="collectionTabLine"
+                        className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#111111]"
+                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Scroll Right Button */}
+            {canScrollRight && (
+              <button
+                type="button"
+                onClick={() => scrollTabs('right')}
+                className="absolute right-0 z-20 p-1.5 bg-white/95 backdrop-blur-sm border border-black/15 shadow-md text-[#111111] hover:bg-[#111111] hover:text-white transition-all cursor-pointer rounded-full translate-x-2"
+                aria-label="Scroll categories right"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            )}
           </div>
 
           {/* Search Box & Custom Sort Dropdown */}
-          <div className="flex items-center gap-3 w-full md:w-auto">
+          <div className="flex items-center gap-3 w-full md:w-auto shrink-0">
             {/* Luxury Search Input */}
             <div className="relative flex-1 md:w-56 lg:w-64">
               <input
