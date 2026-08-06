@@ -1,12 +1,99 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { fetchProducts, fetchCategories } from '../services/api';
 import CartDrawer from './CartDrawer';
 import Footer from './Footer';
 
 import luminousHeroBg from '../assets/lune_luminous_hero_bg.png';
 import mobileHeroBg from '../assets/lune_hero_mobile.png';
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Custom Luxury Sort Dropdown Component
+// ──────────────────────────────────────────────────────────────────────────────
+const SORT_OPTIONS = [
+  { value: 'recommended', label: 'RECOMMENDED' },
+  { value: 'price-low', label: 'PRICE: LOW TO HIGH' },
+  { value: 'price-high', label: 'PRICE: HIGH TO LOW' },
+  { value: 'rating', label: 'HIGHEST RATED' },
+];
+
+function CustomSortDropdown({ value, onChange }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const selectedOption = SORT_OPTIONS.find(opt => opt.value === value) || SORT_OPTIONS[0];
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div ref={dropdownRef} className="relative shrink-0 select-none">
+      {/* Trigger Button */}
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="px-4 py-2.5 bg-[#F9F9FB] hover:bg-white border border-black/15 hover:border-black/40 text-[10px] sm:text-xs font-sans font-extrabold tracking-[0.18em] text-[#111111] uppercase flex items-center justify-between gap-3 min-w-[160px] sm:min-w-[190px] transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-xs"
+      >
+        <span className="truncate">{selectedOption.label}</span>
+        <svg
+          className={`w-3.5 h-3.5 text-[#555555] shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-[#111111]' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {/* Floating Menu Popup */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 6, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 4, scale: 0.98 }}
+            transition={{ duration: 0.16, ease: 'easeOut' }}
+            className="absolute right-0 top-full mt-1.5 w-full min-w-[200px] bg-white border border-black/15 shadow-xl z-50 overflow-hidden py-1"
+          >
+            {SORT_OPTIONS.map((opt) => {
+              const isSelected = opt.value === value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => {
+                    onChange(opt.value);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full px-4 py-2.5 text-left text-[10px] sm:text-xs font-sans font-extrabold tracking-[0.15em] uppercase flex items-center justify-between transition-colors duration-150 cursor-pointer ${
+                    isSelected
+                      ? 'bg-[#111111] text-white'
+                      : 'text-[#333333] hover:bg-[#F4F4F6] hover:text-[#111111]'
+                  }`}
+                >
+                  <span>{opt.label}</span>
+                  {isSelected && (
+                    <svg className="w-3.5 h-3.5 text-[#C08A3E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </button>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export default function Collectionproducts({
   cartItems: parentCartItems,
@@ -50,15 +137,35 @@ export default function Collectionproducts({
     return () => { isMounted = false; };
   }, []);
 
+  // Category items count map
+  const categoryCounts = useMemo(() => {
+    const counts = {};
+    const activeProds = productsList.filter(p => p.inStock !== false && p.in_stock !== false);
+    counts['ALL'] = activeProds.length;
+    activeProds.forEach(p => {
+      if (p.category) {
+        const catKey = p.category.toUpperCase();
+        counts[catKey] = (counts[catKey] || 0) + 1;
+      }
+    });
+    return counts;
+  }, [productsList]);
+
   // Dynamic Categories Tabs from Database
   const categoriesTabs = useMemo(() => {
-    const defaultTabs = [{ id: 'ALL', label: 'ALL CREATIONS' }];
-    const fetchedTabs = dbCategories.map(c => ({
-      id: c.name,
-      label: c.name
-    }));
+    const defaultTabs = [
+      { id: 'ALL', label: 'ALL CREATIONS', count: categoryCounts['ALL'] || 0 }
+    ];
+    const fetchedTabs = dbCategories.map(c => {
+      const count = categoryCounts[c.name.toUpperCase()] || 0;
+      return {
+        id: c.name,
+        label: c.name,
+        count
+      };
+    });
     return [...defaultTabs, ...fetchedTabs];
-  }, [dbCategories]);
+  }, [dbCategories, categoryCounts]);
 
   // Dynamic Filtering & Sorting based on live database records
   const filteredProducts = useMemo(() => {
@@ -146,25 +253,32 @@ export default function Collectionproducts({
       </section>
 
       {/* ── 2. Dynamic Category Navigation Bar ── */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-4">
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between border-b border-black/10 pb-4 gap-4">
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-5">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between border-b border-black/10 pb-4 gap-4 sm:gap-6">
           {/* Dynamic Category Tabs */}
-          <div className="flex items-center gap-4 sm:gap-8 overflow-x-auto no-scrollbar pb-1 md:pb-0">
+          <div className="flex items-center gap-5 sm:gap-8 overflow-x-auto no-scrollbar pb-2 md:pb-0 scroll-smooth">
             {categoriesTabs.map((cat) => {
               const isActive = activeCategory === cat.id;
               return (
                 <button
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.id)}
-                  className={`relative pb-2 text-[10px] sm:text-[11px] md:text-xs font-sans font-bold tracking-[0.2em] uppercase transition-colors duration-200 whitespace-nowrap cursor-pointer ${
-                    isActive ? 'text-[#111111]' : 'text-[#737373] hover:text-[#111111]'
+                  className={`relative pb-3 text-[10.5px] sm:text-xs font-sans font-extrabold tracking-[0.22em] uppercase transition-colors duration-200 whitespace-nowrap cursor-pointer flex items-center gap-2 ${
+                    isActive ? 'text-[#111111]' : 'text-[#777777] hover:text-[#111111]'
                   }`}
                 >
-                  {cat.label}
+                  <span>{cat.label}</span>
+                  {cat.count > 0 && (
+                    <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full transition-colors ${
+                      isActive ? 'bg-[#111111] text-white' : 'bg-[#EAEAEA] text-[#666666]'
+                    }`}>
+                      {cat.count}
+                    </span>
+                  )}
                   {isActive && (
                     <motion.span
                       layoutId="collectionTabLine"
-                      className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#111111]"
+                      className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#111111]"
                       transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -173,41 +287,32 @@ export default function Collectionproducts({
             })}
           </div>
 
-          {/* Search Box & Sort Selector */}
-          <div className="flex items-center gap-2.5 sm:gap-3 w-full md:w-auto">
-            {/* Search Input */}
+          {/* Search Box & Custom Sort Dropdown */}
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            {/* Luxury Search Input */}
             <div className="relative flex-1 md:w-56 lg:w-64">
               <input
                 type="text"
                 placeholder="SEARCH CREATIONS..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-8 pr-7 py-2 bg-[#F9F9FB] border border-black/15 text-[10px] sm:text-xs font-sans text-[#111111] tracking-wider uppercase focus:outline-none focus:border-black transition-all placeholder:text-[#999999]"
+                className="w-full pl-8 pr-7 py-2.5 bg-[#F9F9FB] border border-black/15 text-[10px] sm:text-xs font-sans text-[#111111] tracking-wider uppercase focus:outline-none focus:border-black transition-all placeholder:text-[#999999] shadow-2xs"
               />
-              <svg className="w-3.5 h-3.5 text-[#737373] absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 text-[#737373] absolute left-2.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-2 text-xs text-[#737373] hover:text-[#111111]"
+                  className="absolute right-2.5 top-2.5 text-xs text-[#737373] hover:text-[#111111]"
                 >
                   ✕
                 </button>
               )}
             </div>
 
-            {/* Sort Select Dropdown */}
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 sm:px-4 py-2 bg-[#F9F9FB] border border-black/15 text-[10px] sm:text-xs font-sans font-bold tracking-widest text-[#111111] uppercase focus:outline-none cursor-pointer shrink-0"
-            >
-              <option value="recommended">RECOMMENDED</option>
-              <option value="price-low">PRICE: LOW TO HIGH</option>
-              <option value="price-high">PRICE: HIGH TO LOW</option>
-              <option value="rating">HIGHEST RATED</option>
-            </select>
+            {/* Custom Luxury Sort Select Dropdown */}
+            <CustomSortDropdown value={sortBy} onChange={setSortBy} />
           </div>
         </div>
       </section>
@@ -224,7 +329,7 @@ export default function Collectionproducts({
             <p className="font-sans text-xs text-[#777777] mt-1">Try resetting your search query or category filters.</p>
             <button
               onClick={() => { setActiveCategory('ALL'); setSearchQuery(''); }}
-              className="mt-4 px-6 py-2.5 bg-[#111111] text-white text-[10px] font-sans font-extrabold tracking-[0.2em] uppercase hover:bg-black transition-colors"
+              className="mt-4 px-6 py-2.5 bg-[#111111] text-white text-[10px] font-sans font-extrabold tracking-[0.2em] uppercase hover:bg-black transition-colors cursor-pointer"
             >
               RESET ALL FILTERS
             </button>
