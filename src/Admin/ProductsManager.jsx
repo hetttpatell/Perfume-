@@ -396,7 +396,7 @@ export default function ProductsManager() {
     <div className="space-y-8 font-sans relative text-gray-900">
       {/* Floating Pop-Up Toast Notification */}
       {toast.open && (
-        <div className="fixed top-6 right-6 z-50 animate-bounce-in max-w-md w-full">
+        <div className="fixed top-4 left-4 right-4 sm:left-auto sm:right-6 sm:top-6 z-50 animate-bounce-in max-w-md w-auto">
           <div className={`p-4 rounded-2xl shadow-2xl border flex items-center justify-between gap-4 backdrop-blur-md ${
             toast.type === 'error'
               ? 'bg-red-900/95 text-white border-red-500/50'
@@ -420,7 +420,7 @@ export default function ProductsManager() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-black/10 pb-6">
         <div>
           <span className="text-[10px] font-sans font-extrabold tracking-[0.3em] uppercase text-[#C08A3E] block mb-1">
-            MAISON LUNE • CATALOG MANAGEMENT
+            LUNE • CATALOG MANAGEMENT
           </span>
           <h1 className="font-serif font-black text-2xl sm:text-3xl text-[#111111] uppercase tracking-tight">
             PRODUCTS & SHOWCASE INVENTORY
@@ -568,49 +568,179 @@ export default function ProductsManager() {
           <p className="font-sans text-xs text-[#555555]">No items match your search filter.</p>
         </div>
       ) : (
-        <div className="bg-white border border-black/10 rounded-2xl shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse font-sans">
-              <thead>
-                <tr className="bg-[#F8F8FA] border-b border-black/10 text-[9px] font-extrabold text-[#555555] tracking-[0.2em] uppercase">
-                  <th className="py-4 px-4 text-center w-24">MAIN IMAGE</th>
-                  <th className="py-4 px-5">PRODUCT NAME & SUBTITLE</th>
-                  <th className="py-4 px-4">CATEGORY</th>
-                  <th className="py-4 px-4 text-center">PRICE</th>
-                  <th className="py-4 px-4 text-center">ACTIVE STATUS</th>
-                  <th className="py-4 px-4 text-center">HERO SLIDER</th>
-                  <th className="py-4 px-4 text-center">FEATURED</th>
-                  <th className="py-4 px-5 text-right">ACTIONS</th>
-                </tr>
-              </thead>
+        <div className="space-y-4">
+          {/* DESKTOP TABLE VIEW (Visible on md screens and above) */}
+          <div className="hidden md:block bg-white border border-black/10 rounded-2xl shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse font-sans">
+                <thead>
+                  <tr className="bg-[#F8F8FA] border-b border-black/10 text-[9px] font-extrabold text-[#555555] tracking-[0.2em] uppercase">
+                    <th className="py-4 px-4 text-center w-24">MAIN IMAGE</th>
+                    <th className="py-4 px-5">PRODUCT NAME & SUBTITLE</th>
+                    <th className="py-4 px-4">CATEGORY</th>
+                    <th className="py-4 px-4 text-center">PRICE</th>
+                    <th className="py-4 px-4 text-center">ACTIVE STATUS</th>
+                    <th className="py-4 px-4 text-center">HERO SLIDER</th>
+                    <th className="py-4 px-4 text-center">FEATURED</th>
+                    <th className="py-4 px-5 text-right">ACTIONS</th>
+                  </tr>
+                </thead>
 
-              <tbody className="divide-y divide-black/10 text-xs">
-                {filteredProducts.map((product) => {
-                  const isProdActive = product.inStock !== false && product.in_stock !== false;
-                  return (
-                    <tr key={product.id} className="hover:bg-[#F8F8FA]/60 transition-colors">
-                      {/* COLUMN 1: Main Image Thumbnail */}
-                      <td className="py-4 px-4 text-center">
-                        <div className="relative inline-block">
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-14 h-14 object-contain rounded-xl border border-black/10 bg-[#F4F4F6] p-1 mx-auto"
-                          />
-                          <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-[#C08A3E] text-white text-[7px] font-extrabold px-1.5 py-0.2 rounded-full uppercase tracking-tighter shadow-2xs whitespace-nowrap">
-                            MAIN IMAGE
+                <tbody className="divide-y divide-black/10 text-xs">
+                  {filteredProducts.map((product) => {
+                    const isProdActive = product.inStock !== false && product.in_stock !== false;
+                    return (
+                      <tr key={product.id} className="hover:bg-[#F8F8FA]/60 transition-colors">
+                        {/* COLUMN 1: Main Image Thumbnail */}
+                        <td className="py-4 px-4 text-center">
+                          <div className="relative inline-block">
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="w-14 h-14 object-contain rounded-xl border border-black/10 bg-[#F4F4F6] p-1 mx-auto"
+                            />
+                            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-[#C08A3E] text-white text-[7px] font-extrabold px-1.5 py-0.2 rounded-full uppercase tracking-tighter shadow-2xs whitespace-nowrap">
+                              MAIN IMAGE
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* COLUMN 2: Product Name & Subtitle */}
+                        <td className="py-4 px-5">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-[9px] font-bold text-[#C08A3E] uppercase">
+                              #{product.id}
+                            </span>
+                            {product.badge && (
+                              <span className="px-2 py-0.2 bg-black/5 text-[#555555] font-extrabold text-[8px] tracking-wider uppercase rounded-full border border-black/5">
+                                {product.badge}
+                              </span>
+                            )}
+                          </div>
+                          <h4 className="font-serif font-black text-sm text-[#111111] uppercase tracking-tight truncate mt-0.5">
+                            {product.name}
+                          </h4>
+                          <p className="text-[11px] text-[#555555] font-medium truncate">
+                            {product.frenchName || product.subtitle || 'Vaporisateur de Parfum'}
+                          </p>
+                        </td>
+
+                        {/* COLUMN 3: Category */}
+                        <td className="py-4 px-4">
+                          <span className="px-2.5 py-1 bg-[#F4F4F6] text-[#111111] border border-black/10 font-sans font-extrabold text-[9px] tracking-wider uppercase rounded-full whitespace-nowrap">
+                            {product.category}
                           </span>
-                        </div>
-                      </td>
+                        </td>
 
-                      {/* COLUMN 2: Product Name & Subtitle */}
-                      <td className="py-4 px-5">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-[9px] font-bold text-[#C08A3E] uppercase">
+                        {/* COLUMN 4: Price */}
+                        <td className="py-4 px-4 text-center font-serif font-black text-sm text-[#111111] whitespace-nowrap">
+                          $ {product.price}
+                        </td>
+
+                        {/* COLUMN 5: Active Status Toggle */}
+                        <td className="py-4 px-4 text-center">
+                          <div className="flex flex-col items-center gap-1">
+                            <ToggleSwitch
+                              checked={isProdActive}
+                              onChange={() => handleToggleStock(product)}
+                              disabled={actionLoadingId === product.id}
+                              activeColor="bg-[#10B981]"
+                            />
+                            <span className={`text-[8.5px] font-sans font-extrabold tracking-wider uppercase ${isProdActive ? 'text-[#10B981]' : 'text-gray-400'}`}>
+                              {isProdActive ? 'ACTIVE' : 'DRAFT'}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* COLUMN 6: Hero Showcase Toggle */}
+                        <td className="py-4 px-4 text-center">
+                          <div className="flex flex-col items-center gap-1">
+                            <ToggleSwitch
+                              checked={!!product.isHero}
+                              onChange={() => handleToggleFlags(product, 'hero')}
+                              disabled={actionLoadingId === product.id}
+                              activeColor="bg-[#111111]"
+                            />
+                            <span className={`text-[8.5px] font-sans font-extrabold tracking-wider uppercase ${product.isHero ? 'text-[#111111]' : 'text-gray-400'}`}>
+                              {product.isHero ? 'HERO ★' : 'OFF'}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* COLUMN 7: Featured Item Toggle */}
+                        <td className="py-4 px-4 text-center">
+                          <div className="flex flex-col items-center gap-1">
+                            <ToggleSwitch
+                              checked={!!product.isFeatured}
+                              onChange={() => handleToggleFlags(product, 'featured')}
+                              disabled={actionLoadingId === product.id}
+                              activeColor="bg-[#C08A3E]"
+                            />
+                            <span className={`text-[8.5px] font-sans font-extrabold tracking-wider uppercase ${product.isFeatured ? 'text-[#C08A3E]' : 'text-gray-400'}`}>
+                              {product.isFeatured ? 'FEATURED ★' : 'OFF'}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* COLUMN 8: Edit & Delete Actions */}
+                        <td className="py-4 px-5 text-right">
+                          <div className="inline-flex items-center gap-2">
+                            <button
+                              onClick={() => openEditModal(product)}
+                              title="Edit Product & Manage Images"
+                              className="p-2.5 bg-[#F4F4F6] hover:bg-[#111111] text-[#111111] hover:text-white border border-black/10 rounded-xl transition-all cursor-pointer active:scale-95"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                            </button>
+
+                            <button
+                              disabled={actionLoadingId === product.id}
+                              onClick={() => handleDelete(product)}
+                              title="Delete Product Permanently"
+                              className="p-2.5 bg-white hover:bg-red-50 text-red-600 border border-red-200 hover:border-red-500 rounded-xl transition-all cursor-pointer active:scale-95"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* MOBILE CARD ROW VIEW (Visible on mobile screens < md, matching Screenshot 3) */}
+          <div className="block md:hidden space-y-3.5">
+            {filteredProducts.map((product) => {
+              const isProdActive = product.inStock !== false && product.in_stock !== false;
+              return (
+                <div key={product.id} className="bg-white border border-black/10 rounded-2xl p-4 shadow-sm space-y-3 hover:border-[#C08A3E]/40 transition-all">
+                  {/* Top Row: Thumbnail + Product Title/Badge + Price */}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="relative shrink-0">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-16 h-16 object-contain rounded-xl border border-black/10 bg-[#F4F4F6] p-1"
+                        />
+                        <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-[#C08A3E] text-white text-[7px] font-extrabold px-1.5 py-0.2 rounded-full uppercase tracking-tighter shadow-2xs whitespace-nowrap">
+                          MAIN IMAGE
+                        </span>
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-mono text-[10px] font-extrabold text-[#C08A3E] uppercase">
                             #{product.id}
                           </span>
                           {product.badge && (
-                            <span className="px-2 py-0.2 bg-black/5 text-[#555555] font-extrabold text-[8px] tracking-wider uppercase rounded-full border border-black/5">
+                            <span className="px-2 py-0.5 bg-black/5 text-[#555555] font-extrabold text-[8px] tracking-wider uppercase rounded-full border border-black/5">
                               {product.badge}
                             </span>
                           )}
@@ -621,95 +751,84 @@ export default function ProductsManager() {
                         <p className="text-[11px] text-[#555555] font-medium truncate">
                           {product.frenchName || product.subtitle || 'Vaporisateur de Parfum'}
                         </p>
-                      </td>
+                      </div>
+                    </div>
 
-                      {/* COLUMN 3: Category */}
-                      <td className="py-4 px-4">
-                        <span className="px-2.5 py-1 bg-[#F4F4F6] text-[#111111] border border-black/10 font-sans font-extrabold text-[9px] tracking-wider uppercase rounded-full whitespace-nowrap">
-                          {product.category}
-                        </span>
-                      </td>
+                    <div className="text-right shrink-0">
+                      <span className="font-serif font-black text-base text-[#111111] block">
+                        ${product.price}
+                      </span>
+                      <span className="px-2 py-0.5 bg-[#F4F4F6] text-[#111111] border border-black/10 font-sans font-extrabold text-[8px] tracking-wider uppercase rounded-full inline-block mt-1">
+                        {product.category}
+                      </span>
+                    </div>
+                  </div>
 
-                      {/* COLUMN 4: Price */}
-                      <td className="py-4 px-4 text-center font-serif font-black text-sm text-[#111111] whitespace-nowrap">
-                        $ {product.price}
-                      </td>
+                  {/* Toggles Row */}
+                  <div className="grid grid-cols-3 gap-2 pt-2.5 border-t border-black/5 bg-[#F9F9FB] p-2.5 rounded-xl border border-black/5">
+                    <div className="flex flex-col items-center justify-center gap-1">
+                      <ToggleSwitch
+                        checked={isProdActive}
+                        onChange={() => handleToggleStock(product)}
+                        disabled={actionLoadingId === product.id}
+                        activeColor="bg-[#10B981]"
+                      />
+                      <span className={`text-[8px] font-sans font-extrabold tracking-wider uppercase ${isProdActive ? 'text-[#10B981]' : 'text-gray-400'}`}>
+                        {isProdActive ? 'ACTIVE' : 'DRAFT'}
+                      </span>
+                    </div>
 
-                      {/* COLUMN 5: Active Status Toggle */}
-                      <td className="py-4 px-4 text-center">
-                        <div className="flex flex-col items-center gap-1">
-                          <ToggleSwitch
-                            checked={isProdActive}
-                            onChange={() => handleToggleStock(product)}
-                            disabled={actionLoadingId === product.id}
-                            activeColor="bg-[#10B981]"
-                          />
-                          <span className={`text-[8.5px] font-sans font-extrabold tracking-wider uppercase ${isProdActive ? 'text-[#10B981]' : 'text-gray-400'}`}>
-                            {isProdActive ? 'ACTIVE' : 'DRAFT'}
-                          </span>
-                        </div>
-                      </td>
+                    <div className="flex flex-col items-center justify-center gap-1 border-x border-black/10">
+                      <ToggleSwitch
+                        checked={!!product.isHero}
+                        onChange={() => handleToggleFlags(product, 'hero')}
+                        disabled={actionLoadingId === product.id}
+                        activeColor="bg-[#111111]"
+                      />
+                      <span className={`text-[8px] font-sans font-extrabold tracking-wider uppercase ${product.isHero ? 'text-[#111111]' : 'text-gray-400'}`}>
+                        {product.isHero ? 'HERO ★' : 'OFF'}
+                      </span>
+                    </div>
 
-                      {/* COLUMN 6: Hero Showcase Toggle */}
-                      <td className="py-4 px-4 text-center">
-                        <div className="flex flex-col items-center gap-1">
-                          <ToggleSwitch
-                            checked={!!product.isHero}
-                            onChange={() => handleToggleFlags(product, 'hero')}
-                            disabled={actionLoadingId === product.id}
-                            activeColor="bg-[#111111]"
-                          />
-                          <span className={`text-[8.5px] font-sans font-extrabold tracking-wider uppercase ${product.isHero ? 'text-[#111111]' : 'text-gray-400'}`}>
-                            {product.isHero ? 'HERO ★' : 'OFF'}
-                          </span>
-                        </div>
-                      </td>
+                    <div className="flex flex-col items-center justify-center gap-1">
+                      <ToggleSwitch
+                        checked={!!product.isFeatured}
+                        onChange={() => handleToggleFlags(product, 'featured')}
+                        disabled={actionLoadingId === product.id}
+                        activeColor="bg-[#C08A3E]"
+                      />
+                      <span className={`text-[8px] font-sans font-extrabold tracking-wider uppercase ${product.isFeatured ? 'text-[#C08A3E]' : 'text-gray-400'}`}>
+                        {product.isFeatured ? 'FEATURED ★' : 'OFF'}
+                      </span>
+                    </div>
+                  </div>
 
-                      {/* COLUMN 7: Featured Item Toggle */}
-                      <td className="py-4 px-4 text-center">
-                        <div className="flex flex-col items-center gap-1">
-                          <ToggleSwitch
-                            checked={!!product.isFeatured}
-                            onChange={() => handleToggleFlags(product, 'featured')}
-                            disabled={actionLoadingId === product.id}
-                            activeColor="bg-[#C08A3E]"
-                          />
-                          <span className={`text-[8.5px] font-sans font-extrabold tracking-wider uppercase ${product.isFeatured ? 'text-[#C08A3E]' : 'text-gray-400'}`}>
-                            {product.isFeatured ? 'FEATURED ★' : 'OFF'}
-                          </span>
-                        </div>
-                      </td>
+                  {/* Action Buttons */}
+                  <div className="flex items-center gap-2 pt-1">
+                    <button
+                      onClick={() => openEditModal(product)}
+                      className="flex-1 py-2.5 px-3 bg-[#F4F4F6] hover:bg-[#111111] text-[#111111] hover:text-white border border-black/10 rounded-xl transition-all cursor-pointer font-sans text-xs font-extrabold tracking-wider uppercase flex items-center justify-center gap-2 active:scale-95"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                      <span>EDIT ITEM</span>
+                    </button>
 
-                      {/* COLUMN 8: Edit & Delete Actions */}
-                      <td className="py-4 px-5 text-right">
-                        <div className="inline-flex items-center gap-2">
-                          <button
-                            onClick={() => openEditModal(product)}
-                            title="Edit Product & Manage Images"
-                            className="p-2.5 bg-[#F4F4F6] hover:bg-[#111111] text-[#111111] hover:text-white border border-black/10 rounded-xl transition-all cursor-pointer active:scale-95"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </button>
-
-                          <button
-                            disabled={actionLoadingId === product.id}
-                            onClick={() => handleDelete(product)}
-                            title="Delete Product Permanently"
-                            className="p-2.5 bg-white hover:bg-red-50 text-red-600 border border-red-200 hover:border-red-500 rounded-xl transition-all cursor-pointer active:scale-95"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                    <button
+                      disabled={actionLoadingId === product.id}
+                      onClick={() => handleDelete(product)}
+                      className="py-2.5 px-3 bg-white hover:bg-red-50 text-red-600 border border-red-200 hover:border-red-500 rounded-xl transition-all cursor-pointer font-sans text-xs font-extrabold tracking-wider uppercase flex items-center justify-center gap-2 active:scale-95"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      <span>DELETE</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -724,7 +843,7 @@ export default function ProductsManager() {
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-[#C08A3E]" />
                   <span className="text-[10px] font-sans font-extrabold tracking-[0.25em] text-[#C08A3E] uppercase">
-                    MAISON LUNE ADMIN SUITE
+                    LUNE ADMIN SUITE
                   </span>
                 </div>
                 <h3 className="font-serif font-black text-2xl text-gray-900 uppercase tracking-tight mt-0.5">
@@ -859,12 +978,12 @@ export default function ProductsManager() {
 
                 {/* Uploaded Images Grid */}
                 <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 flex-wrap pb-2 border-b border-gray-100">
                     <span className="text-[11px] font-extrabold uppercase text-gray-800 tracking-wider">
                       UPLOADED PHOTOS ({formData.galleryImages?.length || 0} TOTAL)
                     </span>
                     {formData.imageUrl && (
-                      <span className="text-[10px] font-extrabold text-[#C08A3E] uppercase tracking-wider bg-[#C08A3E]/10 px-3 py-1 rounded-full border border-[#C08A3E]/20">
+                      <span className="text-[9.5px] font-extrabold text-[#C08A3E] uppercase tracking-wider bg-[#C08A3E]/10 px-3 py-1 rounded-full border border-[#C08A3E]/20 shrink-0 self-start sm:self-auto">
                         1 PRIMARY PHOTO SELECTED
                       </span>
                     )}

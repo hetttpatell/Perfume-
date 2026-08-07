@@ -81,21 +81,21 @@ export function ConfirmProvider({ children }) {
             </div>
 
             {/* Actions */}
-            <div className="px-6 pt-4 pb-5 flex items-center justify-end gap-2.5">
+            <div className="px-6 pt-4 pb-5 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5">
               {modal.type === 'confirm' && (
                 <button
                   onClick={() => handleClose(false)}
-                  className="px-5 py-2.5 rounded-full bg-[#F5F5F7] hover:bg-[#EBEBEF] text-[11px] font-sans font-extrabold tracking-[0.15em] uppercase text-[#555555] transition-all cursor-pointer border border-black/5 active:scale-95"
+                  className="w-full sm:w-auto px-5 py-3 rounded-full bg-[#F5F5F7] hover:bg-[#EBEBEF] text-[11px] font-sans font-extrabold tracking-[0.15em] uppercase text-[#555555] transition-all cursor-pointer border border-black/5 active:scale-95 text-center"
                 >
                   {modal.cancelLabel || 'CANCEL'}
                 </button>
               )}
               <button
                 onClick={() => handleClose(true)}
-                className={`px-5 py-2.5 rounded-full text-[11px] font-sans font-extrabold tracking-[0.15em] uppercase transition-all cursor-pointer active:scale-95 border ${
+                className={`w-full sm:w-auto px-5 py-3 rounded-full text-[11px] font-sans font-extrabold tracking-[0.15em] uppercase transition-all cursor-pointer active:scale-95 border text-center ${
                   modal.danger
-                    ? 'bg-red-600 hover:bg-red-700 text-white border-red-600'
-                    : 'bg-[#111111] hover:bg-[#333333] text-white border-[#111111]'
+                    ? 'bg-red-600 hover:bg-red-700 text-white border-red-600 shadow-md'
+                    : 'bg-[#111111] hover:bg-[#333333] text-white border-[#111111] shadow-md'
                 }`}
               >
                 {modal.confirmLabel || (modal.type === 'alert' ? 'OK' : 'CONFIRM')}

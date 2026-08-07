@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { fetchAllReviews, deleteReviewById } from '../services/api';
+import { useConfirm } from '../components/ConfirmModal';
 
 export default function ReviewsManager() {
+  const { confirm } = useConfirm();
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(null);
@@ -18,7 +20,12 @@ export default function ReviewsManager() {
   }, []);
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this review?')) return;
+    const ok = await confirm('Are you sure you want to delete this customer review? This action cannot be undone.', {
+      title: 'Delete Review',
+      confirmLabel: 'DELETE',
+      danger: true
+    });
+    if (!ok) return;
     setDeleting(id);
     const result = await deleteReviewById(id);
     if (result.success) {
@@ -171,7 +178,7 @@ export default function ReviewsManager() {
                 <button
                   onClick={() => handleDelete(r.id)}
                   disabled={deleting === r.id}
-                  className="px-3 py-1 text-[9px] font-extrabold tracking-widest uppercase rounded-full border border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300 transition-all disabled:opacity-50 cursor-pointer"
+                  className="px-4 py-2 text-[10px] font-extrabold tracking-widest uppercase rounded-full border border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300 transition-all disabled:opacity-50 cursor-pointer active:scale-95"
                 >
                   {deleting === r.id ? 'DELETING...' : 'DELETE'}
                 </button>

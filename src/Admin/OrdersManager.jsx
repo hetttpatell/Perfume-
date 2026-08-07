@@ -116,16 +116,16 @@ export default function OrdersManager() {
                     </p>
                   </div>
 
-                    <div className="flex items-center gap-3 bg-[#F8F9FC] border border-black/10 rounded-2xl p-2 shrink-0">
-                      <label className="text-[10px] font-sans font-extrabold tracking-widest text-[#111111] uppercase pl-2">
-                        UPDATE STAGE:
-                      </label>
-                      <CustomStageSelect
-                        value={currentStatus}
-                        disabled={updatingId === order.id}
-                        onChange={(newStatus) => handleStatusChange(order.id, newStatus)}
-                      />
-                    </div>
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 bg-[#F8F9FC] border border-black/10 rounded-2xl p-2.5 shrink-0 w-full lg:w-auto">
+                    <label className="text-[10px] font-sans font-extrabold tracking-widest text-[#111111] uppercase pl-1 shrink-0">
+                      UPDATE STAGE:
+                    </label>
+                    <CustomStageSelect
+                      value={currentStatus}
+                      disabled={updatingId === order.id}
+                      onChange={(newStatus) => handleStatusChange(order.id, newStatus)}
+                    />
+                  </div>
                 </div>
 
                 {/* 2. Customer & Shipping Details Card */}
@@ -154,7 +154,7 @@ export default function OrdersManager() {
                     {order.items && order.items.length > 0 ? (
                       order.items.map((it, idx) => {
                         const prodImg = it.product?.image_url || it.product?.image || '/SVGs/Perfume-SVG.png';
-                        const prodName = it.product?.name || 'Maison Lune Fragrance';
+                        const prodName = it.product?.name || 'Lune Fragrance';
                         const frenchName = it.product?.french_name || it.product?.frenchName || '';
 
                         return (
@@ -202,15 +202,66 @@ export default function OrdersManager() {
                   </div>
                 </div>
 
-                {/* 4. Order Total Bar */}
-                <div className="pt-3 border-t border-black/10 flex items-center justify-between font-sans">
-                  <span className="text-xs font-extrabold text-[#555555] uppercase tracking-wider">
-                    TOTAL AMOUNT PAID
-                  </span>
-                  <span className="font-serif font-black text-xl text-[#111111]">
-                    ${Number(order.total || 0).toFixed(2)} USD
-                  </span>
-                </div>
+                {/* 4. Financial Breakdown: Actual Amount, Coupon Discount, Final Amount Paid */}
+                {(() => {
+                  const items = order.items || order.order_items || [];
+                  let subtotal = Number(order.subtotal || 0);
+                  if (subtotal === 0 && Array.isArray(items) && items.length > 0) {
+                    subtotal = items.reduce((sum, it) => {
+                      const price = Number(it.unit_price || it.price || it.product?.price || 0);
+                      const qty = Number(it.quantity || it.qty || 1);
+                      return sum + (price * qty);
+                    }, 0);
+                  }
+                  let discount = Number(order.discount_amount || order.discountAmount || order.discount || 0);
+                  let finalTotal = Number(order.total || order.total_amount || order.totalAmount || 0);
+                  if (finalTotal === 0) {
+                    finalTotal = Math.max(0, subtotal - discount);
+                  }
+                  if (discount === 0 && subtotal > finalTotal && finalTotal > 0) {
+                    discount = subtotal - finalTotal;
+                  }
+                  const pct = subtotal > 0 && discount > 0 ? Math.round((discount / subtotal) * 100) : 0;
+
+                  return (
+                    <div className="mt-4 pt-3.5 border-t border-black/10 font-sans space-y-2.5 bg-[#F8F8FA] p-4 rounded-2xl border border-gray-200/80">
+                      {/* Amount 1: Actual Amount (Subtotal) */}
+                      <div className="flex items-center justify-between text-xs text-gray-600">
+                        <span className="font-extrabold uppercase tracking-wider">
+                          1. ACTUAL AMOUNT (SUBTOTAL)
+                        </span>
+                        <span className="font-mono font-bold text-gray-900">
+                          ${subtotal.toFixed(2)} USD
+                        </span>
+                      </div>
+
+                      {/* Amount 2: Coupon Discounted Amount */}
+                      <div className="flex items-center justify-between text-xs text-[#C08A3E]">
+                        <span className="font-extrabold uppercase tracking-wider flex items-center gap-1.5">
+                          <span>2. COUPON DISCOUNT</span>
+                          {pct > 0 && (
+                            <span className="text-[9px] bg-[#C08A3E]/15 text-[#C08A3E] px-2 py-0.5 rounded-full border border-[#C08A3E]/30 font-black">
+                              -{pct}% OFF
+                            </span>
+                          )}
+                        </span>
+                        <span className="font-mono font-bold">
+                          {discount > 0 ? `-$${discount.toFixed(2)} USD` : '$0.00 USD'}
+                        </span>
+                      </div>
+
+                      {/* Amount 3: Final Amount Paid */}
+                      <div className="pt-2 border-t border-gray-200 flex items-center justify-between">
+                        <span className="text-xs font-black text-[#111111] uppercase tracking-wider">
+                          3. FINAL AMOUNT PAID
+                        </span>
+                        <span className="font-serif font-black text-xl text-[#111111]">
+                          ${finalTotal.toFixed(2)} USD
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             );
           })}

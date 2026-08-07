@@ -13,7 +13,7 @@ import ContactLocationsManager from './ContactLocationsManager';
 import UsersManager from './UsersManager';
 
 export default function AdminLayout() {
-  const { isLoggedIn, user, promptLoginRequired } = useAuth();
+  const { isLoggedIn, user, logout, promptLoginRequired } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -46,57 +46,156 @@ export default function AdminLayout() {
   ];
 
   return (
-    <div className="min-h-screen w-full bg-[#F8F8FA] text-[#111111] font-sans flex flex-col md:flex-row">
-      {/* Mobile Top Header */}
-      <div className="md:hidden bg-[#111111] text-white p-4 flex items-center justify-between sticky top-0 z-40 shadow-md">
-        <div className="flex items-center gap-3">
-          <img src={logoImg} alt="Lune Logo" className="h-8 w-auto invert" />
-          <span className="font-serif font-black text-sm tracking-wider uppercase">MAISON LUNE ADMIN</span>
+    <div className="h-screen w-full bg-[#F8F8FA] text-[#111111] font-sans flex flex-col md:flex-row overflow-hidden">
+      {/* Mobile Top Header (Fixed at top of screen) */}
+      <div className="md:hidden bg-[#111111] text-white px-4 py-3 flex items-center justify-between shrink-0 shadow-md border-b border-white/10 z-40">
+        {/* Left: Hamburger Menu Button */}
+        <button
+          onClick={() => setMobileNavOpen(true)}
+          className="p-2 text-white hover:text-[#C08A3E] font-bold text-2xl active:scale-95 transition-transform cursor-pointer shrink-0"
+          aria-label="Open navigation menu"
+        >
+          ☰
+        </button>
+
+        {/* Center: LUNE Title & Subtitle */}
+        <div className="text-center flex flex-col items-center justify-center">
+          <span className="font-serif font-black text-lg tracking-[0.2em] uppercase block leading-none text-white">
+            LUNE
+          </span>
+          <span className="text-[7.5px] font-sans font-extrabold tracking-[0.25em] text-[#C08A3E] uppercase block mt-0.5">
+            ADMINISTRATION
+          </span>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => navigate('/')}
-            className="px-3 py-1.5 bg-[#C08A3E] text-white text-[9px] font-extrabold uppercase rounded-full"
-          >
-            ← WEBSITE
-          </button>
-          <button
-            onClick={() => setMobileNavOpen(!mobileNavOpen)}
-            className="p-2 text-white hover:text-[#C08A3E] font-bold text-lg"
-          >
-            {mobileNavOpen ? '✕' : '☰'}
-          </button>
+
+        {/* Right: Live Session Pill */}
+        <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 px-2.5 py-1 rounded-full shrink-0">
+          <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
+          <span className="text-[9px] font-extrabold tracking-wider uppercase text-white">LIVE</span>
         </div>
       </div>
 
-      {/* Left Sidebar Navigation Panel */}
-      <aside className={`w-full md:w-72 bg-[#111111] text-white shrink-0 flex flex-col justify-between border-r border-black/10 transition-all ${
-        mobileNavOpen ? 'block' : 'hidden md:flex'
-      }`}>
+      {/* Mobile Navigation Drawer Overlay (Slide-in from Left) */}
+      {mobileNavOpen && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex md:hidden animate-fade-in">
+          {/* Backdrop click to close */}
+          <div className="absolute inset-0" onClick={() => setMobileNavOpen(false)} />
+
+          {/* Drawer Container Panel (Animates from Left) */}
+          <aside className="relative w-[85vw] max-w-[320px] bg-[#111111] text-white h-full flex flex-col justify-between p-5 shadow-2xl overflow-y-auto border-r border-white/10 z-10 animate-slide-in-left">
+            <div>
+              {/* Drawer Top Header */}
+              <div className="pb-6 border-b border-white/10 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <img src={logoImg} alt="Lune Logo" className="h-9 w-auto invert" />
+                  <div>
+                    <h2 className="font-serif font-black text-base tracking-tight uppercase leading-none">LUNE</h2>
+                    <span className="text-[8px] font-sans font-extrabold tracking-[0.25em] text-[#C08A3E] uppercase block mt-1">
+                      ADMINISTRATION
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setMobileNavOpen(false)}
+                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm font-bold active:scale-95 transition-all cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Drawer Nav Links */}
+              <nav className="py-6 space-y-2">
+                {navItems.map((item) => {
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        setActiveTab(item.id);
+                        setMobileNavOpen(false);
+                      }}
+                      className={`w-full px-4 py-3.5 rounded-2xl font-sans text-xs font-bold tracking-wider uppercase transition-all duration-200 flex items-center gap-3.5 cursor-pointer text-left ${
+                        isActive
+                          ? 'bg-white text-[#111111] shadow-lg font-extrabold'
+                          : 'text-[#A3A3A3] hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      <svg className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#C08A3E]' : 'text-[#737373]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
+                      </svg>
+                      <span className="truncate">{item.label}</span>
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+
+            {/* Drawer Footer */}
+            <div className="pt-4 border-t border-white/10 space-y-3">
+              <div className="flex items-center gap-3 px-2 py-1">
+                <div className="w-8 h-8 rounded-full bg-[#C08A3E] text-white font-serif font-black text-xs flex items-center justify-center shrink-0 shadow-xs">
+                  {user?.email?.charAt(0)?.toUpperCase() || 'A'}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <span className="font-serif font-bold text-xs uppercase block text-white truncate">
+                    {user?.user_metadata?.full_name || user?.email?.split('@')[0]}
+                  </span>
+                  <span className="text-[8.5px] font-sans font-extrabold text-[#C08A3E] tracking-widest uppercase block">
+                    ADMINISTRATOR
+                  </span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  setMobileNavOpen(false);
+                  navigate('/');
+                }}
+                className="w-full py-2.5 bg-white/10 hover:bg-white/20 text-white font-sans text-xs font-bold tracking-wider uppercase rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 border border-white/10 active:scale-95 mb-2"
+              >
+                <svg className="w-4 h-4 text-[#C08A3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                <span>RETURN TO WEBSITE</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  if (logout) logout();
+                  navigate('/');
+                }}
+                className="w-full py-2.5 bg-red-950/40 hover:bg-red-900/60 text-red-400 border border-red-800/40 text-center text-[10px] font-sans font-extrabold tracking-widest uppercase rounded-xl transition-all cursor-pointer active:scale-95"
+              >
+                SIGN OUT SESSION
+              </button>
+            </div>
+          </aside>
+        </div>
+      )}
+
+      {/* Desktop Left Sidebar Navigation Panel */}
+      <aside className="hidden md:flex w-72 bg-[#111111] text-white shrink-0 flex-col justify-between border-r border-black/10">
         <div>
           {/* Top Logo & Title */}
-          <div className="p-6 border-b border-white/10 hidden md:flex items-center gap-3">
+          <div className="p-6 border-b border-white/10 flex items-center gap-3">
             <img src={logoImg} alt="Lune Logo" className="h-10 w-auto invert" />
             <div>
-              <h2 className="font-serif font-black text-lg tracking-tight uppercase">MAISON LUNE</h2>
+              <h2 className="font-serif font-black text-lg tracking-tight uppercase">LUNE</h2>
               <span className="text-[8.5px] font-sans font-extrabold tracking-[0.25em] text-[#C08A3E] uppercase block">
                 ADMINISTRATION
               </span>
             </div>
           </div>
 
-          {/* Nav Items */}
+          {/* Nav Items (Matching Screenshot 1) */}
           <nav className="p-4 space-y-1.5">
             {navItems.map((item) => {
               const isActive = activeTab === item.id;
               return (
                 <button
                   key={item.id}
-                  onClick={() => {
-                    setActiveTab(item.id);
-                    setMobileNavOpen(false);
-                  }}
-                  className={`w-full px-4 py-3.5 rounded-xl font-sans text-xs font-bold tracking-wider uppercase transition-all duration-200 flex items-center gap-3 cursor-pointer ${
+                  onClick={() => setActiveTab(item.id)}
+                  className={`w-full px-4 py-3.5 rounded-2xl font-sans text-xs font-bold tracking-wider uppercase transition-all duration-200 flex items-center gap-3.5 cursor-pointer ${
                     isActive
                       ? 'bg-white text-[#111111] shadow-md font-extrabold'
                       : 'text-[#A3A3A3] hover:text-white hover:bg-white/5'
@@ -114,19 +213,36 @@ export default function AdminLayout() {
 
         {/* Sidebar Footer */}
         <div className="p-6 border-t border-white/10 space-y-3">
+          <div className="flex items-center gap-3 px-2">
+            <div className="w-8 h-8 rounded-full bg-[#C08A3E] text-white font-serif font-black text-xs flex items-center justify-center shrink-0 shadow-xs">
+              {user?.email?.charAt(0)?.toUpperCase() || 'A'}
+            </div>
+            <div className="min-w-0 flex-1">
+              <span className="font-serif font-bold text-xs uppercase block text-white truncate">
+                {user?.user_metadata?.full_name || user?.email?.split('@')[0]}
+              </span>
+              <span className="text-[8.5px] font-sans font-extrabold text-[#C08A3E] tracking-widest uppercase block">
+                ADMIN ROLE ACTIVE
+              </span>
+            </div>
+          </div>
+
           <button
             onClick={() => navigate('/')}
-            className="w-full py-3 bg-[#C08A3E] hover:bg-[#a67431] text-white border border-[#C08A3E] font-sans font-extrabold text-[10px] tracking-[0.2em] uppercase rounded-full transition-all cursor-pointer text-center active:scale-95 shadow-md flex items-center justify-center gap-2"
+            className="w-full py-2.5 bg-white/10 hover:bg-white/20 text-white font-sans text-xs font-bold tracking-wider uppercase rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 border border-white/10 active:scale-95"
           >
-            <span>← RETURN TO BOUTIQUE</span>
+            <svg className="w-4 h-4 text-[#C08A3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>RETURN TO WEBSITE</span>
           </button>
 
           <button
             onClick={() => {
-              logout();
+              if (logout) logout();
               navigate('/');
             }}
-            className="w-full text-center text-[10px] font-sans font-bold text-red-400 hover:underline tracking-widest uppercase cursor-pointer"
+            className="w-full text-center py-2 text-[10px] font-sans font-bold text-red-400 hover:text-red-300 hover:underline tracking-widest uppercase cursor-pointer"
           >
             SIGN OUT
           </button>
@@ -134,24 +250,23 @@ export default function AdminLayout() {
       </aside>
 
       {/* Main Viewport Content Area */}
-      <main className="flex-1 flex flex-col min-w-0">
-        {/* Top Header Bar */}
-        <header className="bg-white border-b border-black/10 px-6 sm:px-8 py-4 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-4">
+      <main className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
+        {/* Top Header Bar (Sticky Desktop & Tablet Header) */}
+        <header className="hidden md:flex bg-white/95 backdrop-blur-md border-b border-black/10 px-4 sm:px-8 py-3.5 items-center justify-between shrink-0 sticky top-0 z-30 shadow-2xs">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => navigate('/')}
-              className="px-4 py-2 bg-gray-900 hover:bg-[#C08A3E] text-white font-extrabold text-[10px] tracking-[0.15em] uppercase rounded-full transition-all cursor-pointer shadow-xs flex items-center gap-2 active:scale-95 border border-black/10"
-              title="Return to Website Main Store"
+              className="px-3.5 py-1.5 bg-[#111111] hover:bg-black text-white text-[10px] font-sans font-extrabold tracking-wider uppercase rounded-full transition-all cursor-pointer flex items-center gap-2 shadow-xs active:scale-95 border border-black/10"
             >
               <svg className="w-3.5 h-3.5 text-[#C08A3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              <span>← BACK TO WEBSITE</span>
+              <span>RETURN TO BOUTIQUE</span>
             </button>
 
-            <div className="hidden lg:flex items-center gap-2 border-l border-gray-200 pl-4">
+            <div className="flex items-center gap-2 bg-[#F4F4F6] border border-black/10 px-3 py-1.5 rounded-full">
               <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-pulse" />
-              <span className="text-[11px] font-sans font-extrabold tracking-wider uppercase text-[#111111]">
+              <span className="text-[10px] font-sans font-extrabold tracking-wider uppercase text-[#111111]">
                 ADMINISTRATOR SESSION ACTIVE
               </span>
             </div>
@@ -163,7 +278,7 @@ export default function AdminLayout() {
                 {user?.user_metadata?.full_name || user?.email?.split('@')[0]}
               </span>
               <span className="text-[9px] font-sans font-extrabold text-[#C08A3E] tracking-widest uppercase block">
-                ADMIN ROLE
+                ADMIN SUITE
               </span>
             </div>
             <div className="w-9 h-9 rounded-full bg-[#111111] text-white font-serif font-black text-sm flex items-center justify-center border border-black/10">
@@ -173,7 +288,7 @@ export default function AdminLayout() {
         </header>
 
         {/* Dynamic Section Content View */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-8 md:p-10">
+        <div className="flex-1 p-3 sm:p-6 md:p-8">
           {activeTab === 'dashboard' && <DashboardOverview onNavigate={setActiveTab} />}
           {activeTab === 'products' && <ProductsManager />}
           {activeTab === 'categories' && <CategoriesManager />}

@@ -182,7 +182,7 @@ export default function CategoriesManager() {
     <div className="space-y-8 font-sans relative text-gray-900">
       {/* Toast Notification */}
       {toast.open && (
-        <div className="fixed top-6 right-6 z-50 animate-bounce-in max-w-md w-full">
+        <div className="fixed top-4 left-4 right-4 sm:left-auto sm:right-6 sm:top-6 z-50 animate-bounce-in max-w-md w-auto">
           <div className={`p-4 rounded-2xl shadow-2xl border flex items-center justify-between gap-4 backdrop-blur-md ${
             toast.type === 'error' ? 'bg-red-900/95 text-white border-red-500/50' : 'bg-[#111111]/95 text-white border-[#C08A3E]/40'
           }`}>
@@ -201,7 +201,7 @@ export default function CategoriesManager() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-6">
         <div>
           <span className="text-[10px] font-extrabold tracking-[0.3em] uppercase text-[#C08A3E] block mb-1">
-            MAISON LUNE • CATALOG MANAGEMENT
+            LUNE • CATALOG MANAGEMENT
           </span>
           <h1 className="font-serif font-black text-2xl sm:text-3xl text-gray-900 uppercase tracking-tight">
             FRAGRANCE CATEGORIES
@@ -239,7 +239,7 @@ export default function CategoriesManager() {
         </div>
       </div>
 
-      {/* Category Table */}
+      {/* Category Table & Mobile View */}
       {loading ? (
         <div className="py-24 text-center text-sm text-gray-500 font-medium">Loading fragrance categories...</div>
       ) : filteredCategories.length === 0 ? (
@@ -247,75 +247,136 @@ export default function CategoriesManager() {
           <h4 className="font-serif font-extrabold text-base uppercase text-gray-900">NO CATEGORIES FOUND</h4>
         </div>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-xs overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse font-sans text-xs">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-200 text-[9px] font-extrabold text-gray-500 tracking-[0.2em] uppercase">
-                  <th className="py-4 px-5">CATEGORY NAME</th>
-                  <th className="py-4 px-5">FRENCH SUBTITLE</th>
-                  <th className="py-4 px-5">ASSIGNED PRODUCTS</th>
-                  <th className="py-4 px-5">DESCRIPTION</th>
-                  <th className="py-4 px-5 text-center">ACTIVE STATUS</th>
-                  <th className="py-4 px-5 text-right">ACTIONS</th>
-                </tr>
-              </thead>
+        <div className="space-y-4">
+          {/* DESKTOP TABLE VIEW */}
+          <div className="hidden md:block bg-white border border-gray-200 rounded-2xl shadow-xs overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse font-sans text-xs">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200 text-[9px] font-extrabold text-gray-500 tracking-[0.2em] uppercase">
+                    <th className="py-4 px-5">CATEGORY NAME</th>
+                    <th className="py-4 px-5">FRENCH SUBTITLE</th>
+                    <th className="py-4 px-5">ASSIGNED PRODUCTS</th>
+                    <th className="py-4 px-5">DESCRIPTION</th>
+                    <th className="py-4 px-5 text-center">ACTIVE STATUS</th>
+                    <th className="py-4 px-5 text-right">ACTIONS</th>
+                  </tr>
+                </thead>
 
-              <tbody className="divide-y divide-gray-200">
-                {filteredCategories.map((cat) => {
-                  const assignedCount = products.filter(p => p.category?.toUpperCase() === cat.name?.toUpperCase()).length;
-                  return (
-                    <tr key={cat.id} className="hover:bg-gray-50/60 transition-colors">
-                      <td className="py-4 px-5">
-                        <span className="font-serif font-black text-sm text-gray-900 uppercase tracking-tight block">
-                          {cat.name}
-                        </span>
-                      </td>
-                      <td className="py-4 px-5 text-gray-600 font-medium">
-                        {cat.french_name || '—'}
-                      </td>
-                      <td className="py-4 px-5">
-                        <span className="px-3 py-1 bg-gray-100 text-gray-900 font-extrabold text-[10px] uppercase rounded-full border border-gray-200">
-                          {assignedCount} PRODUCTS LINKED
-                        </span>
-                      </td>
-                      <td className="py-4 px-5 text-gray-600 max-w-xs truncate">
-                        {cat.description || 'No description added'}
-                      </td>
-                      <td className="py-4 px-5 text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          <ToggleSwitch
-                            checked={cat.is_active !== false}
-                            onChange={() => handleToggleActive(cat)}
-                          />
-                          <span className={`text-[9px] font-extrabold uppercase ${cat.is_active !== false ? 'text-[#10B981]' : 'text-gray-400'}`}>
-                            {cat.is_active !== false ? 'ACTIVE' : 'DRAFT'}
+                <tbody className="divide-y divide-gray-200">
+                  {filteredCategories.map((cat) => {
+                    const assignedCount = products.filter(p => p.category?.toUpperCase() === cat.name?.toUpperCase()).length;
+                    return (
+                      <tr key={cat.id} className="hover:bg-gray-50/60 transition-colors">
+                        <td className="py-4 px-5">
+                          <span className="font-serif font-black text-sm text-gray-900 uppercase tracking-tight block">
+                            {cat.name}
                           </span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-5 text-right">
-                        <div className="inline-flex items-center gap-2">
-                          <button
-                            onClick={() => openEditModal(cat)}
-                            title="Edit Category & Link Products"
-                            className="p-2 bg-gray-100 hover:bg-gray-900 hover:text-white border border-gray-300 rounded-xl transition-all cursor-pointer"
-                          >
-                            ✏️
-                          </button>
-                          <button
-                            onClick={() => handleDelete(cat)}
-                            title="Delete Category"
-                            className="p-2 bg-white hover:bg-red-50 text-red-600 border border-red-200 hover:border-red-500 rounded-xl transition-all cursor-pointer"
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        </td>
+                        <td className="py-4 px-5 text-gray-600 font-medium">
+                          {cat.french_name || '—'}
+                        </td>
+                        <td className="py-4 px-5">
+                          <span className="px-3 py-1 bg-gray-100 text-gray-900 font-extrabold text-[10px] uppercase rounded-full border border-gray-200">
+                            {assignedCount} PRODUCTS LINKED
+                          </span>
+                        </td>
+                        <td className="py-4 px-5 text-gray-600 max-w-xs truncate">
+                          {cat.description || 'No description added'}
+                        </td>
+                        <td className="py-4 px-5 text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <ToggleSwitch
+                              checked={cat.is_active !== false}
+                              onChange={() => handleToggleActive(cat)}
+                            />
+                            <span className={`text-[9px] font-extrabold uppercase ${cat.is_active !== false ? 'text-[#10B981]' : 'text-gray-400'}`}>
+                              {cat.is_active !== false ? 'ACTIVE' : 'DRAFT'}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-4 px-5 text-right">
+                          <div className="inline-flex items-center gap-2">
+                            <button
+                              onClick={() => openEditModal(cat)}
+                              title="Edit Category & Link Products"
+                              className="p-2 bg-gray-100 hover:bg-gray-900 hover:text-white border border-gray-300 rounded-xl transition-all cursor-pointer"
+                            >
+                              ✏️
+                            </button>
+                            <button
+                              onClick={() => handleDelete(cat)}
+                              title="Delete Category"
+                              className="p-2 bg-white hover:bg-red-50 text-red-600 border border-red-200 hover:border-red-500 rounded-xl transition-all cursor-pointer"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* MOBILE CARD VIEW */}
+          <div className="block md:hidden space-y-3.5">
+            {filteredCategories.map((cat) => {
+              const assignedCount = products.filter(p => p.category?.toUpperCase() === cat.name?.toUpperCase()).length;
+              const isActive = cat.is_active !== false;
+              return (
+                <div key={cat.id} className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm space-y-3.5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h4 className="font-serif font-black text-base text-gray-900 uppercase tracking-tight">
+                        {cat.name}
+                      </h4>
+                      {cat.french_name && (
+                        <p className="text-xs text-gray-500 font-medium italic mt-0.5">{cat.french_name}</p>
+                      )}
+                    </div>
+                    <span className="px-3 py-1 bg-gray-100 text-gray-900 font-extrabold text-[9px] uppercase rounded-full border border-gray-200 shrink-0">
+                      {assignedCount} PRODUCTS
+                    </span>
+                  </div>
+
+                  {cat.description && (
+                    <p className="text-xs text-gray-600 line-clamp-2 bg-gray-50 p-2.5 rounded-xl border border-gray-100 font-serif italic">
+                      "{cat.description}"
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                    <div className="flex items-center gap-2">
+                      <ToggleSwitch
+                        checked={isActive}
+                        onChange={() => handleToggleActive(cat)}
+                      />
+                      <span className={`text-[9px] font-extrabold uppercase ${isActive ? 'text-[#10B981]' : 'text-gray-400'}`}>
+                        {isActive ? 'ACTIVE' : 'DRAFT'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => openEditModal(cat)}
+                        className="px-3.5 py-2 bg-gray-100 hover:bg-gray-900 hover:text-white border border-gray-300 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95 flex items-center gap-1.5"
+                      >
+                        ✏️ EDIT
+                      </button>
+                      <button
+                        onClick={() => handleDelete(cat)}
+                        className="px-3.5 py-2 bg-white hover:bg-red-50 text-red-600 border border-red-200 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95 flex items-center gap-1.5"
+                      >
+                        🗑️ DELETE
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

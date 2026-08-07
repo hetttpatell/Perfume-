@@ -59,7 +59,7 @@ export default function DashboardOverview({ onNavigate }) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-6">
         <div>
           <span className="text-[10px] font-extrabold tracking-[0.3em] uppercase text-[#C08A3E] block mb-1">
-            MAISON LUNE • REAL-TIME METRICS & LIVE DATA
+            LUNE • REAL-TIME METRICS & LIVE DATA
           </span>
           <h1 className="font-serif font-black text-2xl sm:text-3xl text-gray-900 uppercase tracking-tight">
             ADMINISTRATOR DASHBOARD
@@ -84,53 +84,55 @@ export default function DashboardOverview({ onNavigate }) {
         </div>
       </div>
 
-      {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {/* Card 1: Total Revenue */}
-        <div className="bg-gradient-to-br from-gray-900 to-black text-white p-6 rounded-3xl border border-gray-800 shadow-xl space-y-3">
-          <span className="text-[9px] font-extrabold tracking-[0.2em] uppercase text-[#C08A3E] block">
+      {/* KPI Cards Grid (2x2 on Mobile/Tablet, 4-col on Desktop) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-6">
+        {/* Card 1: Total Store Revenue (Dark Luxe Card) */}
+        <div className="bg-[#090A0F] text-white p-4 sm:p-7 rounded-[22px] sm:rounded-[26px] border border-white/10 shadow-xl flex flex-col justify-between min-h-[140px] sm:min-h-[145px]">
+          <span className="text-[9px] sm:text-[10px] font-sans font-extrabold tracking-[0.2em] uppercase text-[#C08A3E] block">
             TOTAL STORE REVENUE
           </span>
-          <h3 className="font-serif font-black text-3xl text-white">
-            $ {loading ? '...' : Number(stats.totalRevenue || 0).toLocaleString()}
+          <h3 className="font-serif font-black text-2xl sm:text-4xl text-white my-1">
+            ${loading ? '...' : Number(stats.totalRevenue || 0).toLocaleString()}
           </h3>
-          <p className="text-[10px] text-gray-400 font-medium">Sum of all completed client orders</p>
+          <p className="text-[9px] sm:text-[10px] font-sans text-gray-400 font-medium leading-tight">
+            Sum of all completed client orders
+          </p>
         </div>
 
         {/* Card 2: Catalog Products */}
         <div
           onClick={() => handleNavClick('products')}
-          className="bg-white p-6 rounded-3xl border border-gray-200 shadow-xs hover:shadow-md transition-all cursor-pointer space-y-3 group"
+          className="bg-white p-4 sm:p-7 rounded-[22px] sm:rounded-[26px] border border-black/10 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col justify-between min-h-[140px] sm:min-h-[145px] group"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[9px] font-extrabold tracking-[0.2em] uppercase text-gray-500 block">
+            <span className="text-[9px] sm:text-[10px] font-sans font-extrabold tracking-[0.15em] uppercase text-[#737373] block">
               TOTAL PRODUCTS
             </span>
-            <span className="text-xs group-hover:translate-x-1 transition-transform">&rarr;</span>
+            <span className="text-xs text-gray-400 group-hover:text-black group-hover:translate-x-1 transition-all">&rarr;</span>
           </div>
-          <h3 className="font-serif font-black text-3xl text-gray-900">
+          <h3 className="font-sans font-extrabold text-2xl sm:text-4xl text-[#111111] my-1">
             {loading ? '...' : stats.totalProducts || 0}
           </h3>
-          <p className="text-[10px] text-[#10B981] font-bold uppercase tracking-wider">
+          <p className="text-[9px] sm:text-[10px] font-sans text-[#10B981] font-extrabold uppercase tracking-wider">
             {stats.activeProducts || 0} ACTIVE PRODUCTS IN STORE
           </p>
         </div>
 
-        {/* Card 3: Total Orders */}
+        {/* Card 3: Client Orders */}
         <div
           onClick={() => handleNavClick('orders')}
-          className="bg-white p-6 rounded-3xl border border-gray-200 shadow-xs hover:shadow-md transition-all cursor-pointer space-y-3 group"
+          className="bg-white p-4 sm:p-7 rounded-[22px] sm:rounded-[26px] border border-black/10 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col justify-between min-h-[140px] sm:min-h-[145px] group"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[9px] font-extrabold tracking-[0.2em] uppercase text-gray-500 block">
+            <span className="text-[9px] sm:text-[10px] font-sans font-extrabold tracking-[0.15em] uppercase text-[#737373] block">
               CLIENT ORDERS
             </span>
-            <span className="text-xs group-hover:translate-x-1 transition-transform">&rarr;</span>
+            <span className="text-xs text-gray-400 group-hover:text-black group-hover:translate-x-1 transition-all">&rarr;</span>
           </div>
-          <h3 className="font-serif font-black text-3xl text-gray-900">
+          <h3 className="font-sans font-extrabold text-2xl sm:text-4xl text-[#111111] my-1">
             {loading ? '...' : stats.totalOrders || 0}
           </h3>
-          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
+          <p className="text-[9px] sm:text-[10px] font-sans text-[#737373] font-extrabold uppercase tracking-wider">
             RECORDED CLIENT TRANSACTIONS
           </p>
         </div>
@@ -138,62 +140,83 @@ export default function DashboardOverview({ onNavigate }) {
         {/* Card 4: Registered Users */}
         <div
           onClick={() => handleNavClick('users')}
-          className="bg-white p-6 rounded-3xl border border-gray-200 shadow-xs hover:shadow-md transition-all cursor-pointer space-y-3 group"
+          className="bg-white p-4 sm:p-7 rounded-[22px] sm:rounded-[26px] border border-black/10 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col justify-between min-h-[140px] sm:min-h-[145px] group"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[9px] font-extrabold tracking-[0.2em] uppercase text-gray-500 block">
+            <span className="text-[9px] sm:text-[10px] font-sans font-extrabold tracking-[0.15em] uppercase text-[#737373] block">
               REGISTERED USERS
             </span>
-            <span className="text-xs group-hover:translate-x-1 transition-transform">&rarr;</span>
+            <span className="text-xs text-gray-400 group-hover:text-black group-hover:translate-x-1 transition-all">&rarr;</span>
           </div>
-          <h3 className="font-serif font-black text-3xl text-gray-900">
+          <h3 className="font-sans font-extrabold text-2xl sm:text-4xl text-[#111111] my-1">
             {loading ? '...' : stats.totalUsers || 0}
           </h3>
-          <p className="text-[10px] text-[#C08A3E] font-bold uppercase tracking-wider">
+          <p className="text-[9px] sm:text-[10px] font-sans text-[#C08A3E] font-extrabold uppercase tracking-wider">
             DATABASE CLIENT PROFILES
           </p>
         </div>
       </div>
 
-      {/* Secondary Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      {/* Secondary Metrics Cards (2x2 Grid Layout on Mobile & Desktop) */}
+      <div className="grid grid-cols-2 gap-3 sm:gap-6">
         <div
           onClick={() => handleNavClick('categories')}
-          className="bg-gray-50 border border-gray-200 rounded-3xl p-6 space-y-2 cursor-pointer hover:bg-white transition-all"
+          className="bg-white border border-black/10 rounded-[20px] sm:rounded-[24px] p-3.5 sm:p-6 space-y-1.5 sm:space-y-2.5 cursor-pointer hover:shadow-md transition-all group flex flex-col justify-between"
         >
-          <span className="text-[9px] font-extrabold tracking-[0.2em] uppercase text-[#C08A3E] block">
+          <span className="text-[8.5px] sm:text-[9.5px] font-sans font-extrabold tracking-[0.15em] sm:tracking-[0.2em] uppercase text-[#C08A3E] block">
             FRAGRANCE CATEGORIES
           </span>
-          <h4 className="font-serif font-black text-xl text-gray-900">
+          <h4 className="font-sans font-extrabold text-sm sm:text-xl text-[#111111] tracking-tight my-1">
             {stats.totalCategories || 0} CATEGORIES RECORDED
           </h4>
-          <p className="text-xs text-gray-600">Extrait de Parfum, Eau de Parfum, Body Care, etc.</p>
+          <p className="text-[10px] sm:text-xs text-gray-500 font-medium">
+            Extrait de Parfum, Eau de Parfum, Body Care, etc.
+          </p>
         </div>
 
         <div
           onClick={() => handleNavClick('discounts')}
-          className="bg-gray-50 border border-gray-200 rounded-3xl p-6 space-y-2 cursor-pointer hover:bg-white transition-all"
+          className="bg-white border border-black/10 rounded-[20px] sm:rounded-[24px] p-3.5 sm:p-6 space-y-1.5 sm:space-y-2.5 cursor-pointer hover:shadow-md transition-all group flex flex-col justify-between"
         >
-          <span className="text-[9px] font-extrabold tracking-[0.2em] uppercase text-[#C08A3E] block">
+          <span className="text-[8.5px] sm:text-[9.5px] font-sans font-extrabold tracking-[0.15em] sm:tracking-[0.2em] uppercase text-[#C08A3E] block">
             ACTIVE PROMO COUPONS
           </span>
-          <h4 className="font-serif font-black text-xl text-gray-900">
+          <h4 className="font-sans font-extrabold text-sm sm:text-xl text-[#111111] tracking-tight my-1">
             {stats.totalDiscounts || 0} COUPONS IN DATABASE
           </h4>
-          <p className="text-xs text-gray-600">Live promotional discount codes</p>
+          <p className="text-[10px] sm:text-xs text-gray-500 font-medium">
+            Live promotional discount codes & offers
+          </p>
         </div>
 
         <div
           onClick={() => handleNavClick('products')}
-          className="bg-gray-50 border border-gray-200 rounded-3xl p-6 space-y-2 cursor-pointer hover:bg-white transition-all"
+          className="bg-white border border-black/10 rounded-[20px] sm:rounded-[24px] p-3.5 sm:p-6 space-y-1.5 sm:space-y-2.5 cursor-pointer hover:shadow-md transition-all group flex flex-col justify-between"
         >
-          <span className="text-[9px] font-extrabold tracking-[0.2em] uppercase text-[#C08A3E] block">
+          <span className="text-[8.5px] sm:text-[9.5px] font-sans font-extrabold tracking-[0.15em] sm:tracking-[0.2em] uppercase text-[#C08A3E] block">
             HERO SLIDER & FEATURED
           </span>
-          <h4 className="font-serif font-black text-xl text-gray-900">
+          <h4 className="font-sans font-extrabold text-sm sm:text-xl text-[#111111] tracking-tight my-1">
             {stats.heroProducts || 0} HERO ★ / {stats.featuredProducts || 0} FEATURED
           </h4>
-          <p className="text-xs text-gray-600">Showcase items assigned to homepage</p>
+          <p className="text-[10px] sm:text-xs text-gray-500 font-medium">
+            Showcase items assigned to boutique homepage
+          </p>
+        </div>
+
+        <div
+          onClick={() => handleNavClick('locations')}
+          className="bg-white border border-black/10 rounded-[20px] sm:rounded-[24px] p-3.5 sm:p-6 space-y-1.5 sm:space-y-2.5 cursor-pointer hover:shadow-md transition-all group flex flex-col justify-between"
+        >
+          <span className="text-[8.5px] sm:text-[9.5px] font-sans font-extrabold tracking-[0.15em] sm:tracking-[0.2em] uppercase text-[#C08A3E] block">
+            STORES & CONTACT INQUIRIES
+          </span>
+          <h4 className="font-sans font-extrabold text-sm sm:text-xl text-[#111111] tracking-tight my-1">
+            CUSTOMER CONTACT & LOCATIONS
+          </h4>
+          <p className="text-[10px] sm:text-xs text-gray-500 font-medium">
+            Store location manager & support messages
+          </p>
         </div>
       </div>
 
@@ -220,7 +243,7 @@ export default function DashboardOverview({ onNavigate }) {
           ) : (
             <div className="space-y-3">
               {recentOrders.map(ord => (
-                <div key={ord.id} className="p-3 bg-gray-50 rounded-2xl border border-gray-200 flex items-center justify-between text-xs">
+                <div key={ord.id} className="p-3.5 bg-gray-50 rounded-2xl border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
                   <div>
                     <span className="font-bold text-gray-900 block">
                       Order #{ord.id.substring(0, 8)}...
@@ -229,9 +252,22 @@ export default function DashboardOverview({ onNavigate }) {
                       {ord.shipping_address?.full_name || ord.user_id || 'Guest Client'}
                     </span>
                   </div>
-                  <div className="text-right">
+                  <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-200/60">
                     <span className="font-serif font-black text-sm text-gray-900 block">
-                      $ {ord.total_amount || 0}
+                      ${(() => {
+                        const num = Number(ord.total || ord.total_amount || ord.totalAmount || ord.subtotal || 0);
+                        if (num > 0) return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        const items = ord.items || ord.order_items || [];
+                        if (Array.isArray(items) && items.length > 0) {
+                          const sum = items.reduce((s, it) => {
+                            const price = Number(it.unit_price || it.price || it.product?.price || 0);
+                            const qty = Number(it.quantity || it.qty || 1);
+                            return s + (price * qty);
+                          }, 0);
+                          return sum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        }
+                        return '0.00';
+                      })()}
                     </span>
                     <div className="mt-1">
                       <CustomStageSelect

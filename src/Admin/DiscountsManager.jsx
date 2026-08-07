@@ -146,7 +146,7 @@ export default function DiscountsManager() {
     <div className="space-y-8 font-sans relative text-gray-900">
       {/* Toast Notification */}
       {toast.open && (
-        <div className="fixed top-6 right-6 z-50 animate-bounce-in max-w-md w-full">
+        <div className="fixed top-4 left-4 right-4 sm:left-auto sm:right-6 sm:top-6 z-50 animate-bounce-in max-w-md w-auto">
           <div className={`p-4 rounded-2xl shadow-2xl border flex items-center justify-between gap-4 backdrop-blur-md ${
             toast.type === 'error' ? 'bg-red-900/95 text-white border-red-500/50' : 'bg-[#111111]/95 text-white border-[#C08A3E]/40'
           }`}>
@@ -165,7 +165,7 @@ export default function DiscountsManager() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-6">
         <div>
           <span className="text-[10px] font-extrabold tracking-[0.3em] uppercase text-[#C08A3E] block mb-1">
-            MAISON LUNE • PROMOTIONAL SUITE
+            LUNE • PROMOTIONAL SUITE
           </span>
           <h1 className="font-serif font-black text-2xl sm:text-3xl text-gray-900 uppercase tracking-tight">
             COUPONS & PROMOTIONAL DISCOUNTS
@@ -203,7 +203,7 @@ export default function DiscountsManager() {
         </div>
       </div>
 
-      {/* Coupons Table */}
+      {/* Coupons Table & Mobile Cards */}
       {loading ? (
         <div className="py-24 text-center text-sm text-gray-500 font-medium">Loading promotional coupons...</div>
       ) : filteredCoupons.length === 0 ? (
@@ -211,77 +211,140 @@ export default function DiscountsManager() {
           <h4 className="font-serif font-extrabold text-base uppercase text-gray-900">NO COUPONS FOUND</h4>
         </div>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-xs overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse font-sans text-xs">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-200 text-[9px] font-extrabold text-gray-500 tracking-[0.2em] uppercase">
-                  <th className="py-4 px-5">COUPON CODE</th>
-                  <th className="py-4 px-5 text-center">DISCOUNT %</th>
-                  <th className="py-4 px-5 text-center">USAGE PROGRESS</th>
-                  <th className="py-4 px-5 text-center">ACTIVE STATUS</th>
-                  <th className="py-4 px-5 text-right">ACTIONS</th>
-                </tr>
-              </thead>
+        <div className="space-y-4">
+          {/* DESKTOP TABLE VIEW */}
+          <div className="hidden md:block bg-white border border-gray-200 rounded-2xl shadow-xs overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse font-sans text-xs">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200 text-[9px] font-extrabold text-gray-500 tracking-[0.2em] uppercase">
+                    <th className="py-4 px-5">COUPON CODE</th>
+                    <th className="py-4 px-5 text-center">DISCOUNT %</th>
+                    <th className="py-4 px-5 text-center">USAGE PROGRESS</th>
+                    <th className="py-4 px-5 text-center">ACTIVE STATUS</th>
+                    <th className="py-4 px-5 text-right">ACTIONS</th>
+                  </tr>
+                </thead>
 
-              <tbody className="divide-y divide-gray-200">
-                {filteredCoupons.map((coupon) => {
-                  const used = coupon.used_count || 0;
-                  const max = coupon.max_uses || 100;
-                  const pct = Math.min(100, Math.round((used / max) * 100));
+                <tbody className="divide-y divide-gray-200">
+                  {filteredCoupons.map((coupon) => {
+                    const used = coupon.used_count || 0;
+                    const max = coupon.max_uses || 100;
+                    const pct = Math.min(100, Math.round((used / max) * 100));
 
-                  return (
-                    <tr key={coupon.id} className="hover:bg-gray-50/60 transition-colors">
-                      <td className="py-4 px-5">
-                        <span className="font-mono text-sm font-black text-gray-900 uppercase tracking-wider bg-gray-100 px-3 py-1 rounded-lg border border-gray-200 inline-block">
-                          {coupon.code}
-                        </span>
-                      </td>
-                      <td className="py-4 px-5 text-center font-serif font-black text-base text-[#C08A3E]">
-                        {coupon.percentage}% OFF
-                      </td>
-                      <td className="py-4 px-5 text-center">
-                        <div className="flex flex-col items-center gap-1 max-w-[140px] mx-auto">
-                          <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                            <div className="bg-[#111111] h-1.5 rounded-full" style={{ width: `${pct}%` }} />
+                    return (
+                      <tr key={coupon.id} className="hover:bg-gray-50/60 transition-colors">
+                        <td className="py-4 px-5">
+                          <span className="font-mono text-sm font-black text-gray-900 uppercase tracking-wider bg-gray-100 px-3 py-1 rounded-lg border border-gray-200 inline-block">
+                            {coupon.code}
+                          </span>
+                        </td>
+                        <td className="py-4 px-5 text-center font-serif font-black text-base text-[#C08A3E]">
+                          {coupon.percentage}% OFF
+                        </td>
+                        <td className="py-4 px-5 text-center">
+                          <div className="flex flex-col items-center gap-1 max-w-[140px] mx-auto">
+                            <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                              <div className="bg-[#111111] h-1.5 rounded-full" style={{ width: `${pct}%` }} />
+                            </div>
+                            <span className="text-[9px] font-extrabold text-gray-500 uppercase">
+                              {used} / {max} USES ({pct}%)
+                            </span>
                           </div>
-                          <span className="text-[9px] font-extrabold text-gray-500 uppercase">
-                            {used} / {max} USES ({pct}%)
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-5 text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          <ToggleSwitch
-                            checked={coupon.is_active !== false}
-                            onChange={() => handleToggleActive(coupon)}
-                          />
-                          <span className={`text-[9px] font-extrabold uppercase ${coupon.is_active !== false ? 'text-[#10B981]' : 'text-gray-400'}`}>
-                            {coupon.is_active !== false ? 'ACTIVE' : 'EXPIRED'}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-5 text-right">
-                        <div className="inline-flex items-center gap-2">
-                          <button
-                            onClick={() => openEditModal(coupon)}
-                            className="p-2 bg-gray-100 hover:bg-gray-900 hover:text-white border border-gray-300 rounded-xl transition-all cursor-pointer"
-                          >
-                            ✏️
-                          </button>
-                          <button
-                            onClick={() => handleDelete(coupon)}
-                            className="p-2 bg-white hover:bg-red-50 text-red-600 border border-red-200 hover:border-red-500 rounded-xl transition-all cursor-pointer"
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        </td>
+                        <td className="py-4 px-5 text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <ToggleSwitch
+                              checked={coupon.is_active !== false}
+                              onChange={() => handleToggleActive(coupon)}
+                            />
+                            <span className={`text-[9px] font-extrabold uppercase ${coupon.is_active !== false ? 'text-[#10B981]' : 'text-gray-400'}`}>
+                              {coupon.is_active !== false ? 'ACTIVE' : 'EXPIRED'}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-4 px-5 text-right">
+                          <div className="inline-flex items-center gap-2">
+                            <button
+                              onClick={() => openEditModal(coupon)}
+                              className="p-2 bg-gray-100 hover:bg-gray-900 hover:text-white border border-gray-300 rounded-xl transition-all cursor-pointer"
+                            >
+                              ✏️
+                            </button>
+                            <button
+                              onClick={() => handleDelete(coupon)}
+                              className="p-2 bg-white hover:bg-red-50 text-red-600 border border-red-200 hover:border-red-500 rounded-xl transition-all cursor-pointer"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* MOBILE CARD ROW VIEW */}
+          <div className="block md:hidden space-y-3.5">
+            {filteredCoupons.map((coupon) => {
+              const used = coupon.used_count || 0;
+              const max = coupon.max_uses || 100;
+              const pct = Math.min(100, Math.round((used / max) * 100));
+              const isActive = coupon.is_active !== false;
+
+              return (
+                <div key={coupon.id} className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm space-y-3.5">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-mono text-base font-black text-gray-900 uppercase tracking-wider bg-gray-100 px-3 py-1 rounded-xl border border-gray-200">
+                      {coupon.code}
+                    </span>
+                    <span className="font-serif font-black text-lg text-[#C08A3E]">
+                      {coupon.percentage}% OFF
+                    </span>
+                  </div>
+
+                  <div className="space-y-1 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                    <div className="flex justify-between text-[10px] font-extrabold text-gray-600 uppercase">
+                      <span>USAGE PROGRESS</span>
+                      <span>{used} / {max} USES ({pct}%)</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                      <div className="bg-[#111111] h-2 rounded-full" style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                    <div className="flex items-center gap-2">
+                      <ToggleSwitch
+                        checked={isActive}
+                        onChange={() => handleToggleActive(coupon)}
+                      />
+                      <span className={`text-[9px] font-extrabold uppercase ${isActive ? 'text-[#10B981]' : 'text-gray-400'}`}>
+                        {isActive ? 'ACTIVE' : 'EXPIRED'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => openEditModal(coupon)}
+                        className="px-3.5 py-2 bg-gray-100 hover:bg-gray-900 hover:text-white border border-gray-300 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95 flex items-center gap-1.5"
+                      >
+                        ✏️ EDIT
+                      </button>
+                      <button
+                        onClick={() => handleDelete(coupon)}
+                        className="px-3.5 py-2 bg-white hover:bg-red-50 text-red-600 border border-red-200 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95 flex items-center gap-1.5"
+                      >
+                        🗑️ DELETE
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

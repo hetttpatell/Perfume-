@@ -144,7 +144,7 @@ export default function AdminPanelModal({ isOpen, onClose }) {
             <div className="bg-[#111111] text-white p-6 flex items-center justify-between shrink-0">
               <div>
                 <span className="text-[9px] font-sans font-bold tracking-[0.3em] uppercase text-[#C08A3E]">
-                  MAISON LUNE • ADMIN CONTROL CENTER
+                  LUNE • ADMIN CONTROL CENTER
                 </span>
                 <h2 className="font-serif font-black text-xl sm:text-2xl uppercase tracking-tight">
                   LIVE ORDER STAGES & CATALOG MANAGEMENT
@@ -262,7 +262,7 @@ export default function AdminPanelModal({ isOpen, onClose }) {
                             {order.items && order.items.length > 0 ? (
                               order.items.map((it, idx) => {
                                 const prodImg = it.product?.image_url || it.product?.image || '/SVGs/Perfume-SVG.png';
-                                const prodName = it.product?.name || 'Maison Lune Fragrance';
+                                const prodName = it.product?.name || 'Lune Fragrance';
                                 const frenchName = it.product?.french_name || '';
 
                                 return (
@@ -302,11 +302,51 @@ export default function AdminPanelModal({ isOpen, onClose }) {
                           </div>
                         </div>
 
-                        {/* Total Paid Footer */}
-                        <div className="pt-3 border-t border-black/10 flex items-center justify-between font-sans">
-                          <span className="text-xs font-extrabold text-[#555555] uppercase tracking-wider">TOTAL PAID</span>
-                          <span className="font-serif font-black text-base text-[#111111]">${Number(order.total || 0).toFixed(2)} USD</span>
-                        </div>
+                        {/* Financial Breakdown: Actual Amount, Coupon Discount, Final Amount Paid */}
+                        {(() => {
+                          const items = order.items || order.order_items || [];
+                          let subtotal = Number(order.subtotal || 0);
+                          if (subtotal === 0 && Array.isArray(items) && items.length > 0) {
+                            subtotal = items.reduce((sum, it) => {
+                              const price = Number(it.unit_price || it.price || it.product?.price || 0);
+                              const qty = Number(it.quantity || it.qty || 1);
+                              return sum + (price * qty);
+                            }, 0);
+                          }
+                          let discount = Number(order.discount_amount || order.discountAmount || order.discount || 0);
+                          let finalTotal = Number(order.total || order.total_amount || order.totalAmount || 0);
+                          if (finalTotal === 0) {
+                            finalTotal = Math.max(0, subtotal - discount);
+                          }
+                          if (discount === 0 && subtotal > finalTotal && finalTotal > 0) {
+                            discount = subtotal - finalTotal;
+                          }
+                          const pct = subtotal > 0 && discount > 0 ? Math.round((discount / subtotal) * 100) : 0;
+
+                          return (
+                            <div className="mt-3 pt-3 border-t border-black/10 font-sans space-y-2 bg-[#F8F8FA] p-3.5 rounded-2xl border border-gray-200/80">
+                              <div className="flex items-center justify-between text-xs text-gray-600">
+                                <span className="font-extrabold uppercase tracking-wider">1. ACTUAL AMOUNT (SUBTOTAL)</span>
+                                <span className="font-mono font-bold text-gray-900">${subtotal.toFixed(2)} USD</span>
+                              </div>
+                              <div className="flex items-center justify-between text-xs text-[#C08A3E]">
+                                <span className="font-extrabold uppercase tracking-wider flex items-center gap-1.5">
+                                  <span>2. COUPON DISCOUNT</span>
+                                  {pct > 0 && (
+                                    <span className="text-[9px] bg-[#C08A3E]/15 text-[#C08A3E] px-2 py-0.5 rounded-full border border-[#C08A3E]/30 font-black">
+                                      -{pct}% OFF
+                                    </span>
+                                  )}
+                                </span>
+                                <span className="font-mono font-bold">{discount > 0 ? `-$${discount.toFixed(2)} USD` : '$0.00 USD'}</span>
+                              </div>
+                              <div className="pt-2 border-t border-gray-200 flex items-center justify-between">
+                                <span className="text-xs font-black text-[#111111] uppercase tracking-wider">3. FINAL AMOUNT PAID</span>
+                                <span className="font-serif font-black text-lg text-[#111111]">${finalTotal.toFixed(2)} USD</span>
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
                     );
                   })

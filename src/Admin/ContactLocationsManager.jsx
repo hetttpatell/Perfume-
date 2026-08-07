@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { fetchContactMessages, updateContactStatus, deleteContactMsg } from '../services/api';
+import { useConfirm } from '../components/ConfirmModal';
 
 const STATUS_CONFIG = {
   new: { label: 'NEW', bg: 'bg-[#EF4444]/10', text: 'text-[#EF4444]', border: 'border-[#EF4444]/20' },
@@ -9,6 +10,7 @@ const STATUS_CONFIG = {
 };
 
 export default function ContactLocationsManager() {
+  const { confirm } = useConfirm();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -33,7 +35,12 @@ export default function ContactLocationsManager() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Permanently delete this message?')) return;
+    const ok = await confirm('Permanently delete this customer message?', {
+      title: 'Delete Message',
+      confirmLabel: 'DELETE',
+      danger: true
+    });
+    if (!ok) return;
     const result = await deleteContactMsg(id);
     if (result.success) {
       setMessages(prev => prev.filter(m => m.id !== id));
