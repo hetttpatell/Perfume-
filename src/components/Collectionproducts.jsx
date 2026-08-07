@@ -121,17 +121,25 @@ export default function Collectionproducts({
     let isMounted = true;
     setLoading(true);
 
-    Promise.all([fetchProducts(), fetchCategories()]).then(([prods, cats]) => {
-      if (isMounted) {
-        if (prods && prods.length > 0) {
-          setProductsList(prods);
+    Promise.all([fetchProducts(), fetchCategories()])
+      .then(([prods, cats]) => {
+        if (isMounted) {
+          if (Array.isArray(prods)) {
+            setProductsList(prods);
+          }
+          if (Array.isArray(cats)) {
+            setDbCategories(cats);
+          }
         }
-        if (cats && cats.length > 0) {
-          setDbCategories(cats);
+      })
+      .catch((err) => {
+        console.error('Error fetching collection products:', err);
+      })
+      .finally(() => {
+        if (isMounted) {
+          setLoading(false);
         }
-        setLoading(false);
-      }
-    });
+      });
 
     return () => { isMounted = false; };
   }, []);

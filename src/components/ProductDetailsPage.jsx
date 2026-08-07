@@ -28,15 +28,23 @@ export default function ProductDetailsPage({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     setLoading(true);
     if (id) {
-      fetchProductById(id).then((p) => {
-        if (p) setDbProduct(p);
-        setLoading(false);
-      });
+      fetchProductById(id)
+        .then((p) => {
+          if (isMounted && p) setDbProduct(p);
+        })
+        .catch((err) => {
+          console.error('Error fetching product details:', err);
+        })
+        .finally(() => {
+          if (isMounted) setLoading(false);
+        });
     } else {
       setLoading(false);
     }
+    return () => { isMounted = false; };
   }, [id]);
 
   const product = dbProduct;

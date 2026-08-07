@@ -9,12 +9,88 @@ export const apiClient = axios.create({
   }
 });
 
-// Response interceptor to automatically handle 401 Unauthorized errors & refresh tokens
+// Helper to check if a JWT token is expired or close to expiring (threshold in seconds)
+export const isTokenExpired = (token, thresholdSeconds = 60) => {
+  if (!token) return true;
+  try {
+    const base64Url = token.split('.')[1];
+    if (!base64Url) return true;
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    const { exp } = JSON.parse(jsonPayload);
+    if (!exp) return false;
+    return Date.now() >= (exp - thresholdSeconds) * 1000;
+  } catch {
+    return true;
+  }
+};
+
+let refreshPromise = null;
+
+// Proactively ensure valid token before making API requests
+export const ensureValidToken = async () => {
+  const token = localStorage.getItem('lune_token');
+  const refreshToken = localStorage.getItem('lune_refresh_token');
+
+  // If token exists and is not expired, return it immediately
+  if (token && !isTokenExpired(token)) {
+    return token;
+  }
+
+  // If no refresh token is available, return null
+  if (!refreshToken) {
+    return null;
+  }
+
+  // Deduplicate concurrent token refresh attempts
+  if (refreshPromise) {
+    return refreshPromise;
+  }
+
+  refreshPromise = refreshSessionToken().finally(() => {
+    refreshPromise = null;
+  });
+
+  return refreshPromise;
+};
+
+// Request interceptor to proactively refresh tokens and attach Authorization header
+apiClient.interceptors.request.use(
+  async (config) => {
+    if (
+      config.url?.includes('/auth/refresh') ||
+      config.url?.includes('/auth/login') ||
+      config.url?.includes('/auth/register')
+    ) {
+      return config;
+    }
+
+    const validToken = await ensureValidToken();
+    if (validToken) {
+      if (config.headers && typeof config.headers.set === 'function') {
+        config.headers.set('Authorization', `Bearer ${validToken}`);
+      } else {
+        config.headers = config.headers || {};
+        config.headers['Authorization'] = `Bearer ${validToken}`;
+      }
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response interceptor to handle unexpected 401 Unauthorized errors & retry
 let isRefreshing = false;
 let failedQueue = [];
 
 const processQueue = (error, newToken = null) => {
-  failedQueue.forEach(prom => {
+  failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
     } else {
@@ -29,7 +105,6 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Do not attempt token refresh for login, register, or refresh calls themselves
     if (
       originalRequest?.url?.includes('/auth/refresh') ||
       originalRequest?.url?.includes('/auth/login') ||
@@ -44,10 +119,17 @@ apiClient.interceptors.response.use(
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        }).then(newToken => {
-          originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
-          return apiClient(originalRequest);
-        }).catch(err => Promise.reject(err));
+        })
+          .then((newToken) => {
+            if (originalRequest.headers && typeof originalRequest.headers.set === 'function') {
+              originalRequest.headers.set('Authorization', `Bearer ${newToken}`);
+            } else {
+              originalRequest.headers = originalRequest.headers || {};
+              originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+            }
+            return apiClient(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
       }
 
       isRefreshing = true;
@@ -58,21 +140,20 @@ apiClient.interceptors.response.use(
 
         if (newToken) {
           processQueue(null, newToken);
-          originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+          if (originalRequest.headers && typeof originalRequest.headers.set === 'function') {
+            originalRequest.headers.set('Authorization', `Bearer ${newToken}`);
+          } else {
+            originalRequest.headers = originalRequest.headers || {};
+            originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+          }
           return apiClient(originalRequest);
         } else {
           processQueue(new Error('Token refresh failed'), null);
-          localStorage.removeItem('lune_token');
-          localStorage.removeItem('lune_refresh_token');
-          localStorage.removeItem('lune_user');
           return Promise.reject(error);
         }
       } catch (refreshErr) {
         isRefreshing = false;
         processQueue(refreshErr, null);
-        localStorage.removeItem('lune_token');
-        localStorage.removeItem('lune_refresh_token');
-        localStorage.removeItem('lune_user');
         return Promise.reject(refreshErr);
       }
     }
@@ -176,20 +257,67 @@ export const normalizeProduct = (p) => {
   };
 };
 
+// Client-side Memory Cache & Request Deduplication
+const apiCache = new Map();
+const inFlightRequests = new Map();
+
+export const cachedApiCall = async (cacheKey, apiFn, ttlMs = 120000) => {
+  const cached = apiCache.get(cacheKey);
+  const now = Date.now();
+
+  if (cached && (now - cached.timestamp < ttlMs)) {
+    return cached.data;
+  }
+
+  if (inFlightRequests.has(cacheKey)) {
+    return inFlightRequests.get(cacheKey);
+  }
+
+  const promise = (async () => {
+    try {
+      const data = await apiFn();
+      if (data !== null && data !== undefined) {
+        apiCache.set(cacheKey, { data, timestamp: Date.now() });
+      }
+      return data;
+    } finally {
+      inFlightRequests.delete(cacheKey);
+    }
+  })();
+
+  inFlightRequests.set(cacheKey, promise);
+  return promise;
+};
+
+export const clearClientCache = (keyPrefix) => {
+  if (!keyPrefix) {
+    apiCache.clear();
+    return;
+  }
+  for (const key of apiCache.keys()) {
+    if (key.startsWith(keyPrefix)) {
+      apiCache.delete(key);
+    }
+  }
+};
+
 /**
  * Fetch all products (with optional filters) via POST request
  */
 export const fetchProducts = async (filters = {}) => {
-  try {
-    const response = await apiClient.post('/products/list', filters);
-    if (response.data.success) {
-      return response.data.products.map(normalizeProduct);
+  const cacheKey = `products_${JSON.stringify(filters)}`;
+  return cachedApiCall(cacheKey, async () => {
+    try {
+      const response = await apiClient.post('/products/list', filters);
+      if (response.data.success) {
+        return response.data.products.map(normalizeProduct);
+      }
+      return [];
+    } catch (error) {
+      console.error('Error fetching products from backend:', error);
+      return [];
     }
-    return [];
-  } catch (error) {
-    console.error('Error fetching products from backend:', error);
-    return [];
-  }
+  }, 120000);
 };
 
 /**
@@ -286,19 +414,32 @@ export const refreshSessionToken = async () => {
     const refreshToken = localStorage.getItem('lune_refresh_token');
     if (!refreshToken) return null;
 
-    const response = await apiClient.post('/auth/refresh', { refreshToken });
+    // Use raw axios instance to prevent interceptor recursion
+    const response = await axios.post(
+      `${API_BASE_URL}/auth/refresh`,
+      { refreshToken },
+      { headers: { 'Content-Type': 'application/json' } }
+    );
     if (response.data.success && response.data.session) {
-      localStorage.setItem('lune_token', response.data.session.access_token);
-      localStorage.setItem('lune_refresh_token', response.data.session.refresh_token);
-      localStorage.setItem('lune_user', JSON.stringify(response.data.user));
-      return response.data.session.access_token;
+      const access_token = response.data.session.access_token;
+      const new_refresh_token = response.data.session.refresh_token;
+      const user = response.data.user;
+
+      if (access_token) localStorage.setItem('lune_token', access_token);
+      if (new_refresh_token) localStorage.setItem('lune_refresh_token', new_refresh_token);
+      if (user) localStorage.setItem('lune_user', JSON.stringify(user));
+      return access_token;
     }
     return null;
   } catch (error) {
     console.error('Error refreshing token:', error);
-    localStorage.removeItem('lune_token');
-    localStorage.removeItem('lune_refresh_token');
-    localStorage.removeItem('lune_user');
+    // Only remove session if server explicitly rejects refresh token (401 or 400)
+    if (error.response && (error.response.status === 401 || error.response.status === 400)) {
+      localStorage.removeItem('lune_token');
+      localStorage.removeItem('lune_refresh_token');
+      localStorage.removeItem('lune_user');
+      window.dispatchEvent(new CustomEvent('lune:auth_logout'));
+    }
     return null;
   }
 };
@@ -309,23 +450,15 @@ export const refreshSessionToken = async () => {
 export const fetchUserProfile = async () => {
   try {
     const token = localStorage.getItem('lune_token');
-    if (!token) return null;
-    const response = await apiClient.post(
-      '/auth/me',
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    const refreshToken = localStorage.getItem('lune_refresh_token');
+    if (!token && !refreshToken) return null;
+
+    const response = await apiClient.post('/auth/me');
     if (response.data.success) {
       return response.data.profile;
     }
     return null;
   } catch (error) {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('lune_token');
-      localStorage.removeItem('lune_refresh_token');
-      localStorage.removeItem('lune_user');
-      return null;
-    }
     console.error('Error fetching user profile:', error);
     return null;
   }
@@ -593,6 +726,7 @@ export const createProduct = async (productData) => {
     const response = await apiClient.post('/products/create', productData, {
       headers: { Authorization: `Bearer ${token}` }
     });
+    clearClientCache('products');
     return response.data;
   } catch (error) {
     return { success: false, error: error.response?.data?.error || 'Failed to create product' };
@@ -608,6 +742,7 @@ export const updateProduct = async (productData) => {
     const response = await apiClient.post('/products/update', productData, {
       headers: { Authorization: `Bearer ${token}` }
     });
+    clearClientCache('products');
     return response.data;
   } catch (error) {
     return { success: false, error: error.response?.data?.error || 'Failed to update product' };
@@ -623,6 +758,7 @@ export const deleteProduct = async (productId) => {
     const response = await apiClient.post('/products/delete', { id: productId }, {
       headers: { Authorization: `Bearer ${token}` }
     });
+    clearClientCache('products');
     return response.data;
   } catch (error) {
     return { success: false, error: error.response?.data?.error || 'Failed to delete product' };
@@ -645,6 +781,7 @@ export const toggleProductStockStatus = async (productId, inStock) => {
         headers: { Authorization: `Bearer ${token}` }
       });
     }
+    clearClientCache('products');
     return response.data;
   } catch (error) {
     return { success: false, error: error.response?.data?.error || 'Failed to toggle product status' };
@@ -655,15 +792,14 @@ export const toggleProductStockStatus = async (productId, inStock) => {
  * Admin: Category Management API
  */
 export const fetchCategories = async () => {
-  try {
-    const token = localStorage.getItem('lune_token');
-    const response = await apiClient.post('/admin/categories/list', {}, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return response.data.categories || [];
-  } catch (error) {
-    return [];
-  }
+  return cachedApiCall('categories_all', async () => {
+    try {
+      const response = await apiClient.post('/admin/categories/list', {});
+      return response.data.categories || [];
+    } catch (error) {
+      return [];
+    }
+  }, 180000);
 };
 
 export const createCategory = async (catData) => {
@@ -672,6 +808,7 @@ export const createCategory = async (catData) => {
     const response = await apiClient.post('/admin/categories/create', catData, {
       headers: { Authorization: `Bearer ${token}` }
     });
+    clearClientCache('categories');
     return response.data;
   } catch (error) {
     return { success: false, error: error.response?.data?.error || 'Failed to create category' };
@@ -684,6 +821,7 @@ export const updateCategory = async (catData) => {
     const response = await apiClient.post('/admin/categories/update', catData, {
       headers: { Authorization: `Bearer ${token}` }
     });
+    clearClientCache('categories');
     return response.data;
   } catch (error) {
     return { success: false, error: error.response?.data?.error || 'Failed to update category' };
@@ -696,6 +834,7 @@ export const deleteCategory = async (id) => {
     const response = await apiClient.post('/admin/categories/delete', { id }, {
       headers: { Authorization: `Bearer ${token}` }
     });
+    clearClientCache('categories');
     return response.data;
   } catch (error) {
     return { success: false, error: error.response?.data?.error || 'Failed to delete category' };

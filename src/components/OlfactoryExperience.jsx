@@ -26,13 +26,19 @@ export default function OlfactoryExperience({
     let isMounted = true;
     setLoading(true);
 
-    Promise.all([fetchProducts(), fetchCategories()]).then(([prods, cats]) => {
-      if (isMounted) {
-        if (prods && prods.length > 0) setProductsList(prods);
-        if (cats && cats.length > 0) setDbCategories(cats);
-        setLoading(false);
-      }
-    });
+    Promise.all([fetchProducts(), fetchCategories()])
+      .then(([prods, cats]) => {
+        if (isMounted) {
+          if (Array.isArray(prods)) setProductsList(prods);
+          if (Array.isArray(cats)) setDbCategories(cats);
+        }
+      })
+      .catch((err) => {
+        console.error('Error fetching olfactory experience data:', err);
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
 
     return () => { isMounted = false; };
   }, []);

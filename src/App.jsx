@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import HeroSlider from './components/HeroSlider';
 import Collectionproducts from './components/Collectionproducts';
 import ProductDetailsPage from './components/ProductDetailsPage';
@@ -13,6 +13,7 @@ import AdminLayout from './Admin/AdminLayout';
 import DiscountOfferModal from './components/DiscountOfferModal';
 import { ConfirmProvider } from './components/ConfirmModal';
 import { useCart } from './context/CartContext';
+import { useAuth } from './context/AuthContext';
 import './App.css';
 
 // Automatically scroll to top of page on route changes
@@ -22,6 +23,24 @@ function ScrollToTop() {
     window.scrollTo(0, 0);
   }, [pathname]);
   return null;
+}
+
+// Security Route Guard: Restricts /admin routes strictly to verified admin accounts
+function ProtectedAdminRoute({ children }) {
+  const { isLoggedIn, user, promptLoginRequired } = useAuth();
+  const isAdmin = user?.role === 'admin' || user?.profile?.role === 'admin';
+
+  useEffect(() => {
+    if (isLoggedIn && !isAdmin) {
+      promptLoginRequired('Access denied: Admin privileges required.');
+    }
+  }, [isLoggedIn, isAdmin, promptLoginRequired]);
+
+  if (!isLoggedIn || !isAdmin) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
 }
 
 function MainApp() {
@@ -204,7 +223,14 @@ function MainApp() {
               />
             }
           />
-          <Route path="/admin/*" element={<AdminLayout />} />
+          <Route
+            path="/admin/*"
+            element={
+              <ProtectedAdminRoute>
+                <AdminLayout />
+              </ProtectedAdminRoute>
+            }
+          />
 
         </Routes>
         {!isAdminRoute && <DiscountOfferModal />}

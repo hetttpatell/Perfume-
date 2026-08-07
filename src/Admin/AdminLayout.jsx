@@ -13,17 +13,26 @@ import ContactLocationsManager from './ContactLocationsManager';
 import UsersManager from './UsersManager';
 
 export default function AdminLayout() {
-  const { isLoggedIn, user, logout } = useAuth();
+  const { isLoggedIn, user, promptLoginRequired } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  // Protect route - Redirect unauthenticated users
+  const isAdmin = user?.role === 'admin' || user?.profile?.role === 'admin';
+
+  // Protect route - Instantly redirect unauthenticated users and customer role accounts
   useEffect(() => {
-    if (!isLoggedIn) {
-      navigate('/');
+    if (!isLoggedIn || !isAdmin) {
+      if (isLoggedIn && !isAdmin && promptLoginRequired) {
+        promptLoginRequired('Access denied: Admin privileges required.');
+      }
+      navigate('/', { replace: true });
     }
-  }, [isLoggedIn, navigate]);
+  }, [isLoggedIn, isAdmin, navigate, promptLoginRequired]);
+
+  if (!isLoggedIn || !isAdmin) {
+    return null;
+  }
 
   const navItems = [
     { id: 'dashboard', label: 'DASHBOARD SUMMARY', icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z' },

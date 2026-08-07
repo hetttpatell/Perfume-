@@ -266,6 +266,22 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
   );
 }
 
+// Dynamic font scaling helper for background watermark text based on character length
+const getWatermarkFontSize = (title = '') => {
+  const len = (title || '').trim().length;
+  if (!len || len <= 4) {
+    return { fontSize: 'clamp(4.5rem, 17vw, 15rem)' };
+  } else if (len <= 7) {
+    return { fontSize: 'clamp(3.5rem, 13vw, 12rem)' };
+  } else if (len <= 10) {
+    return { fontSize: 'clamp(2.6rem, 10vw, 9.5rem)' };
+  } else if (len <= 14) {
+    return { fontSize: 'clamp(2.1rem, 7.8vw, 7.2rem)' };
+  } else {
+    return { fontSize: 'clamp(1.6rem, 5.8vw, 5.6rem)' };
+  }
+};
+
 export default function HeroSlider({
   loaderKey,
   loaderState,
@@ -662,13 +678,14 @@ export default function HeroSlider({
         style={{ backgroundColor: activeSlideData.bg || '#FFFFFF', color: activeSlideData.text || '#111111' }}
         aria-label="Lune Interactive Fragrance Showcase"
       >
-        {/* Large Background Watermark Text — Continuous Unbroken Display */}
-        <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center md:justify-end md:pr-6 lg:pr-10 overflow-hidden select-none">
+        {/* Large Background Watermark Text — Dynamically proportioned based on word length */}
+        <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center md:justify-end md:pr-6 lg:pr-10 overflow-hidden select-none px-4 pt-20 sm:pt-28 md:pt-32 lg:pt-36 translate-y-8 sm:translate-y-12 md:translate-y-14">
           <h1
             ref={watermarkRef}
-            className="font-serif font-black text-[16vw] sm:text-[15vw] md:text-[13vw] lg:text-[14vw] xl:text-[16vw] leading-none text-[#D8D8DC] tracking-tighter uppercase whitespace-nowrap will-change-transform select-none"
+            style={getWatermarkFontSize(activeSlideData.shortTitle || activeSlideData.title)}
+            className="font-serif font-black leading-none text-[#D8D8DC] tracking-tighter uppercase whitespace-nowrap will-change-transform select-none text-center md:text-right"
           >
-            {activeSlideData.shortTitle}
+            {activeSlideData.shortTitle || activeSlideData.title}
           </h1>
         </div>
 

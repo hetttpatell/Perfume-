@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { loginUser, registerUser, fetchUserProfile } from '../services/api';
+import { loginUser, registerUser, fetchUserProfile, ensureValidToken } from '../services/api';
 
 const AuthContext = createContext();
 
@@ -15,28 +15,78 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem('lune_token') || null);
   const [authRequiredNotice, setAuthRequiredNotice] = useState('');
 
-  // Async: sync latest profile & role from the database after mount
+  // Async: sync latest session, profile & token proactively on mount and tab focus
   useEffect(() => {
-    if (!token || !user) return;
+    const syncSession = async () => {
+      const storedToken = localStorage.getItem('lune_token');
+      const storedRefresh = localStorage.getItem('lune_refresh_token');
 
-    fetchUserProfile().then(profile => {
-      if (profile && profile.role) {
-        const updatedUser = { ...user, role: profile.role, profile };
-        setUser(updatedUser);
-        localStorage.setItem('lune_user', JSON.stringify(updatedUser));
-
-        // Also sync the react token state if it got silently refreshed
-        const currentToken = localStorage.getItem('lune_token');
-        if (currentToken && currentToken !== token) {
-          setToken(currentToken);
-        }
-      } else if (!localStorage.getItem('lune_token')) {
-        // Token was invalid/expired and could not be refreshed - reset state cleanly
+      if (!storedToken && !storedRefresh) {
         setUser(null);
         setToken(null);
+        return;
       }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+      // Proactively ensure token is valid (refreshes silently if expired)
+      const validToken = await ensureValidToken();
+      if (!validToken) {
+        if (!localStorage.getItem('lune_token') && !localStorage.getItem('lune_refresh_token')) {
+          setUser(null);
+          setToken(null);
+        }
+        return;
+      }
+
+      setToken(validToken);
+
+      // Fetch fresh profile details from DB
+      const profile = await fetchUserProfile();
+      if (profile) {
+        let currentStoredUser = null;
+        try {
+          currentStoredUser = JSON.parse(localStorage.getItem('lune_user') || 'null');
+        } catch { currentStoredUser = null; }
+
+        const updatedUser = {
+          ...(currentStoredUser || {}),
+          role: profile.role || 'customer',
+          profile
+        };
+        setUser(updatedUser);
+        localStorage.setItem('lune_user', JSON.stringify(updatedUser));
+      }
+    };
+
+    syncSession();
+
+    // Re-verify session when returning to tab after a day/hours
+    const handleFocus = () => syncSession();
+    window.addEventListener('focus', handleFocus);
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        syncSession();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    // Periodic silent refresh check every 10 minutes
+    const intervalTimer = setInterval(() => {
+      syncSession();
+    }, 10 * 60 * 1000);
+
+    const handleLogoutEvent = () => {
+      setUser(null);
+      setToken(null);
+    };
+    window.addEventListener('lune:auth_logout', handleLogoutEvent);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('lune:auth_logout', handleLogoutEvent);
+      clearInterval(intervalTimer);
+    };
   }, []);
 
   const login = async ({ email, password }) => {
