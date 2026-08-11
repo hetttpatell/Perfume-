@@ -26,8 +26,8 @@ function FloatingNotes({ slideData }) {
     <>
       {/* Floating Note 1 - Top Left */}
       {notes[0] && (
-        <div className="absolute top-[24%] -left-6 sm:-left-8 md:-left-12 lg:-left-16 z-20 animate-float-slow pointer-events-auto">
-          <div className="px-3 py-1 sm:px-4 sm:py-2 bg-white backdrop-blur-xl border border-black/10 rounded-full shadow-lg shadow-black/5 flex items-center gap-1.5 sm:gap-2.5 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+        <div className="absolute top-[18%] -left-2 sm:-left-4 md:left-0 lg:left-4 z-20 animate-float-slow pointer-events-auto">
+          <div className="px-3 py-1 sm:px-4 sm:py-2 bg-white/90 backdrop-blur-xl border border-black/10 rounded-full shadow-lg shadow-black/5 flex items-center gap-1.5 sm:gap-2.5 transition-all duration-300 hover:scale-105 hover:shadow-xl">
             <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shrink-0" style={{ backgroundColor: accent }} />
             <span className="font-sans font-bold text-[9px] sm:text-[11px] md:text-[12px] tracking-[0.15em] uppercase text-[#111111] whitespace-nowrap">
               {notes[0]}
@@ -38,8 +38,8 @@ function FloatingNotes({ slideData }) {
 
       {/* Floating Note 2 - Middle Right */}
       {notes[1] && (
-        <div className="absolute top-[42%] -right-6 sm:-right-8 md:-right-12 lg:-right-16 z-20 animate-float-reverse pointer-events-auto">
-          <div className="px-3 py-1 sm:px-4 sm:py-2 bg-white backdrop-blur-xl border border-black/10 rounded-full shadow-lg shadow-black/5 flex items-center gap-1.5 sm:gap-2.5 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+        <div className="absolute top-[42%] -right-2 sm:-right-4 md:right-0 lg:right-4 z-20 animate-float-reverse pointer-events-auto">
+          <div className="px-3 py-1 sm:px-4 sm:py-2 bg-white/90 backdrop-blur-xl border border-black/10 rounded-full shadow-lg shadow-black/5 flex items-center gap-1.5 sm:gap-2.5 transition-all duration-300 hover:scale-105 hover:shadow-xl">
             <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shrink-0" style={{ backgroundColor: accent }} />
             <span className="font-sans font-bold text-[9px] sm:text-[11px] md:text-[12px] tracking-[0.15em] uppercase text-[#111111] whitespace-nowrap">
               {notes[1]}
@@ -50,8 +50,8 @@ function FloatingNotes({ slideData }) {
 
       {/* Floating Note 3 - Bottom Left */}
       {notes[2] && (
-        <div className="absolute bottom-[6%] -left-5 sm:-left-7 md:-left-10 lg:-left-14 z-20 animate-float-delayed pointer-events-auto">
-          <div className="px-3 py-1 sm:px-4 sm:py-2 bg-white backdrop-blur-xl border border-black/10 rounded-full shadow-lg shadow-black/5 flex items-center gap-1.5 sm:gap-2.5 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+        <div className="absolute bottom-[10%] -left-1 sm:-left-3 md:left-2 lg:left-6 z-20 animate-float-delayed pointer-events-auto">
+          <div className="px-3 py-1 sm:px-4 sm:py-2 bg-white/90 backdrop-blur-xl border border-black/10 rounded-full shadow-lg shadow-black/5 flex items-center gap-1.5 sm:gap-2.5 transition-all duration-300 hover:scale-105 hover:shadow-xl">
             <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shrink-0" style={{ backgroundColor: accent }} />
             <span className="font-sans font-bold text-[9px] sm:text-[11px] md:text-[12px] tracking-[0.15em] uppercase text-[#111111] whitespace-nowrap">
               {notes[2]}
@@ -692,12 +692,12 @@ export default function HeroSlider({
         style={{ backgroundColor: activeSlideData.bg || '#FFFFFF', color: activeSlideData.text || '#111111' }}
         aria-label="Lune Interactive Fragrance Showcase"
       >
-        {/* Large Background Watermark Text — Dynamically proportioned based on word length */}
-        <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center md:justify-end md:pr-6 lg:pr-10 overflow-hidden select-none px-4 pt-20 sm:pt-28 md:pt-32 lg:pt-36 translate-y-8 sm:translate-y-12 md:translate-y-14">
+        {/* Large Background Watermark Text — Seamless centered luxury backdrop across entire Hero */}
+        <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden select-none px-4 pt-16 sm:pt-20 md:pt-12">
           <h1
             ref={watermarkRef}
             style={getWatermarkFontSize(activeSlideData.shortTitle || activeSlideData.title)}
-            className="font-serif font-black leading-none text-[#D8D8DC] tracking-tighter uppercase whitespace-nowrap will-change-transform select-none text-center md:text-right"
+            className="font-serif font-black leading-none text-[#E5E5E8] tracking-tighter uppercase whitespace-nowrap will-change-transform select-none text-center"
           >
             {activeSlideData.shortTitle || activeSlideData.title}
           </h1>
