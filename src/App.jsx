@@ -52,13 +52,7 @@ function MainApp() {
 
   const [loaderKey, setLoaderKey] = useState(0);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
-  const [loaderState, setLoaderState] = useState(() => {
-    try {
-      return sessionStorage.getItem('perfume_has_visited') ? 'completed' : 'loading';
-    } catch {
-      return 'loading';
-    }
-  });
+  const [loaderState, setLoaderState] = useState('loading');
 
   // Global E-commerce Account & Admin State
   const [isAccountOpen, setIsAccountOpen] = useState(false);

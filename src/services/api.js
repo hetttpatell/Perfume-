@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { supabase } from '../lib/supabase';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
 
@@ -309,21 +310,64 @@ export const fetchProducts = async (filters = {}) => {
   return cachedApiCall(cacheKey, async () => {
     try {
       const response = await apiClient.post('/products/list', filters);
-      if (response.data.success) {
+      if (response.data.success && Array.isArray(response.data.products) && response.data.products.length > 0) {
         return response.data.products.map(normalizeProduct);
       }
-      return [];
     } catch (error) {
-      console.error('Error fetching products from backend:', error);
-      return [];
+      console.warn('Backend API request failed, querying Supabase directly:', error.message);
     }
+
+    // Direct Supabase Fallback for Live / Offline environments (e.g. Vercel)
+    try {
+      let query = supabase.from('products').select(`
+        *,
+        sizes:product_sizes(*),
+        scentDetails:product_scent_details(*),
+        images:product_images(*)
+      `);
+
+      if (filters.isHero) {
+        query = query.eq('is_hero', true);
+      }
+      if (filters.isFeatured) {
+        query = query.eq('is_featured', true);
+      }
+      if (filters.category) {
+        query = query.eq('category', filters.category);
+      }
+
+      const { data, error } = await query;
+      if (!error && data && data.length > 0) {
+        return data.map(normalizeProduct);
+      }
+
+      // If filtering by isHero returned empty, fallback query all live products
+      if (filters.isHero) {
+        const { data: allData } = await supabase.from('products').select(`
+          *,
+          sizes:product_sizes(*),
+          scentDetails:product_scent_details(*),
+          images:product_images(*)
+        `);
+        if (allData && allData.length > 0) {
+          return allData.map(normalizeProduct);
+        }
+      }
+    } catch (sbError) {
+      console.error('Direct Supabase fetch error:', sbError);
+    }
+
+    return [];
   }, 120000);
 };
 
 /**
  * Fetch products flagged for Hero Section
  */
-export const fetchHeroProducts = async () => {
+export const fetchHeroProducts = async (forceRefresh = false) => {
+  if (forceRefresh) {
+    clearClientCache('products');
+  }
   const heroProds = await fetchProducts({ isHero: true });
   if (heroProds && heroProds.length > 0) {
     return heroProds;
@@ -345,14 +389,33 @@ export const fetchFeaturedProducts = async () => {
 export const fetchProductById = async (id) => {
   try {
     const response = await apiClient.post('/products/detail', { id });
-    if (response.data.success) {
+    if (response.data.success && response.data.product) {
       return normalizeProduct(response.data.product);
     }
-    return null;
   } catch (error) {
-    console.error(`Error fetching product ${id} from backend:`, error);
-    return null;
+    console.warn(`Backend API failed for product ${id}, trying direct Supabase query:`, error.message);
   }
+
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select(`
+        *,
+        sizes:product_sizes(*),
+        scentDetails:product_scent_details(*),
+        images:product_images(*)
+      `)
+      .eq('id', id)
+      .single();
+
+    if (!error && data) {
+      return normalizeProduct(data);
+    }
+  } catch (sbError) {
+    console.error(`Direct Supabase fetch error for product ${id}:`, sbError);
+  }
+
+  return null;
 };
 
 /**
@@ -365,6 +428,7 @@ export const toggleProductFlags = async (productId, { isHero, isFeatured }) => {
       isHero,
       isFeatured
     });
+    clearClientCache('products');
     return response.data;
   } catch (error) {
     console.error('Error toggling product flags:', error);

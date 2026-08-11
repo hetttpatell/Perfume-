@@ -75,13 +75,6 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
 
   const hasEntranceAnimatedRef = useRef(false);
 
-  // Notify parent component that asset is ready
-  useEffect(() => {
-    if (onModelLoaded) {
-      onModelLoaded();
-    }
-  }, [onModelLoaded]);
-
   // Initial loader entrance animation for product SVG flacon
   useEffect(() => {
     if (loaderState === 'loading') {
@@ -319,9 +312,14 @@ export default function HeroSlider({
 
   useEffect(() => {
     let isMounted = true;
-    fetchHeroProducts().then((heroProds) => {
-      if (isMounted && heroProds && heroProds.length > 0) {
-        const dynamicSlides = heroProds.map((prod, index) => ({
+    
+    // Always force refresh from API to guarantee fresh live data from database
+    fetchHeroProducts(true).then((heroProds) => {
+      if (!isMounted) return;
+
+      let slidesToSet = SLIDES;
+      if (heroProds && heroProds.length > 0) {
+        slidesToSet = heroProds.map((prod, index) => ({
           id: String(index + 1).padStart(2, '0'),
           productId: prod.id,
           shortTitle: prod.heroTitle || prod.name.split(' ')[0],
@@ -344,11 +342,27 @@ export default function HeroSlider({
           image: prod.heroImageUrl || prod.image,
           pose: { rotation: [0, 0, 0] }
         }));
-        setSlidesList(dynamicSlides);
       }
+
+      setSlidesList(slidesToSet);
+
+      // Preload primary hero bottle image before telling loader we're ready
+      const mainHeroImg = slidesToSet[0]?.image;
+      if (mainHeroImg) {
+        const img = new Image();
+        img.src = mainHeroImg;
+        img.onload = () => { if (isMounted && onModelLoaded) onModelLoaded(); };
+        img.onerror = () => { if (isMounted && onModelLoaded) onModelLoaded(); };
+      } else {
+        if (onModelLoaded) onModelLoaded();
+      }
+    }).catch(err => {
+      console.error('Error loading live hero products:', err);
+      if (isMounted && onModelLoaded) onModelLoaded();
     });
+
     return () => { isMounted = false; };
-  }, []);
+  }, [onModelLoaded]);
 
   const activeSlideData = slidesList[displayedSlideIndex] || slidesList[0];
 
