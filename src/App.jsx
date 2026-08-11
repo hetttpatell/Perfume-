@@ -54,6 +54,12 @@ function MainApp() {
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [loaderState, setLoaderState] = useState('loading');
 
+  useEffect(() => {
+    if (location.pathname !== '/') {
+      setLoaderState('completed');
+    }
+  }, [location.pathname]);
+
   // Global E-commerce Account & Admin State
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);

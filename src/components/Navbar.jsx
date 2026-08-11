@@ -139,7 +139,7 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
     }
   };
 
-  const isVisible = loaderState === 'completed';
+  const isVisible = location.pathname !== '/' || loaderState === 'completed' || loaderState === 'exiting';
 
   return (
     <>
