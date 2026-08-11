@@ -171,7 +171,8 @@ export const normalizeProduct = (p) => {
   const images = p.images || [];
 
   const resolveImgPath = (url) => {
-    if (!url) return '/SVGs/Perfume-SVG.png';
+    if (!url || typeof url !== 'string') return '/SVGs/Perfume-SVG.png';
+    if (url.startsWith('file://') || url.includes('antigravity-ide')) return '/SVGs/Perfume-SVG.png';
     if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) return url;
     if (url.startsWith('src/assets/')) return '/' + url.replace('src/assets/', 'assets/');
     if (url.startsWith('assets/')) return '/' + url;
@@ -180,7 +181,7 @@ export const normalizeProduct = (p) => {
   };
 
   // Separate hero section image records from standard product catalog photos
-  const heroRec = (images || []).find(img => img.alt_text === 'hero_image');
+  const heroRec = (images || []).find(img => img.alt_text === 'hero_image' && img.image_url && !img.image_url.startsWith('file://'));
   const standardImages = (images || []).filter(img => img.alt_text !== 'hero_image');
 
   const rawMain = standardImages.find(img => img.is_primary)?.image_url || p.image_url || p.image;
@@ -212,9 +213,13 @@ export const normalizeProduct = (p) => {
     galleryImages: gallery,
     imagesList: images,
     heroImageUrl: (() => {
-      const heroRec = (images || []).find(img => img.alt_text === 'hero_image');
+      const heroRec = (images || []).find(img => img.alt_text === 'hero_image' && img.image_url && !img.image_url.startsWith('file://'));
       const rawHero = p.hero_image_url || p.heroImageUrl || heroRec?.image_url || '';
-      return rawHero ? resolveImgPath(rawHero) : '';
+      const resolved = resolveImgPath(rawHero);
+      if (resolved && resolved !== '/SVGs/Perfume-SVG.png') {
+        return resolved;
+      }
+      return mainImage;
     })(),
     heroTitle: p.hero_title || p.name,
     heroSubtitle: p.hero_subtitle || p.french_name || p.subtitle,
