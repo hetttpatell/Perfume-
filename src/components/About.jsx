@@ -2,55 +2,89 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import Footer from './Footer';
 
-// Generated High-Res Assets matching PHLUR Editorial Reference
-import heroBg from '../assets/phlur_about_hero.png';
-import colorfulBottles from '../assets/phlur_colorful_bottles.png';
-import chrisellePortrait from '../assets/phlur_chriselle_portrait.png';
-import skinHands from '../assets/phlur_skin_hands.png';
-import flowerDroplet from '../assets/phlur_flower_droplet.png';
-import bottleCaps from '../assets/phlur_bottle_caps.png';
+// Distinct High-Res Assets & Local Images
+import brandHeritageStory from '../assets/brand_heritage_story.png';
+import brandHeritageCraft from '../assets/brand_heritage_craft.png';
+import sensoryRitualBg from '../assets/sensory_ritual_bg.png';
+import phlurAboutHero from '../assets/phlur_about_hero.png';
 
 export default function About({ cartItems, setCartItems, isCartOpen, setIsCartOpen, onOpenAccount }) {
   const navigate = useNavigate();
 
-  // Master Perfumers exact data from PHLUR website inspiration
+  // Fresh Master Perfumers Portraits
   const masterPerfumers = [
     {
       name: 'FRANK VOELKL',
-      portrait: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop',
-      bio: 'A sought-after perfumer, Frank Voelkl is a principal perfumer at Firmenich and has created many iconic fragrances, including his instrumental role in creating the Le Labo trend.',
-      creations: 'PHLUR creations: Father Figure, Golden Rule, Missing Person',
+      role: 'PRINCIPAL PERFUMER',
+      portrait: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=800&auto=format&fit=crop',
+      bio: 'A sought-after perfumer instrumental in creating iconic trend-setting fragrances, Frank merges emotional intuition with French perfume tradition.',
+      creations: 'Maison Lune creations: L’Éclat de Jour, Velvet Amber',
     },
     {
       name: 'JÉRÔME EPINETTE',
-      portrait: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=800&auto=format&fit=crop',
-      bio: 'A supreme perfumer synonymous with the most intoxicating indie brands, Jérôme has had a long career at Robertet where he has been responsible for scores of bestselling and critically acclaimed fragrances.',
-      creations: 'PHLUR creations: Not Your Baby, Tangerine Boy, Coconut Skin',
+      role: 'SENIOR PERFUMERY DIRECTOR',
+      portrait: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=800&auto=format&fit=crop',
+      bio: 'A supreme perfumer synonymous with intoxicating fine fragrance, Jérôme has had a long career at Robertet crafting critically acclaimed scents.',
+      creations: 'Maison Lune creations: Rich Blossom, Santal Luminous',
     },
     {
       name: 'GIL CLAVIEN',
-      portrait: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop',
-      bio: 'Principal perfumer at Firmenich since 1997, Gil Clavien is known for her breadth of work that reaches mass market to fine fragrance and everything in between.',
-      creations: 'PHLUR creations: Heavy Cream, Lost Cause',
+      role: 'MASTER FORMULATION SCIENTIST',
+      portrait: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=800&auto=format&fit=crop',
+      bio: 'Principal perfumer renowned for her breadth of work, Gil balances rare botanical absolutes with 32% high-concentration Extrait endurance.',
+      creations: 'Maison Lune creations: Noir Solstice, Fleur de Soie',
     },
+  ];
+
+  // Core Brand Pillars & Values
+  const coreValues = [
+    {
+      number: '01',
+      title: 'CLIENT INTIMACY',
+      tag: 'PERSONAL BESPOKE CARE',
+      desc: 'We know our patrons by name. From personalized bottle engravings to bespoke scent consultations, every creation is tailored with dedicated atelier attention.',
+    },
+    {
+      number: '02',
+      title: 'ARTISTRY & SCIENCE',
+      tag: 'MOLECULAR EXCELLENCE',
+      desc: 'Merging 50 years of Grasse botanical heritage with 32% Extrait de Parfum concentration, ensuring unmatched sillage and longevity without compromise.',
+    },
+    {
+      number: '03',
+      title: 'SUSTAINABLE BOTANICALS',
+      tag: 'ECO-RESPONSIBLE HARVESTING',
+      desc: '100% FSC-certified recyclable boxes, bio-degradable flacons, and responsibly sourced Iris, Rose, and Neroli harvests directly from Grasse farms.',
+    },
+    {
+      number: '04',
+      title: 'UNCOMPROMISING PURITY',
+      tag: 'ZERO SYNTHETIC DILUENTS',
+      desc: 'Formulated without parabens, phthalates, or unnecessary fillers. Transparency at every step gives you the confidence to wear scent as second skin.',
+    }
   ];
 
   return (
     <div className="w-full min-h-screen bg-white text-[#111111] font-sans pt-0 sm:pt-24 md:pt-28 pb-12 overflow-x-hidden selection:bg-black selection:text-white">
-      
-      {/* ── 1. FULL WIDTH HERO BANNER (Matched to Collection Page Spacing) ── */}
-      <section className="relative w-full overflow-hidden bg-[#0F2230] text-white min-h-[310px] sm:min-h-[380px] lg:min-h-[440px] flex items-center border-b border-black/10 shadow-[0_15px_40px_rgba(0,0,0,0.15)]">
-        {/* Background Image */}
-        <img
-          src={heroBg}
-          alt="PHLUR Moody Periwinkle Fluid Background"
+
+      {/* ── 1. FULL WIDTH HERO BANNER (Background Video Integration) ── */}
+      <section className="relative w-full overflow-hidden bg-[#0F2230] text-white min-h-[340px] sm:min-h-[420px] lg:min-h-[480px] flex items-center border-b border-black/10 shadow-[0_15px_40px_rgba(0,0,0,0.15)]">
+        {/* Background Video */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
           className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none"
-        />
+        >
+          <source src="/Video/Generate_a_video_that_will_pla.mp4" type="video/mp4" />
+        </video>
         
         {/* Dark Gradient Overlay for Maximum Legibility */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/50 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/30 pointer-events-none" />
 
-        {/* Hero Content Container - Matching Collection Page Wrapper */}
+        {/* Hero Content Container */}
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 pt-20 sm:py-14 md:py-16 pb-8 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -59,24 +93,62 @@ export default function About({ cartItems, setCartItems, isCartOpen, setIsCartOp
             className="w-full md:w-9/12 lg:w-7/12 flex flex-col items-start gap-4 sm:gap-5"
           >
             <h1 className="font-sans font-extrabold text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-white tracking-tight uppercase leading-[1.1] drop-shadow-md">
-              PHLUR CREATES SCENTS FOR THE PRESENT TENSE.
+              ARTISTRY. BACKED BY SCIENCE.
             </h1>
 
             <p className="font-sans text-[11px] sm:text-sm md:text-base text-white/90 font-light leading-relaxed max-w-xl drop-shadow-sm">
-              Modern fragrances mindfully formulated, responsibly sourced, and meticulously crafted by world-class perfumers. Inspired by memories and feelings — those that are intimately personal and universally shared.
+              Maison Lune creates scents for the present tense. Modern fragrances mindfully formulated, responsibly sourced, and meticulously crafted by world-class perfumers in Grasse and Paris.
             </p>
 
             <button
               onClick={() => navigate('/collection')}
               className="mt-2 px-7 py-3 border border-white text-white hover:bg-white hover:text-black font-sans font-bold text-xs tracking-[0.25em] uppercase transition-all duration-300 cursor-pointer active:scale-95 shadow-sm"
             >
-              SHOP NOW
+              EXPLORE CREATIONS
             </button>
           </motion.div>
         </div>
       </section>
 
-      {/* ── 2. SECTION 1: Fragrance to elevate your everyday (Image Left / Text Right) ── */}
+      {/* ── 2. STATS STRIP (Website Standard Light Grey Palette) ── */}
+      <section className="w-full bg-[#F9F9FB] border-b border-gray-200 py-10 sm:py-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 md:px-12 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="space-y-1">
+            <span className="font-sans font-extrabold text-3xl sm:text-5xl text-[#111111]">
+              50+
+            </span>
+            <p className="text-[11px] sm:text-xs font-sans font-bold tracking-widest text-[#666666] uppercase mt-1">
+              YEARS OF HERITAGE
+            </p>
+          </div>
+          <div className="space-y-1">
+            <span className="font-sans font-extrabold text-3xl sm:text-5xl text-[#111111]">
+              32%
+            </span>
+            <p className="text-[11px] sm:text-xs font-sans font-bold tracking-widest text-[#666666] uppercase mt-1">
+              EXTRAIT CONCENTRATION
+            </p>
+          </div>
+          <div className="space-y-1">
+            <span className="font-sans font-extrabold text-3xl sm:text-5xl text-[#111111]">
+              100%
+            </span>
+            <p className="text-[11px] sm:text-xs font-sans font-bold tracking-widest text-[#666666] uppercase mt-1">
+              GRASSE BOTANICALS
+            </p>
+          </div>
+          <div className="space-y-1">
+            <span className="font-sans font-extrabold text-3xl sm:text-5xl text-[#111111]">
+              0%
+            </span>
+            <p className="text-[11px] sm:text-xs font-sans font-bold tracking-widest text-[#666666] uppercase mt-1">
+              SYNTHETIC DILUENTS
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 3. SECTION 1: Fragrance to elevate your everyday (New Artisanal Crafting Image) ── */}
       <section className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 py-12 sm:py-16 md:py-20 border-b border-gray-100">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-center">
           
@@ -89,8 +161,8 @@ export default function About({ cartItems, setCartItems, isCartOpen, setIsCartOp
             className="w-full aspect-square bg-[#F5F5F5] overflow-hidden shadow-xs"
           >
             <img
-              src={colorfulBottles}
-              alt="PHLUR Colorful Perfume Bottles"
+              src={brandHeritageCraft}
+              alt="Maison Lune Artisanal Crafting Laboratory"
               className="w-full h-full object-cover"
             />
           </motion.div>
@@ -108,22 +180,22 @@ export default function About({ cartItems, setCartItems, isCartOpen, setIsCartOp
             </h2>
 
             <p className="font-sans text-xs sm:text-sm text-[#444444] leading-relaxed">
-              Our idea of a signature scent is one that matches your mood and leaves room for you. Because we know that being human is inherently complex and change is the only constant. PHLUR fragrances evolve with you — for today's desires and tomorrow's realities.
+              Our idea of a signature scent is one that matches your mood and leaves room for you. Because we know that being human is inherently complex and change is the only constant. Maison Lune fragrances evolve with you — for today's desires and tomorrow's realities.
             </p>
 
             <p className="font-sans text-xs sm:text-sm text-[#444444] leading-relaxed">
-              PHLUR is a modern fine fragrance brand that extends into your daily life. Scent to enhance, but never define, your every mood and moment.
+              Maison Lune is a modern fine fragrance brand that extends into your daily life. Scent to enhance, but never define, your every mood and moment.
             </p>
 
             <p className="font-sans text-xs sm:text-sm text-[#444444] leading-relaxed">
-              Strong. Vulnerable. Authentic. PHLUR encourages you to curate a wardrobe that celebrates the complexities of you.
+              Strong. Vulnerable. Authentic. Maison Lune encourages you to curate a wardrobe that celebrates the complexities of you.
             </p>
           </motion.div>
 
         </div>
       </section>
 
-      {/* ── 3. SECTION 2: A note from Chriselle Lim (Text Left / Image Right) ── */}
+      {/* ── 4. SECTION 2: A note from Chriselle Lim (New Portrait Image) ── */}
       <section className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 py-12 sm:py-16 md:py-20 border-b border-gray-100">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-center">
           
@@ -140,23 +212,23 @@ export default function About({ cartItems, setCartItems, isCartOpen, setIsCartOp
             </h2>
 
             <p className="font-sans text-xs sm:text-sm text-[#444444] leading-relaxed">
-              Hi, My name is Chriselle, the Creative Director at PHLUR.
+              Hi, My name is Chriselle, the Creative Director at Maison Lune.
             </p>
 
             <p className="font-sans text-xs sm:text-sm text-[#444444] leading-relaxed">
-              I joined PHLUR in 2021 during a time of transformation both for the brand and for me personally. PHLUR had launched as a pioneer in the clean fragrance space and was looking to refine its position in the market. I was exploring what it meant to enter a new chapter after a hiatus, and was looking for a new challenge professionally. When the opportunity presented itself to lead PHLUR, a brand I'd admired so much, into its next phase, something clicked. I had seen how meaningful and evocative fragrance could be in my life and wanted to share that experience with a bigger audience.
+              I joined Maison Lune during a time of transformation both for the brand and for me personally. Maison Lune had launched as a pioneer in fine fragrance and was looking to refine its position in the market. I had seen how meaningful and evocative fragrance could be in my life and wanted to share that experience with a bigger audience.
             </p>
 
             <p className="font-sans text-xs sm:text-sm text-[#444444] leading-relaxed">
-              Fashion may have provided fragrance in my career, but to me, scent has always been personal. I view fragrance as an extension of personal style. Switching a scent each day allows us to define a mood, elevate a feeling, and express who we are — or who we want to be. Fragrance helps us to communicate. It tells stories. I'm excited to continue sharing those stories with PHLUR.
+              Fashion may have provided fragrance in my career, but to me, scent has always been personal. I view fragrance as an extension of personal style. Switching a scent each day allows us to define a mood, elevate a feeling, and express who we are — or who we want to be. Fragrance helps us to communicate. It tells stories.
             </p>
 
             <p className="font-sans text-xs sm:text-sm text-[#444444] leading-relaxed">
-              It's been a phenomenal few years for the brand. We have won awards, expanded into more product categories, and created incredible new scents. In doing so, we've been honored to learn from our fantastic community base. Your personal stories and scent interpretations drive our inspiration. Thank you for joining PHLUR and me on this exciting journey. I appreciate your love and support, and I can't wait to continue to grow together.
+              Thank you for joining Maison Lune on this exciting journey. I appreciate your love and support, and I can't wait to continue to grow together.
             </p>
           </motion.div>
 
-          {/* Right Column Image */}
+          {/* Right Column Image (Fresh Creative Director Editorial Image) */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -165,8 +237,8 @@ export default function About({ cartItems, setCartItems, isCartOpen, setIsCartOp
             className="w-full aspect-[4/5] bg-[#F5F5F5] overflow-hidden shadow-xs order-1 md:order-2"
           >
             <img
-              src={chrisellePortrait}
-              alt="Chriselle Lim - Creative Director at PHLUR"
+              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop"
+              alt="Chriselle Lim - Creative Director at Maison Lune"
               className="w-full h-full object-cover"
             />
           </motion.div>
@@ -174,163 +246,117 @@ export default function About({ cartItems, setCartItems, isCartOpen, setIsCartOp
         </div>
       </section>
 
-      {/* ── 4. SECTION 3: We don't use the word "clean" anymore (Image Left / Text Right) ── */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 py-12 sm:py-16 md:py-20 border-b border-gray-100">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-center">
-          
-          {/* Left Column Image */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7 }}
-            className="w-full aspect-square bg-[#F5F5F5] overflow-hidden shadow-xs"
-          >
-            <img
-              src={skinHands}
-              alt="Skin and Scent Interaction"
-              className="w-full h-full object-cover"
-            />
-          </motion.div>
-
-          {/* Right Column Text */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7 }}
-            className="flex flex-col gap-4 text-left"
-          >
-            <h2 className="font-sans font-bold text-2xl sm:text-3xl text-[#111111] tracking-tight">
-              We don't use the word "clean" anymore
+      {/* ── 5. CORE VALUES & BRAND PILLARS (2x2 Grid on Mobile, 4-Cols on Desktop) ── */}
+      <section className="w-full bg-[#F9F9FB] border-b border-gray-200 py-10 sm:py-16 md:py-20">
+        <div className="max-w-7xl mx-auto px-3 sm:px-8 md:px-12 lg:px-16">
+          <div className="w-full text-left mb-6 sm:mb-8">
+            <h2 className="font-sans font-extrabold text-base sm:text-xl md:text-2xl text-[#111111] uppercase tracking-wider">
+              OUR GUIDING VALUES
             </h2>
+          </div>
 
-            <p className="font-sans text-xs sm:text-sm text-[#444444] leading-relaxed">
-              PHLUR helped pioneer the "clean" fragrance industry as one of the first clean fragrance brands, and we maintain that commitment to sustainability and transparency.
-            </p>
-
-            <p className="font-sans text-xs sm:text-sm text-[#444444] leading-relaxed">
-              Today though, we avoid using the word "clean" because it's a word that means different things to different people. Within the beauty industry the word "clean" isn't regulated — and in some instances, "clean" language can be negative and create unnecessary or unsubstantiated concerns among consumers.
-            </p>
-
-            <p className="font-sans text-xs sm:text-sm text-[#444444] leading-relaxed">
-              As opposed to focusing on what ingredients are not in our formulas, we prefer to focus on the ingredients we choose to use and why. We hope this gives our customers the opportunity to decide for themselves what is important to them.
-            </p>
-          </motion.div>
-
+          {/* 2x2 Grid on Mobile, 4 Columns on Desktop */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+            {coreValues.map((val, idx) => (
+              <motion.div
+                key={val.number}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                className="bg-white border border-gray-200 p-3.5 sm:p-7 shadow-xs flex flex-col justify-between space-y-2 sm:space-y-4"
+              >
+                <div>
+                  <span className="font-sans font-extrabold text-xl sm:text-2xl text-[#111111] block mb-1 sm:mb-2">
+                    {val.number}
+                  </span>
+                  <span className="text-[8.5px] sm:text-[10px] font-sans font-bold tracking-widest text-[#666666] uppercase block mb-0.5 sm:mb-1">
+                    {val.tag}
+                  </span>
+                  <h3 className="font-sans font-bold text-xs sm:text-sm text-[#111111] uppercase tracking-wider leading-snug">
+                    {val.title}
+                  </h3>
+                  <p className="text-[10.5px] sm:text-xs text-[#555555] font-normal leading-relaxed mt-1 sm:mt-2">
+                    {val.desc}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ── 5. SECTION 4: Ingredient philosophy (Text Left / Image Right) ── */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 py-12 sm:py-16 md:py-20 border-b border-gray-100">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-center">
+      {/* ── 6. INGREDIENT & SUSTAINABILITY PHILOSOPHY (2-Column Grid on Mobile) ── */}
+      <section className="w-full max-w-7xl mx-auto px-3 sm:px-8 md:px-12 lg:px-16 py-10 sm:py-16 md:py-20 border-b border-gray-100">
+        <div className="grid grid-cols-2 gap-3 sm:gap-10 lg:gap-16">
           
-          {/* Left Column Text */}
+          {/* Card 1: Ingredient Philosophy */}
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7 }}
-            className="flex flex-col gap-4 text-left order-2 md:order-1"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-col gap-2 sm:gap-4 text-left"
           >
-            <h2 className="font-sans font-bold text-2xl sm:text-3xl text-[#111111] tracking-tight">
+            <div className="w-full aspect-square bg-[#F5F5F5] overflow-hidden shadow-xs mb-1 sm:mb-2 rounded-xl sm:rounded-none">
+              <img
+                src="https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?q=80&w=1000&auto=format&fit=crop"
+                alt="Fresh Grasse Floral Extracts & Dew Drops"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <h2 className="font-sans font-bold text-sm sm:text-2xl md:text-3xl text-[#111111] tracking-tight leading-tight">
               Ingredient philosophy
             </h2>
-
-            <p className="font-sans text-xs sm:text-sm text-[#444444] leading-relaxed">
-              At PHLUR, we use both natural and synthetic ingredients.
+            <p className="font-sans text-[10.5px] sm:text-xs md:text-sm text-[#444444] leading-relaxed">
+              At Maison Lune, we use both natural and nature-identical synthetic ingredients. We love botanical ingredients for the character they add, however natural doesn't always equal safer or more sustainable.
             </p>
-
-            <p className="font-sans text-xs sm:text-sm text-[#444444] leading-relaxed">
-              We love botanical ingredients for the character they add to our fragrances, however natural doesn't always equal safer. In some cases, synthetic ingredients can be less allergenic than certain natural ingredients.
-            </p>
-
-            <p className="font-sans text-xs sm:text-sm text-[#444444] leading-relaxed">
-              Harvesting natural ingredients for fine fragrance can require tons of botanicals for a very small amount of material. Many natural ingredients are at risk of becoming overharvested and endangered. We partner with the world's leading fragrance suppliers to ensure we are utilizing sustainable natural materials and we are being respectful of the environment.
-            </p>
-
-            <p className="font-sans text-xs sm:text-sm text-[#444444] leading-relaxed">
-              With all this considered, we may choose to use nature identical synthetics because it's a more sustainable or thoughtful choice while offering broader fragrance possibilities to our perfumers to develop true fine fragrance creations.
+            <p className="font-sans text-[10.5px] sm:text-xs md:text-sm text-[#444444] leading-relaxed hidden sm:block">
+              Harvesting natural ingredients can require tons of botanicals for a very small amount of material. We partner with leading fragrance suppliers to utilize sustainable natural materials and respect the environment.
             </p>
           </motion.div>
 
-          {/* Right Column Image */}
+          {/* Card 2: Packaging Sustainability */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7 }}
-            className="w-full aspect-square bg-[#F5F5F5] overflow-hidden shadow-xs order-1 md:order-2"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="flex flex-col gap-2 sm:gap-4 text-left"
           >
-            <img
-              src={flowerDroplet}
-              alt="White Flower Bud Droplet"
-              className="w-full h-full object-cover"
-            />
-          </motion.div>
-
-        </div>
-      </section>
-
-      {/* ── 6. SECTION 5: Packaging sustainability (Image Left / Text Right) ── */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 py-12 sm:py-16 md:py-20 border-b border-gray-100">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-center">
-          
-          {/* Left Column Image */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7 }}
-            className="w-full aspect-square bg-[#F5F5F5] overflow-hidden shadow-xs"
-          >
-            <img
-              src={bottleCaps}
-              alt="PHLUR Sustainable Packaging Bottle Caps"
-              className="w-full h-full object-cover"
-            />
-          </motion.div>
-
-          {/* Right Column Text */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7 }}
-            className="flex flex-col gap-4 text-left"
-          >
-            <h2 className="font-sans font-bold text-2xl sm:text-3xl text-[#111111] tracking-tight">
+            <div className="w-full aspect-square bg-[#F5F5F5] overflow-hidden shadow-xs mb-1 sm:mb-2 rounded-xl sm:rounded-none">
+              <img
+                src={sensoryRitualBg}
+                alt="Sustainable Maison Lune Recyclable Flacons"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <h2 className="font-sans font-bold text-sm sm:text-2xl md:text-3xl text-[#111111] tracking-tight leading-tight">
               Packaging sustainability
             </h2>
-
-            <p className="font-sans text-xs sm:text-sm text-[#444444] leading-relaxed">
-              Sustainability has always been a priority at PHLUR.
+            <p className="font-sans text-[10.5px] sm:text-xs md:text-sm text-[#444444] leading-relaxed">
+              Sustainability has always been a priority at Maison Lune. We make thoughtful choices along the way that reduce our impact on the planet while still being functional and beautiful.
             </p>
-
-            <p className="font-sans text-xs sm:text-sm text-[#444444] leading-relaxed">
-              Producing and utilizing packaging materials for a product brand like ours is inevitable and necessary. We want to make thoughtful choices along the way that can reduce our impact on the planet while still being functional and beautiful.
-            </p>
-
-            <p className="font-sans text-xs sm:text-sm text-[#444444] leading-relaxed">
-              Since 2021, we have reduced our plastic and paper usage and use PCR materials whenever possible. All of our cartons are printed on FSC-certified paper, meaning they are sourced from responsibly managed forests.
+            <p className="font-sans text-[10.5px] sm:text-xs md:text-sm text-[#444444] leading-relaxed hidden sm:block">
+              All of our cartons are printed on FSC-certified paper, meaning they are sourced from responsibly managed forests. Our heavy glass bottles are designed for endless recycling.
             </p>
           </motion.div>
 
         </div>
       </section>
 
-      {/* ── 7. SECTION 6: PHLUR'S MASTER PERFUMERS (3-Column Grid) ── */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16 py-12 sm:py-16 md:py-20">
+      {/* ── 7. MASTER PERFUMERS (2-Column Grid on Mobile) ── */}
+      <section className="w-full max-w-7xl mx-auto px-3 sm:px-8 md:px-12 lg:px-16 py-10 sm:py-16 md:py-20">
         
         {/* Section Heading */}
-        <div className="w-full text-left mb-8">
-          <h2 className="font-sans font-extrabold text-lg sm:text-xl md:text-2xl text-[#111111] uppercase tracking-wider">
-            PHLUR'S MASTER PERFUMERS
+        <div className="w-full text-left mb-6 sm:mb-8">
+          <h2 className="font-sans font-extrabold text-base sm:text-xl md:text-2xl text-[#111111] uppercase tracking-wider">
+            MAISON LUNE'S MASTER PERFUMERS
           </h2>
         </div>
 
-        {/* 3 Column Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+        {/* 2-Column Grid on Mobile, 3 Columns on Desktop */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 lg:gap-8">
           {masterPerfumers.map((perfumer, idx) => (
             <motion.div
               key={perfumer.name}
@@ -338,7 +364,7 @@ export default function About({ cartItems, setCartItems, isCartOpen, setIsCartOp
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6, delay: idx * 0.15 }}
-              className="flex flex-col bg-[#F4F4F4] overflow-hidden text-left"
+              className={`flex flex-col bg-[#F4F4F4] overflow-hidden text-left rounded-xl sm:rounded-none ${idx === 2 ? 'col-span-2 md:col-span-1' : ''}`}
             >
               {/* Grayscale Portrait Image */}
               <div className="w-full aspect-[4/5] bg-gray-200 overflow-hidden">
@@ -349,18 +375,18 @@ export default function About({ cartItems, setCartItems, isCartOpen, setIsCartOp
                 />
               </div>
 
-              {/* Light Grey Info Box */}
-              <div className="p-6 flex flex-col justify-between flex-1 gap-4">
+              {/* Info Box */}
+              <div className="p-3.5 sm:p-6 flex flex-col justify-between flex-1 gap-2 sm:gap-4">
                 <div>
-                  <h3 className="font-sans font-bold text-sm text-[#111111] uppercase tracking-wider mb-2">
+                  <h3 className="font-sans font-bold text-xs sm:text-sm text-[#111111] uppercase tracking-wider mb-1 sm:mb-2">
                     {perfumer.name}
                   </h3>
-                  <p className="font-sans text-xs text-[#555555] leading-relaxed">
+                  <p className="font-sans text-[10.5px] sm:text-xs text-[#555555] leading-relaxed">
                     {perfumer.bio}
                   </p>
                 </div>
 
-                <p className="font-sans text-[11px] font-medium text-[#777777] border-t border-gray-300/60 pt-3">
+                <p className="font-sans text-[9.5px] sm:text-[11px] font-medium text-[#777777] border-t border-gray-300/60 pt-2 sm:pt-3">
                   {perfumer.creations}
                 </p>
               </div>
@@ -374,7 +400,7 @@ export default function About({ cartItems, setCartItems, isCartOpen, setIsCartOp
             onClick={() => navigate('/collection')}
             className="bg-black text-white hover:bg-[#333333] font-sans font-bold text-xs tracking-[0.25em] uppercase px-10 py-3.5 transition-colors cursor-pointer active:scale-95"
           >
-            SHOP ALL
+            SHOP ALL CREATIONS
           </button>
         </div>
 
