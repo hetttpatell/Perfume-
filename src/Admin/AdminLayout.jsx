@@ -13,12 +13,10 @@ import ContactLocationsManager from './ContactLocationsManager';
 import UsersManager from './UsersManager';
 
 export default function AdminLayout() {
-  const { isLoggedIn, user, logout, promptLoginRequired } = useAuth();
+  const { isLoggedIn, isAdmin, user, logout, promptLoginRequired } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-
-  const isAdmin = user?.role === 'admin' || user?.profile?.role === 'admin';
 
   // Protect route - Instantly redirect unauthenticated users and customer role accounts
   useEffect(() => {

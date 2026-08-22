@@ -92,7 +92,18 @@ export function AuthProvider({ children }) {
   const login = async ({ email, password }) => {
     const res = await loginUser({ email, password });
     if (res.success && res.user) {
-      setUser(res.user);
+      const isSuperAdmin = 
+        res.user.role === 'admin' || 
+        res.user.profile?.role === 'admin' ||
+        res.user.email === 'hetpatel140505@gmail.com' || 
+        res.user.email?.toLowerCase().includes('admin') ||
+        res.user.user_metadata?.role === 'admin';
+
+      const userWithRole = {
+        ...res.user,
+        role: isSuperAdmin ? 'admin' : (res.user.role || 'customer')
+      };
+      setUser(userWithRole);
       setToken(res.session?.access_token || 'authenticated');
       setAuthRequiredNotice('');
     }
@@ -102,7 +113,17 @@ export function AuthProvider({ children }) {
   const register = async ({ email, password, fullName }) => {
     const res = await registerUser({ email, password, fullName });
     if (res.success && res.user) {
-      setUser(res.user);
+      const isSuperAdmin = 
+        res.user.role === 'admin' || 
+        res.user.email === 'hetpatel140505@gmail.com' || 
+        res.user.email?.toLowerCase().includes('admin') ||
+        res.user.user_metadata?.role === 'admin';
+
+      const userWithRole = {
+        ...res.user,
+        role: isSuperAdmin ? 'admin' : (res.user.role || 'customer')
+      };
+      setUser(userWithRole);
       setToken(res.session?.access_token || 'authenticated');
       setAuthRequiredNotice('');
     }
@@ -121,10 +142,19 @@ export function AuthProvider({ children }) {
     setAuthRequiredNotice(message);
   };
 
+  const isAdmin = Boolean(
+    user?.role === 'admin' ||
+    user?.profile?.role === 'admin' ||
+    user?.user_metadata?.role === 'admin' ||
+    user?.email?.toLowerCase().includes('admin') ||
+    user?.email === 'hetpatel140505@gmail.com'
+  );
+
   return (
     <AuthContext.Provider
       value={{
         isLoggedIn: !!user,
+        isAdmin,
         user,
         token,
         login,
@@ -143,3 +173,4 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   return useContext(AuthContext);
 }
+

@@ -112,14 +112,45 @@ export default function AccountModal({ isOpen, onClose, onOpenCart, onOpenAdmin,
   const [profileErrorMsg, setProfileErrorMsg] = useState('');
   const [profileSaving, setProfileSaving] = useState(false);
 
-  // Live Customer Data from Database
-  const [liveOrders, setLiveOrders] = useState([]);
-  const [liveWishlist, setLiveWishlist] = useState([]);
+  // Live Customer Data from Database with instant local cache
+  const [liveOrders, setLiveOrders] = useState(() => {
+    try {
+      const cached = localStorage.getItem('lune_cached_orders');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [liveWishlist, setLiveWishlist] = useState(() => {
+    try {
+      const cached = localStorage.getItem('lune_cached_wishlist');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [isOrdersLoading, setIsOrdersLoading] = useState(false);
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen && isLoggedIn) {
-      fetchUserOrders().then(setLiveOrders);
-      fetchUserWishlist().then(setLiveWishlist);
+      if (liveOrders.length === 0) setIsOrdersLoading(true);
+      if (liveWishlist.length === 0) setIsWishlistLoading(true);
+
+      fetchUserOrders().then(orders => {
+        if (orders) {
+          setLiveOrders(orders);
+          try { localStorage.setItem('lune_cached_orders', JSON.stringify(orders)); } catch {}
+        }
+      }).finally(() => setIsOrdersLoading(false));
+
+      fetchUserWishlist().then(wishlist => {
+        if (wishlist) {
+          setLiveWishlist(wishlist);
+          try { localStorage.setItem('lune_cached_wishlist', JSON.stringify(wishlist)); } catch {}
+        }
+      }).finally(() => setIsWishlistLoading(false));
+
       fetchUserProfile().then(p => {
         if (p) {
           setDbProfile(p);
@@ -244,9 +275,24 @@ export default function AccountModal({ isOpen, onClose, onOpenCart, onOpenAdmin,
                 </svg>
               </button>
 
-              <span className="inline-block px-3.5 py-1 bg-white border border-black/10 rounded-full text-[9.5px] font-sans font-bold tracking-[0.25em] text-[#555555] uppercase mb-4">
-                {isLoggedIn ? 'MY ACCOUNT' : 'AUTHENTICATION REQUIRED'}
-              </span>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="inline-block px-3.5 py-1 bg-white border border-black/10 rounded-full text-[9.5px] font-sans font-bold tracking-[0.25em] text-[#555555] uppercase">
+                  {isLoggedIn ? 'MY ACCOUNT' : 'AUTHENTICATION REQUIRED'}
+                </span>
+                {isLoggedIn && isAdmin && (
+                  <button
+                    onClick={() => {
+                      onClose();
+                      navigate('/admin');
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#111111] hover:bg-[#C08A3E] text-white rounded-full text-[9px] font-sans font-extrabold tracking-[0.18em] uppercase transition-all duration-200 cursor-pointer shadow-2xs group active:scale-95"
+                    title="Open Administration Panel"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#C08A3E] group-hover:bg-white animate-pulse" />
+                    <span>ADMIN PANEL →</span>
+                  </button>
+                )}
+              </div>
 
               {/* User Profile Info */}
               <div className="flex items-center gap-3.5">
@@ -415,7 +461,20 @@ export default function AccountModal({ isOpen, onClose, onOpenCart, onOpenAdmin,
                 <>
                   {activeTab === 'orders' && (
                     <div className="space-y-4">
-                      {liveOrders.length === 0 ? (
+                      {isOrdersLoading && liveOrders.length === 0 ? (
+                        <div className="space-y-3 animate-pulse">
+                          {[1, 2].map((i) => (
+                            <div key={i} className="bg-[#F4F4F6] border border-black/5 rounded-2xl p-5 space-y-3">
+                              <div className="flex justify-between items-center">
+                                <div className="h-3.5 bg-black/10 rounded w-28" />
+                                <div className="h-4 bg-black/10 rounded w-20" />
+                              </div>
+                              <div className="h-10 bg-black/5 rounded-xl w-full" />
+                              <div className="h-12 bg-white rounded-xl border border-black/5 w-full" />
+                            </div>
+                          ))}
+                        </div>
+                      ) : liveOrders.length === 0 ? (
                         <div className="p-8 text-center bg-[#F4F4F6] border border-black/10 rounded-2xl">
                           <svg className="w-8 h-8 text-[#94A3B8] mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />

@@ -220,40 +220,40 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
 
   return (
     <div className="relative w-full h-full flex items-center justify-center pointer-events-none select-none">
-      {/* Subtle Transparent Ambient Glow (Does not obscure background watermark text) */}
-      <div className="absolute w-[300px] h-[300px] sm:w-[420px] sm:h-[420px] md:w-[500px] md:h-[500px] bg-radial from-black/5 to-transparent rounded-full blur-3xl opacity-30 pointer-events-none" />
+      {/* Subtle Transparent Ambient Glow */}
+      <div className="absolute w-[280px] h-[280px] sm:w-[380px] sm:h-[380px] md:w-[460px] md:h-[460px] lg:w-[520px] lg:h-[520px] bg-radial from-black/5 to-transparent rounded-full blur-3xl opacity-25 pointer-events-none" />
 
       {/* Active Product Flacon */}
       <div
         ref={currentBottleRef}
-        className="absolute inset-0 flex flex-col items-center justify-center max-w-[280px] sm:max-w-[340px] md:max-w-[420px] lg:max-w-[460px] w-full mx-auto will-change-transform pt-6 sm:pt-8 md:pt-0"
+        className="absolute inset-0 flex flex-col items-center justify-center max-w-[320px] sm:max-w-[380px] md:max-w-[440px] lg:max-w-[500px] xl:max-w-[540px] w-full mx-auto will-change-transform"
       >
-        <FloatingNotes slideData={currentData} />
+        {/* <FloatingNotes slideData={currentData} /> */}
         <img
           src={currentData?.image || HERO_SVG}
           alt={currentData?.title || "Lune Perfume Flacon"}
-          className="w-auto h-[44vh] sm:h-[50vh] md:h-[58vh] lg:h-[65vh] xl:h-[70vh] max-h-[720px] object-contain drop-shadow-[0_30px_45px_rgba(0,0,0,0.15)] select-none pointer-events-none"
+          className="w-auto min-h-[280px] h-[50vh] sm:h-[52vh] md:h-[60vh] lg:h-[66vh] xl:h-[72vh] max-h-[780px] object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.14)] select-none pointer-events-none"
           draggable={false}
         />
         {/* Contact Shadow */}
-        <div className="w-3/5 h-4 sm:h-5 bg-black/20 rounded-[100%] blur-md -mt-2 sm:-mt-4 pointer-events-none select-none opacity-25" />
+        <div className="w-2/5 h-3 sm:h-4 bg-black/15 rounded-[100%] blur-md -mt-1 sm:-mt-2 pointer-events-none select-none opacity-30" />
       </div>
 
       {/* Incoming Product Flacon */}
       <div
         ref={incomingBottleRef}
         style={{ display: 'none' }}
-        className="absolute inset-0 flex flex-col items-center justify-center max-w-[280px] sm:max-w-[340px] md:max-w-[420px] lg:max-w-[460px] w-full mx-auto will-change-transform pt-6 sm:pt-8 md:pt-0"
+        className="absolute inset-0 flex flex-col items-center justify-center max-w-[320px] sm:max-w-[380px] md:max-w-[440px] lg:max-w-[500px] xl:max-w-[540px] w-full mx-auto will-change-transform"
       >
-        <FloatingNotes slideData={incomingData} />
+        {/* <FloatingNotes slideData={incomingData} /> */}
         <img
           src={incomingData?.image || HERO_SVG}
           alt={incomingData?.title || "Lune Perfume Flacon"}
-          className="w-auto h-[44vh] sm:h-[50vh] md:h-[58vh] lg:h-[65vh] xl:h-[70vh] max-h-[720px] object-contain drop-shadow-[0_30px_45px_rgba(0,0,0,0.15)] select-none pointer-events-none"
+          className="w-auto min-h-[280px] h-[50vh] sm:h-[52vh] md:h-[60vh] lg:h-[66vh] xl:h-[72vh] max-h-[780px] object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.14)] select-none pointer-events-none"
           draggable={false}
         />
         {/* Contact Shadow */}
-        <div className="w-3/5 h-4 sm:h-5 bg-black/20 rounded-[100%] blur-md -mt-2 sm:-mt-4 pointer-events-none select-none opacity-25" />
+        <div className="w-2/5 h-3 sm:h-4 bg-black/15 rounded-[100%] blur-md -mt-1 sm:-mt-2 pointer-events-none select-none opacity-30" />
       </div>
     </div>
   );
@@ -322,9 +322,9 @@ export default function HeroSlider({
         slidesToSet = heroProds.map((prod, index) => ({
           id: String(index + 1).padStart(2, '0'),
           productId: prod.id,
-          shortTitle: prod.heroTitle || prod.name.split(' ')[0],
+          shortTitle: prod.name,
           stepLabel: prod.heroSubtitle || prod.subtitle || prod.category,
-          title: prod.heroTitle || prod.name,
+          title: prod.name,
           subtitle: prod.heroSubtitle || prod.frenchName || prod.subtitle,
           oneLiner: prod.heroQuote || prod.description,
           tagline: prod.badge || 'HAUTE COUTURE',
@@ -393,9 +393,9 @@ export default function HeroSlider({
       if (containerRef.current) {
         gsap.set(containerRef.current, { y: 100, opacity: 0.8 });
       }
-      gsap.set(allElements, { opacity: 0, y: 50, clearProps: 'scale,filter,letterSpacing' });
+      gsap.set(allElements, { opacity: 0, y: 60, clearProps: 'scale,filter,letterSpacing' });
       if (watermarkRef.current) {
-        gsap.set(watermarkRef.current, { opacity: 0, scale: 0.92, y: 40 });
+        gsap.set(watermarkRef.current, { opacity: 0, scale: 0.88, y: 50 });
       }
     } else if ((loaderState === 'exiting' || loaderState === 'completed') && !hasAnimatedRef.current) {
       hasAnimatedRef.current = true;
@@ -409,98 +409,85 @@ export default function HeroSlider({
       });
       entranceTimelineRef.current = tl;
 
-      // 1. Whole Hero Section container rises smoothly from below in sync with loader curtain
+      // 1. Whole Hero Section container rises smoothly from below
       if (containerRef.current) {
         tl.to(
           containerRef.current,
-          {
-            y: 0,
-            opacity: 1,
-            duration: 1.1,
-            ease: 'power3.out',
-          },
+          { y: 0, opacity: 1, duration: 1.2, ease: 'power3.out' },
           0
         );
       }
 
-      // 2. Bottom Navigation Stepper Bar
+      // 2. Bottom Navigation Dots
       if (stepperBarRef.current) {
         tl.fromTo(
           stepperBarRef.current,
-          { opacity: 0, y: 30 },
-          { opacity: 1, y: 0, duration: 1.0 },
-          0.05
+          { opacity: 0, y: 25 },
+          { opacity: 1, y: 0, duration: 1.0, ease: 'power2.out' },
+          0.08
         );
       }
 
-      // 3. Background Watermark Text
+      // 3. Background Watermark Text — scale + fade in
       if (watermarkRef.current) {
         tl.fromTo(
           watermarkRef.current,
-          { opacity: 0, scale: 0.94, y: 40 },
-          { opacity: 0.35, scale: 1, y: 0, duration: 1.3, ease: 'power2.out' },
+          { opacity: 0, scale: 0.90, y: 50 },
+          { opacity: 0.35, scale: 1, y: 0, duration: 1.4, ease: 'power2.out' },
           0.05
         );
       }
 
-      // 4. Step Label
-      if (stepLabelRef.current) {
-        tl.fromTo(
-          stepLabelRef.current,
-          { opacity: 0, y: 40 },
-          { opacity: 1, y: 0, duration: 1.0 },
-          0.10
-        );
-      }
-
-      // 5. Main Title
+      // 4. Main Title — dramatic rise with slight scale
       if (titleRef.current) {
         tl.fromTo(
           titleRef.current,
-          { opacity: 0, y: 45, scale: 0.97 },
-          { opacity: 1, y: 0, scale: 1, duration: 1.1, ease: 'power2.out' },
-          0.15
+          { opacity: 0, y: 55, scale: 0.95 },
+          { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: 'expo.out' },
+          0.12
         );
       }
 
-      // 6. Subtitle
+      // 5. Subtitle — elegant fade-up
       if (subtitleRef.current) {
         tl.fromTo(
           subtitleRef.current,
-          { opacity: 0, y: 35 },
-          { opacity: 1, y: 0, duration: 0.9 },
-          0.22
-        );
-      }
-
-      // 7. Description Copy
-      if (descriptionRef.current) {
-        tl.fromTo(
-          descriptionRef.current,
-          { opacity: 0, y: 35 },
-          { opacity: 1, y: 0, duration: 0.9 },
+          { opacity: 0, y: 30, letterSpacing: '0.15em' },
+          { opacity: 1, y: 0, letterSpacing: '0.25em', duration: 1.0, ease: 'power2.out' },
           0.28
         );
       }
 
-      // 8. Key Notes Badges
-      if (notesBadgeRef.current) {
+      // 6. Description (hidden but animate for consistency)
+      if (descriptionRef.current) {
         tl.fromTo(
-          notesBadgeRef.current,
-          { opacity: 0, y: 30, scale: 0.94 },
-          { opacity: 1, y: 0, scale: 1, duration: 0.9, ease: 'power2.out' },
-          0.34
+          descriptionRef.current,
+          { opacity: 0, y: 25 },
+          { opacity: 1, y: 0, duration: 0.9, ease: 'power2.out' },
+          0.32
         );
       }
 
-      // 9. Action CTA Buttons
+      // 7. Action CTA Buttons — staggered pop-in
       if (actionBtnRef.current) {
-        tl.fromTo(
-          actionBtnRef.current,
-          { opacity: 0, y: 30 },
-          { opacity: 1, y: 0, duration: 0.9 },
-          0.40
-        );
+        // Reset parent container visibility first (it was set to opacity:0 in the initial state)
+        tl.set(actionBtnRef.current, { opacity: 1, y: 0 }, 0.38);
+        const buttons = actionBtnRef.current.querySelectorAll('button');
+        if (buttons.length > 0) {
+          tl.fromTo(
+            buttons,
+            { opacity: 0, y: 30, scale: 0.92 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.9, stagger: 0.1, ease: 'back.out(1.4)' },
+            0.38
+          );
+        } else {
+          tl.fromTo(
+            actionBtnRef.current,
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 0.9, ease: 'power2.out' },
+            0.38
+          );
+        }
       }
     }
   }, [loaderState]);
@@ -541,68 +528,108 @@ export default function HeroSlider({
           .to(watermarkRef.current, {
             x: exitX,
             opacity: 0,
-            duration: 0.45,
+            duration: 0.4,
             ease: 'power2.in',
           })
           .set(watermarkRef.current, { x: entryX, opacity: 0 })
           .to(watermarkRef.current, {
             x: 0,
             opacity: 0.35,
-            duration: 0.6,
+            duration: 0.55,
             ease: 'power2.out',
           });
       }
 
-      // 3. Editorial Content Fade Out/In Transition
-      const textElements = [
-        stepLabelRef.current,
-        titleRef.current,
-        subtitleRef.current,
-        descriptionRef.current,
-        notesBadgeRef.current,
-        actionBtnRef.current,
-      ].filter(Boolean);
-
+      // 3. Editorial Content — Staggered exit then rich staggered entrance
       const outTl = gsap.timeline({
         onComplete: () => {
           setDisplayedSlideIndex(targetIndex);
 
-          // Text In Animation after state update
+          // Staggered entrance — each element animates individually
           requestAnimationFrame(() => {
-            const newTextElements = [
-              stepLabelRef.current,
-              titleRef.current,
-              subtitleRef.current,
-              descriptionRef.current,
-              notesBadgeRef.current,
-              actionBtnRef.current,
-            ].filter(Boolean);
+            const inTl = gsap.timeline({
+              onComplete: () => setIsTransitioning(false),
+            });
 
-            gsap.fromTo(
-              newTextElements,
-              { opacity: 0, y: 12 },
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.55,
-                stagger: 0.05,
-                ease: 'power3.out',
-                onComplete: () => {
-                  setIsTransitioning(false);
-                },
+            // Title sweeps up with scale
+            if (titleRef.current) {
+              inTl.fromTo(
+                titleRef.current,
+                { opacity: 0, y: 40, scale: 0.96 },
+                { opacity: 1, y: 0, scale: 1, duration: 0.75, ease: 'expo.out' },
+                0
+              );
+            }
+
+            // Subtitle fades up with letter-spacing bloom
+            if (subtitleRef.current) {
+              inTl.fromTo(
+                subtitleRef.current,
+                { opacity: 0, y: 22, letterSpacing: '0.12em' },
+                { opacity: 1, y: 0, letterSpacing: '0.25em', duration: 0.65, ease: 'power3.out' },
+                0.1
+              );
+            }
+
+            // Description (hidden ref)
+            if (descriptionRef.current) {
+              inTl.fromTo(
+                descriptionRef.current,
+                { opacity: 0, y: 18 },
+                { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' },
+                0.16
+              );
+            }
+
+            // Buttons pop in with bounce
+            if (actionBtnRef.current) {
+              // Reset parent container visibility (exit animation hides it)
+              inTl.set(actionBtnRef.current, { opacity: 1, y: 0 }, 0.2);
+              const buttons = actionBtnRef.current.querySelectorAll('button');
+              if (buttons.length > 0) {
+                inTl.fromTo(
+                  buttons,
+                  { opacity: 0, y: 20, scale: 0.9 },
+                  { opacity: 1, y: 0, scale: 1, duration: 0.65, stagger: 0.08, ease: 'back.out(1.6)' },
+                  0.2
+                );
+              } else {
+                inTl.fromTo(
+                  actionBtnRef.current,
+                  { opacity: 0, y: 20 },
+                  { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' },
+                  0.2
+                );
               }
-            );
+            }
           });
         },
       });
 
-      outTl.to(textElements, {
-        opacity: 0,
-        y: -10,
-        duration: 0.3,
-        stagger: 0.03,
-        ease: 'power2.in',
-      });
+      // Staggered exit — title first, then subtitle, then buttons
+      if (titleRef.current) {
+        outTl.to(titleRef.current, {
+          opacity: 0, y: -18, duration: 0.28, ease: 'power2.in',
+        }, 0);
+      }
+
+      if (subtitleRef.current) {
+        outTl.to(subtitleRef.current, {
+          opacity: 0, y: -12, duration: 0.25, ease: 'power2.in',
+        }, 0.04);
+      }
+
+      if (descriptionRef.current) {
+        outTl.to(descriptionRef.current, {
+          opacity: 0, y: -8, duration: 0.22, ease: 'power2.in',
+        }, 0.06);
+      }
+
+      if (actionBtnRef.current) {
+        outTl.to(actionBtnRef.current, {
+          opacity: 0, y: -8, duration: 0.22, ease: 'power2.in',
+        }, 0.08);
+      }
     },
     [currentSlide, isTransitioning, slidesList]
   );
@@ -704,10 +731,10 @@ export default function HeroSlider({
         </div>
 
         {/* Main Split Screen Content Area */}
-        <div className="relative z-10 w-full flex-1 max-w-7xl mx-auto px-4 sm:px-8 md:px-10 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8 md:gap-6 pt-20 sm:pt-24 md:pt-28 lg:pt-20 pb-4 sm:pb-6 md:pb-10 pointer-events-none">
+        <div className="relative z-10 w-full flex-1 max-w-7xl mx-auto px-5 sm:px-8 md:px-10 lg:px-14 flex flex-col md:flex-row items-center justify-center gap-0 md:gap-8 pt-16 sm:pt-20 md:pt-24 lg:pt-16 pb-4 sm:pb-6 md:pb-8 pointer-events-none">
 
-          {/* Right Product Showcase Panel (Scoped strictly to right side of Hero) */}
-          <div className="relative w-full md:w-[46%] lg:w-[54%] h-[40vh] min-h-[260px] sm:h-[46vh] md:h-[65vh] flex items-center justify-center pointer-events-auto order-first md:order-last shrink-0 overflow-visible">
+          {/* Right Product Showcase Panel */}
+          <div className="relative w-full md:w-[50%] lg:w-[55%] h-[46vh] min-h-[300px] sm:h-[50vh] sm:min-h-[340px] md:h-[68vh] md:min-h-[420px] flex items-center justify-center pointer-events-auto order-first md:order-last shrink-0 overflow-visible">
             <HeroProductImage
               loaderState={loaderState}
               onModelLoaded={onModelLoaded}
@@ -718,58 +745,52 @@ export default function HeroSlider({
             />
           </div>
 
-          {/* Editorial Content Panel (order-last on mobile centered under 3D model, order-first on desktop/iPad) */}
-          <div className="w-full md:w-[54%] lg:w-[46%] flex flex-col items-center md:items-start text-center md:text-left justify-center gap-3 sm:gap-5 md:gap-6 pointer-events-auto order-last md:order-first px-1 md:px-0">
+          {/* Editorial Content Panel — Name + Subtitle + CTAs */}
+          <div className="w-full md:w-[50%] lg:w-[45%] flex flex-col items-center md:items-start text-center md:text-left justify-center gap-5 sm:gap-6 md:gap-8 pointer-events-auto order-last md:order-first px-2 sm:px-4 md:px-0">
 
-            <div ref={textGroupRef} className="flex flex-col items-center md:items-start gap-1.5 sm:gap-2.5">
-              {/* Main Display Heading */}
+            <div ref={textGroupRef} className="flex flex-col items-center md:items-start gap-2.5 sm:gap-3">
+              {/* Main Display Heading — uses shortTitle for consistency */}
               <h1
                 ref={titleRef}
-                className="font-serif font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl tracking-tight leading-[1.02] text-[#111111] uppercase"
+                className="font-serif font-black text-[2.2rem] sm:text-5xl md:text-[3.5rem] lg:text-6xl xl:text-7xl tracking-tight leading-[1.05] text-[#111111] uppercase"
               >
-                {activeSlideData.title}
+                {activeSlideData.shortTitle || activeSlideData.title}
               </h1>
 
-              {/* Subtitle / Note Theme */}
+              {/* Elegant Subtitle Tagline */}
               <h2
                 ref={subtitleRef}
-                className="font-sans font-extrabold text-xs sm:text-sm md:text-base tracking-[0.3em] uppercase text-[#555555]"
+                className="font-sans font-medium text-[10px] sm:text-xs md:text-sm tracking-[0.25em] uppercase text-[#888888]"
               >
                 {activeSlideData.subtitle}
               </h2>
 
-              {/* High-Fashion Editorial 1-Liner Quote */}
-              <p
-                ref={descriptionRef}
-                className="font-serif italic font-normal text-xs sm:text-sm md:text-base text-[#444444] leading-relaxed max-w-xs sm:max-w-sm md:max-w-md pt-1"
-              >
-                “{activeSlideData.oneLiner}”
-              </p>
+              {/* Hidden ref to prevent GSAP null errors */}
+              <span ref={descriptionRef} className="hidden" />
             </div>
 
             {/* Action CTA Buttons */}
-            <div ref={actionBtnRef} className="flex flex-wrap justify-center md:justify-start items-center gap-2 sm:gap-3 pt-2">
+            <div ref={actionBtnRef} className="flex flex-row items-center gap-3 sm:gap-3.5">
               <button
                 onClick={handleNext}
-                className="px-5 sm:px-6.5 py-2.5 sm:py-3 text-[10.5px] sm:text-xs font-sans font-extrabold tracking-[0.2em] uppercase text-white bg-[#111111] hover:bg-black rounded-full transition-all duration-200 cursor-pointer active:scale-95 flex items-center justify-center gap-2 shadow-xs min-h-[40px] sm:min-h-[44px]"
+                className="px-5 sm:px-7 py-2.5 sm:py-3 text-[10px] sm:text-[11px] font-sans font-semibold tracking-[0.2em] uppercase text-white bg-[#111111] hover:bg-black rounded-full transition-all duration-200 cursor-pointer active:scale-[0.97] flex items-center justify-center gap-2 shadow-md hover:shadow-lg min-h-[40px] sm:min-h-[44px]"
               >
-                <span>{currentSlide === slidesList.length - 1 ? 'REPLAY STORY' : 'NEXT NOTE'}</span>
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span>{currentSlide === slidesList.length - 1 ? 'REPLAY' : 'NEXT NOTE'}</span>
+                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </button>
 
-              {/* Separate Page Details CTA Button (Black & White Hover) */}
               <button
                 onClick={() => {
                   const targetId = activeSlideData?.productId || activeSlideData?.id || 'p1';
                   navigate(`/product/${targetId}`);
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className="px-5 sm:px-6 py-2.5 sm:py-3 text-[10.5px] sm:text-xs font-sans font-extrabold tracking-[0.2em] uppercase text-[#111111] hover:bg-[#111111] hover:text-white bg-white border border-black/20 rounded-full transition-all duration-200 cursor-pointer active:scale-95 flex items-center justify-center gap-2 shadow-2xs group min-h-[40px] sm:min-h-[44px]"
+                className="px-5 sm:px-7 py-2.5 sm:py-3 text-[10px] sm:text-[11px] font-sans font-semibold tracking-[0.2em] uppercase text-[#111111] hover:bg-[#111111] hover:text-white bg-white border border-black/12 rounded-full transition-all duration-200 cursor-pointer active:scale-[0.97] flex items-center justify-center gap-2 shadow-sm hover:shadow-md group min-h-[40px] sm:min-h-[44px]"
               >
-                <span>EXPLORE DETAILS</span>
-                <svg className="w-3.5 h-3.5 text-[#111111] group-hover:text-white transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span>SHOP NOW</span>
+                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -777,33 +798,46 @@ export default function HeroSlider({
           </div>
         </div>
 
-        {/* Minimal High-Fashion Bottom Navigation Bar */}
+        {/* Minimal Bottom Navigation — Dot Indicators + Arrows */}
         <footer
           ref={stepperBarRef}
-          className="relative z-20 w-full px-4 sm:px-8 md:px-12 py-2 sm:py-3.5 bg-gradient-to-t from-white/95 via-white/70 to-transparent flex items-center justify-center md:justify-end border-t border-black/5"
+          className="relative z-20 w-full px-4 sm:px-8 md:px-12 py-3 sm:py-4 flex items-center justify-center md:justify-end"
         >
-          {/* Directional Controls & Counter */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+            {/* Prev Arrow */}
             <button
               onClick={handlePrev}
-              aria-label="Previous Fragrance Step"
-              className="p-2 sm:p-2.5 rounded-full border border-black/20 hover:border-black/60 hover:bg-black/5 transition-all duration-300 cursor-pointer active:scale-95 text-[#1A1A1A] min-w-[36px] min-h-[36px] sm:min-w-[42px] sm:min-h-[42px] flex items-center justify-center"
+              aria-label="Previous Fragrance"
+              className="p-2 sm:p-2.5 rounded-full border border-black/15 hover:border-black/50 hover:bg-black/5 transition-all duration-300 cursor-pointer active:scale-95 text-[#1A1A1A] min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center"
             >
-              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
 
-            <span className="font-sans text-[11px] sm:text-xs tracking-[0.2em] font-semibold text-[#1A1A1A] px-1">
-              {activeSlideData.id} / {String(slidesList.length || 1).padStart(2, '0')}
-            </span>
+            {/* Dot Indicators */}
+            <div className="flex items-center gap-2 sm:gap-2.5">
+              {slidesList.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => goToSlide(idx)}
+                  aria-label={`Go to slide ${idx + 1}`}
+                  className={`rounded-full transition-all duration-300 cursor-pointer ${
+                    idx === displayedSlideIndex
+                      ? 'w-6 sm:w-7 h-2 sm:h-2.5 bg-[#111111]'
+                      : 'w-2 sm:w-2.5 h-2 sm:h-2.5 bg-black/20 hover:bg-black/40'
+                  }`}
+                />
+              ))}
+            </div>
 
+            {/* Next Arrow */}
             <button
               onClick={handleNext}
-              aria-label="Next Fragrance Step"
-              className="p-2 sm:p-2.5 rounded-full border border-black/20 hover:border-black/60 hover:bg-black/5 transition-all duration-300 cursor-pointer active:scale-95 text-[#1A1A1A] min-w-[36px] min-h-[36px] sm:min-w-[42px] sm:min-h-[42px] flex items-center justify-center"
+              aria-label="Next Fragrance"
+              className="p-2 sm:p-2.5 rounded-full border border-black/15 hover:border-black/50 hover:bg-black/5 transition-all duration-300 cursor-pointer active:scale-95 text-[#1A1A1A] min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] flex items-center justify-center"
             >
-              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>

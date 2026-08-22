@@ -27,8 +27,7 @@ function ScrollToTop() {
 
 // Security Route Guard: Restricts /admin routes strictly to verified admin accounts
 function ProtectedAdminRoute({ children }) {
-  const { isLoggedIn, user, promptLoginRequired } = useAuth();
-  const isAdmin = user?.role === 'admin' || user?.profile?.role === 'admin';
+  const { isLoggedIn, user, isAdmin, promptLoginRequired } = useAuth();
 
   useEffect(() => {
     if (isLoggedIn && !isAdmin) {

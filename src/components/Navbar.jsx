@@ -215,54 +215,54 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
           {/* RIGHT SECTION: Minimal Luxury Bag & Desktop Account */}
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             {!isLoggedIn ? (
-              <button
-                onClick={onOpenAccount}
-                className="hidden xl:flex items-center gap-2 px-4 py-1.5 rounded-full border border-black/15 bg-white/40 hover:bg-[#111111] text-[#111111] hover:text-white hover:border-[#111111] transition-all duration-300 cursor-pointer text-[10.5px] font-sans font-extrabold tracking-[0.2em] uppercase active:scale-95 shadow-2xs group"
-              >
-                <svg
-                  className="w-3.5 h-3.5 text-[#C08A3E] group-hover:text-white transition-colors duration-300"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+                <button
+                  onClick={onOpenAccount}
+                  className="hidden xl:flex items-center gap-2 px-4 py-1.5 rounded-full border border-black/15 bg-white/40 hover:bg-[#111111] text-[#111111] hover:text-white hover:border-[#111111] transition-all duration-300 cursor-pointer text-[10.5px] font-sans font-extrabold tracking-[0.2em] uppercase active:scale-95 shadow-2xs group"
                 >
+                  <svg
+                    className="w-3.5 h-3.5 text-[#C08A3E] group-hover:text-white transition-colors duration-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.8}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                  <span>SIGN IN</span>
+                </button>
+              ) : (
+                <button
+                  onClick={onOpenAccount}
+                  className="hidden xl:flex items-center gap-2 text-[11px] xl:text-[12px] font-sans font-medium tracking-[0.14em] uppercase text-[#1A1A1A] hover:text-[#C08A3E] transition-colors duration-300 cursor-pointer"
+                >
+                  <div className="w-5 h-5 rounded-full bg-[#111111] text-white text-[9.5px] font-serif font-black flex items-center justify-center">
+                    {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || 'L'}
+                  </div>
+                  <span>ACCOUNT</span>
+                </button>
+              )}
+
+              <button
+                onClick={onOpenCart}
+                className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#111111] hover:bg-[#C08A3E] text-white transition-all duration-300 cursor-pointer shadow-sm group active:scale-95"
+                aria-label="View Shopping Bag"
+              >
+                <svg className="w-3.5 h-3.5 text-[#F3E5AB] group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={1.8}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
                   />
                 </svg>
-                <span>SIGN IN</span>
+                <span className="text-[11px] font-sans font-bold tracking-widest">{cartCount}</span>
               </button>
-            ) : (
-              <button
-                onClick={onOpenAccount}
-                className="hidden xl:flex items-center gap-2 text-[11px] xl:text-[12px] font-sans font-medium tracking-[0.14em] uppercase text-[#1A1A1A] hover:text-[#C08A3E] transition-colors duration-300 cursor-pointer"
-              >
-                <div className="w-5 h-5 rounded-full bg-[#111111] text-white text-[9.5px] font-serif font-black flex items-center justify-center">
-                  {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || 'L'}
-                </div>
-                <span>ACCOUNT</span>
-              </button>
-            )}
-
-            <button
-              onClick={onOpenCart}
-              className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#111111] hover:bg-[#C08A3E] text-white transition-all duration-300 cursor-pointer shadow-sm group active:scale-95"
-              aria-label="View Shopping Bag"
-            >
-              <svg className="w-3.5 h-3.5 text-[#F3E5AB] group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.8}
-                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                />
-              </svg>
-              <span className="text-[11px] font-sans font-bold tracking-widest">{cartCount}</span>
-            </button>
-          </div>
-        </nav>
+            </div>
+          </nav>
       </header>
 
       {/* ── 2. INDEPENDENT MOBILE & TABLET NAVIGATION DRAWER MODAL ── */}
@@ -418,7 +418,6 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </motion.button>
-
                 </div>
 
                 {/* ACCOUNT & BAG Buttons */}
