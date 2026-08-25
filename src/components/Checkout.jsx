@@ -18,13 +18,16 @@ export default function Checkout({ cartItems: propsCartItems, setCartItems, onOp
   // Form State
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [confirmEmail, setConfirmEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [street, setStreet] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const [country, setCountry] = useState('France');
+  const [orderNotes, setOrderNotes] = useState('');
   const [saveToProfile, setSaveToProfile] = useState(true);
+  const [emailMismatchError, setEmailMismatchError] = useState('');
 
   // Customization & Shipping State
   const [deliveryOption, setDeliveryOption] = useState('express');
@@ -109,16 +112,11 @@ export default function Checkout({ cartItems: propsCartItems, setCartItems, onOp
     }
   };
 
-  // Handle order submission
+  // Handle order submission — works for both logged-in users and guests
   const handleSubmitOrder = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
     setFormError('');
-
-    if (!isLoggedIn) {
-      promptLoginRequired('Please sign in or create an account to complete your secure checkout.');
-      onOpenAccount();
-      return;
-    }
+    setEmailMismatchError('');
 
     if (cartItems.length === 0) {
       setFormError('Your bag is currently empty. Please add items before placing an order.');
@@ -126,9 +124,23 @@ export default function Checkout({ cartItems: propsCartItems, setCartItems, onOp
     }
 
     // Validation check
-    if (!fullName.trim() || !phone.trim() || !street.trim() || !city.trim() || !postalCode.trim() || !country.trim()) {
+    if (!fullName.trim() || !email.trim() || !phone.trim() || !street.trim() || !city.trim() || !postalCode.trim() || !country.trim()) {
       setFormError('Please fill in all required shipping and contact details marked with *');
       return;
+    }
+
+    // Guest-specific: validate email confirmation
+    if (!isLoggedIn) {
+      if (!confirmEmail.trim()) {
+        setEmailMismatchError('Please confirm your email address');
+        setFormError('Please confirm your email address to proceed.');
+        return;
+      }
+      if (email.trim().toLowerCase() !== confirmEmail.trim().toLowerCase()) {
+        setEmailMismatchError('Email addresses do not match');
+        setFormError('Email addresses do not match. Please correct and try again.');
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -152,7 +164,16 @@ export default function Checkout({ cartItems: propsCartItems, setCartItems, onOp
           country: country.trim()
         },
         discountCode: appliedDiscount ? appliedDiscount.code : undefined,
-        saveToProfile
+        // Authenticated user fields
+        ...(isLoggedIn ? { saveToProfile } : {}),
+        // Guest checkout fields
+        ...(!isLoggedIn ? {
+          guestEmail: email.trim(),
+          guestName: fullName.trim(),
+          guestPhone: phone.trim()
+        } : {}),
+        // Optional order notes
+        ...(orderNotes.trim() ? { orderNotes: orderNotes.trim() } : {})
       };
 
       const res = await placeOrder(orderPayload);
@@ -225,12 +246,18 @@ export default function Checkout({ cartItems: propsCartItems, setCartItems, onOp
             >
               CONTINUE SHOPPING
             </button>
-            <button
-              onClick={onOpenAccount}
-              className="w-full sm:w-auto px-8 py-3.5 border border-black/20 text-[#111111] hover:bg-black hover:text-white text-xs font-sans font-extrabold tracking-[0.2em] uppercase rounded-full transition-all cursor-pointer active:scale-95 min-h-[46px] flex items-center justify-center"
-            >
-              VIEW IN MY PROFILE
-            </button>
+            {isLoggedIn ? (
+              <button
+                onClick={onOpenAccount}
+                className="w-full sm:w-auto px-8 py-3.5 border border-black/20 text-[#111111] hover:bg-black hover:text-white text-xs font-sans font-extrabold tracking-[0.2em] uppercase rounded-full transition-all cursor-pointer active:scale-95 min-h-[46px] flex items-center justify-center"
+              >
+                VIEW IN MY PROFILE
+              </button>
+            ) : (
+              <p className="text-xs text-[#555555] font-medium text-center max-w-sm leading-relaxed">
+                A confirmation email has been sent to <span className="font-bold text-[#111111]">{email}</span>. You can track your order using the reference number above.
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -397,20 +424,35 @@ export default function Checkout({ cartItems: propsCartItems, setCartItems, onOp
         {/* Left Column: Form Details */}
         <div className="lg:col-span-7 space-y-6 sm:space-y-8">
           {!isLoggedIn && (
-            <div className="bg-[#FEF3C7] border border-[#F59E0B]/30 rounded-2xl p-4 sm:p-5 text-xs text-[#92400E] font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
-              <div className="flex items-center gap-3">
-                <svg className="w-5 h-5 text-[#D97706] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>Already have a Maison Lune account? Sign in for instant autofill.</span>
+            <div className="bg-white border border-black/10 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-xs space-y-3">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-[#C08A3E]/10 flex items-center justify-center shrink-0">
+                    <svg className="w-4.5 h-4.5 text-[#C08A3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="font-serif text-sm sm:text-base font-extrabold text-[#111111] uppercase">GUEST CHECKOUT</h4>
+                    <p className="text-[11px] text-[#737373] font-medium mt-0.5 leading-relaxed">
+                      No account needed — simply fill in your details below. Already have an account?
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={onOpenAccount}
+                  className="w-full sm:w-auto px-5 py-2.5 border border-[#C08A3E]/30 text-[#C08A3E] hover:bg-[#C08A3E] hover:text-white rounded-full font-bold text-[10px] tracking-widest uppercase transition-all cursor-pointer shrink-0 text-center"
+                >
+                  SIGN IN FOR FASTER CHECKOUT
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={onOpenAccount}
-                className="w-full sm:w-auto px-4 py-2.5 bg-[#111111] hover:bg-black text-white rounded-full font-bold text-[10px] tracking-widest uppercase transition-all cursor-pointer shrink-0 text-center"
-              >
-                SIGN IN
-              </button>
+              <div className="flex items-center gap-2 px-3 py-2 bg-[#F8F8FA] rounded-xl border border-black/5">
+                <svg className="w-3.5 h-3.5 text-[#059669] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="text-[10px] font-semibold text-[#555555]">Your information is protected with 256-bit encryption. We never share your data.</span>
+              </div>
             </div>
           )}
 
@@ -466,12 +508,40 @@ export default function Checkout({ cartItems: propsCartItems, setCartItems, onOp
                     autoComplete="email"
                     enterKeyHint="next"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => { setEmail(e.target.value); setEmailMismatchError(''); }}
                     placeholder="eleonore@maison-lune.com"
                     className="w-full px-4 py-3 bg-[#F4F4F6] border border-black/10 rounded-xl text-base sm:text-xs font-sans text-[#111111] focus:outline-none focus:border-black focus:bg-white transition-colors min-h-[46px]"
                   />
                 </div>
               </div>
+
+              {/* Confirm Email — Guest Only */}
+              {!isLoggedIn && (
+                <div>
+                  <label className="block text-[10px] font-sans font-extrabold tracking-[0.18em] text-[#111111] uppercase mb-1.5">
+                    CONFIRM EMAIL ADDRESS *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    inputMode="email"
+                    autoComplete="email"
+                    enterKeyHint="next"
+                    value={confirmEmail}
+                    onChange={(e) => { setConfirmEmail(e.target.value); setEmailMismatchError(''); }}
+                    placeholder="Re-enter your email address"
+                    className={`w-full px-4 py-3 bg-[#F4F4F6] border rounded-xl text-base sm:text-xs font-sans text-[#111111] focus:outline-none focus:bg-white transition-colors min-h-[46px] ${emailMismatchError ? 'border-red-400 bg-red-50/50' : 'border-black/10 focus:border-black'}`}
+                  />
+                  {emailMismatchError && (
+                    <p className="mt-1.5 text-[10px] font-semibold text-red-500 flex items-center gap-1">
+                      <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {emailMismatchError}
+                    </p>
+                  )}
+                </div>
+              )}
 
               <div>
                 <label className="block text-[10px] font-sans font-extrabold tracking-[0.18em] text-[#111111] uppercase mb-1.5">
@@ -597,17 +667,46 @@ export default function Checkout({ cartItems: propsCartItems, setCartItems, onOp
                 </select>
               </div>
 
-              <div className="pt-2 flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  id="saveProfileCheck"
-                  checked={saveToProfile}
-                  onChange={(e) => setSaveToProfile(e.target.checked)}
-                  className="w-4 h-4 mt-0.5 rounded border-black/20 text-[#111111] focus:ring-black cursor-pointer shrink-0"
-                />
-                <label htmlFor="saveProfileCheck" className="text-xs text-[#111111] font-semibold cursor-pointer select-none leading-tight">
-                  Save shipping details to my profile for future creations
+              {/* Save to profile — only for authenticated users */}
+              {isLoggedIn && (
+                <div className="pt-2 flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="saveProfileCheck"
+                    checked={saveToProfile}
+                    onChange={(e) => setSaveToProfile(e.target.checked)}
+                    className="w-4 h-4 mt-0.5 rounded border-black/20 text-[#111111] focus:ring-black cursor-pointer shrink-0"
+                  />
+                  <label htmlFor="saveProfileCheck" className="text-xs text-[#111111] font-semibold cursor-pointer select-none leading-tight">
+                    Save shipping details to my profile for future creations
+                  </label>
+                </div>
+              )}
+            </div>
+
+            {/* Order Notes / Special Instructions */}
+            <div className="bg-white border border-black/10 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-xs space-y-4 sm:space-y-5">
+              <div className="border-b border-black/10 pb-3.5 sm:pb-4">
+                <span className="text-[9px] font-sans font-bold tracking-[0.25em] text-[#C08A3E] uppercase block">
+                  OPTIONAL
+                </span>
+                <h3 className="font-serif text-base sm:text-xl font-extrabold uppercase text-[#111111]">
+                  ORDER NOTES
+                </h3>
+              </div>
+              <div>
+                <label className="block text-[10px] font-sans font-extrabold tracking-[0.18em] text-[#111111] uppercase mb-1.5">
+                  SPECIAL INSTRUCTIONS OR DELIVERY NOTES
                 </label>
+                <textarea
+                  value={orderNotes}
+                  onChange={(e) => setOrderNotes(e.target.value)}
+                  placeholder="e.g. Please leave at the reception desk, Ring doorbell twice, Gift wrap with gold ribbon..."
+                  rows={3}
+                  maxLength={500}
+                  className="w-full px-4 py-3 bg-[#F4F4F6] border border-black/10 rounded-xl text-base sm:text-xs font-sans text-[#111111] focus:outline-none focus:border-black focus:bg-white transition-colors resize-none"
+                />
+                <p className="mt-1 text-[9px] text-[#999999] font-medium text-right">{orderNotes.length}/500</p>
               </div>
             </div>
 

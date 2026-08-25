@@ -312,7 +312,7 @@ export default function HeroSlider({
 
   useEffect(() => {
     let isMounted = true;
-    
+
     // Always force refresh from API to guarantee fresh live data from database
     fetchHeroProducts(true).then((heroProds) => {
       if (!isMounted) return;
@@ -499,7 +499,7 @@ export default function HeroSlider({
       if (len === 0 || isTransitioning || targetIndex === currentSlide) return;
       if (targetIndex < 0 || targetIndex >= len) return;
 
-      const isNext = targetIndex > currentSlide 
+      const isNext = targetIndex > currentSlide
         ? (currentSlide === 0 && targetIndex === len - 1 ? false : true)
         : (currentSlide === len - 1 && targetIndex === 0 ? true : false);
 
@@ -822,11 +822,10 @@ export default function HeroSlider({
                   key={idx}
                   onClick={() => goToSlide(idx)}
                   aria-label={`Go to slide ${idx + 1}`}
-                  className={`rounded-full transition-all duration-300 cursor-pointer ${
-                    idx === displayedSlideIndex
+                  className={`rounded-full transition-all duration-300 cursor-pointer ${idx === displayedSlideIndex
                       ? 'w-6 sm:w-7 h-2 sm:h-2.5 bg-[#111111]'
                       : 'w-2 sm:w-2.5 h-2 sm:h-2.5 bg-black/20 hover:bg-black/40'
-                  }`}
+                    }`}
                 />
               ))}
             </div>

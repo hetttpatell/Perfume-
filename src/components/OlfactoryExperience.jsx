@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchProducts, fetchCategories } from '../services/api';
 import { useCart } from '../context/CartContext';
 import CartDrawer from './CartDrawer';
-import Testimonials from './Testimonials';
+import OurStory from './OurStory';
 import BrandLocationsMap from './BrandLocationsMap';
 import Footer from './Footer';
 
@@ -110,8 +110,8 @@ export default function OlfactoryExperience({
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
               className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-[10px] sm:text-xs font-sans font-extrabold tracking-[0.2em] uppercase transition-all duration-300 cursor-pointer flex items-center gap-2 border ${isSelected
-                  ? 'bg-[#111111] text-white border-[#111111] shadow-sm'
-                  : 'bg-[#F4F4F6] text-[#555555] border-black/5 hover:border-black/20 hover:text-[#111111]'
+                ? 'bg-[#111111] text-white border-[#111111] shadow-sm'
+                : 'bg-[#F4F4F6] text-[#555555] border-black/5 hover:border-black/20 hover:text-[#111111]'
                 }`}
             >
               <span>{cat.label}</span>
@@ -238,9 +238,9 @@ export default function OlfactoryExperience({
         </div>
       </div>
 
-      {/* Haute Testimonials & Critiques Section */}
+      {/* Our Story — Pre-Launch Brand Journey */}
       <div id="gallery" className="w-full scroll-mt-24">
-        <Testimonials />
+        <OurStory />
       </div>
 
       {/* Brand Locations & Interactive Google Maps Section */}

@@ -556,15 +556,16 @@ export const updateUserProfile = async (profileData) => {
 
 /**
  * User Orders: Place a new order with shipping details
+ * Supports both authenticated checkout (with token) and guest checkout (without token)
  */
 export const placeOrder = async (orderData) => {
   try {
     const token = localStorage.getItem('lune_token');
-    if (!token) return { success: false, error: 'Authentication required' };
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
     const response = await apiClient.post(
       '/orders/create',
       orderData,
-      { headers: { Authorization: `Bearer ${token}` } }
+      { headers }
     );
     return response.data;
   } catch (error) {

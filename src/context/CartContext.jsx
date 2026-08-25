@@ -1,20 +1,39 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from './AuthContext';
 import { fetchUserCart, addToUserCart, updateUserCartQuantity, removeFromUserCart, clearUserCart } from '../services/api';
 
 const CartContext = createContext();
 
+// Load guest cart from localStorage
+const loadGuestCart = () => {
+  try {
+    const stored = localStorage.getItem('lune_guest_cart');
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+// Save guest cart to localStorage
+const saveGuestCart = (items) => {
+  try {
+    localStorage.setItem('lune_guest_cart', JSON.stringify(items));
+  } catch {
+    // ignore storage errors
+  }
+};
+
 export function CartProvider({ children }) {
   const { isLoggedIn, token } = useAuth();
 
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(() => loadGuestCart());
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [loadingCart, setLoadingCart] = useState(true);
+  const prevLoggedIn = useRef(isLoggedIn);
 
-  // Sync / Load live cart data from database
+  // Sync / Load live cart data from database (authenticated users only)
   const refreshCartFromDb = useCallback(async () => {
     if (!isLoggedIn) {
-      setCartItems([]);
       setLoadingCart(false);
       return;
     }
@@ -37,11 +56,33 @@ export function CartProvider({ children }) {
 
     async function initCart() {
       if (!isLoggedIn) {
+        // Guest: use local cart from localStorage
         if (isMounted) {
-          setCartItems([]);
+          setCartItems(loadGuestCart());
           setLoadingCart(false);
         }
         return;
+      }
+
+      // User just logged in — sync any guest cart items to DB then load DB cart
+      if (!prevLoggedIn.current && isLoggedIn) {
+        const guestCart = loadGuestCart();
+        if (guestCart.length > 0) {
+          try {
+            for (const item of guestCart) {
+              await addToUserCart({
+                productId: item.product?.id,
+                selectedSize: item.size?.size || 'Full Size Flacon',
+                quantity: item.quantity,
+                engravingText: item.engraving || null
+              });
+            }
+            // Clear guest cart after syncing
+            localStorage.removeItem('lune_guest_cart');
+          } catch (err) {
+            console.error('Error syncing guest cart to DB:', err);
+          }
+        }
       }
 
       try {
@@ -57,21 +98,20 @@ export function CartProvider({ children }) {
     }
 
     initCart();
+    prevLoggedIn.current = isLoggedIn;
     return () => { isMounted = false; };
   }, [isLoggedIn, token]);
 
-  // Save cart state to localStorage as a backup for instant display
+  // Save cart state to localStorage for guests
   useEffect(() => {
-    try {
-      localStorage.setItem('lune_guest_cart', JSON.stringify(cartItems));
-    } catch (e) {
-      // ignore storage errors
+    if (!isLoggedIn) {
+      saveGuestCart(cartItems);
     }
-  }, [cartItems]);
+  }, [cartItems, isLoggedIn]);
 
   const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  // Add Item to Live Cart
+  // Add Item to Cart (works for both guest and authenticated)
   const addItemToCart = async (product, sizeObj, quantity = 1, engraving = '') => {
     const targetSize = sizeObj || (product.sizes && product.sizes[0]) || { size: '50 ml', price: product.price };
     const price = targetSize.price || product.price;
@@ -100,25 +140,27 @@ export function CartProvider({ children }) {
       return [...prev, newItem];
     });
 
-    // Sync to Supabase Database
-    try {
-      await addToUserCart({
-        productId: product.id,
-        selectedSize: targetSize.size,
-        quantity,
-        engravingText: engraving || null
-      });
-      // Refresh to get exact DB primary keys
-      const freshDbCart = await fetchUserCart();
-      if (Array.isArray(freshDbCart)) {
-        setCartItems(freshDbCart);
+    // Sync to Supabase Database (authenticated users only)
+    if (isLoggedIn) {
+      try {
+        await addToUserCart({
+          productId: product.id,
+          selectedSize: targetSize.size,
+          quantity,
+          engravingText: engraving || null
+        });
+        // Refresh to get exact DB primary keys
+        const freshDbCart = await fetchUserCart();
+        if (Array.isArray(freshDbCart)) {
+          setCartItems(freshDbCart);
+        }
+      } catch (err) {
+        console.error('Error syncing to database cart:', err);
       }
-    } catch (err) {
-      console.error('Error syncing to database cart:', err);
     }
   };
 
-  // Update Item Quantity in Live Cart
+  // Update Item Quantity in Cart
   const updateQuantity = async (indexOrDbId, newQuantity) => {
     let targetItem = null;
 
@@ -140,13 +182,13 @@ export function CartProvider({ children }) {
       })
     );
 
-    // Sync to database
-    if (targetItem?.dbId) {
+    // Sync to database (authenticated only)
+    if (isLoggedIn && targetItem?.dbId) {
       await updateUserCartQuantity(targetItem.dbId, newQuantity);
     }
   };
 
-  // Remove Item from Live Cart
+  // Remove Item from Cart
   const removeItem = async (indexOrDbId) => {
     let targetItem = null;
 
@@ -163,7 +205,7 @@ export function CartProvider({ children }) {
       })
     );
 
-    if (targetItem?.dbId) {
+    if (isLoggedIn && targetItem?.dbId) {
       await removeFromUserCart(targetItem.dbId);
     }
   };
@@ -172,7 +214,9 @@ export function CartProvider({ children }) {
   const clearCart = async () => {
     setCartItems([]);
     localStorage.removeItem('lune_guest_cart');
-    await clearUserCart();
+    if (isLoggedIn) {
+      await clearUserCart();
+    }
   };
 
   return (
@@ -199,3 +243,4 @@ export function CartProvider({ children }) {
 export function useCart() {
   return useContext(CartContext);
 }
+

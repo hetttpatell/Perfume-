@@ -153,12 +153,6 @@ export default function ProductDetailsPage({
   }, [addedToast]);
 
   const handleAddToCart = () => {
-    if (!isLoggedIn) {
-      promptLoginRequired('Please sign in or create an account to add items to your shopping bag.');
-      if (onOpenAccount) onOpenAccount();
-      return;
-    }
-
     const defaultFlaconObj = { size: product?.frenchName || product?.subtitle || 'Full Size Flacon', price: unitPrice };
     addItemToCart(product, defaultFlaconObj, quantity, engravingText);
     setAddedToast(true);

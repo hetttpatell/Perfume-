@@ -220,6 +220,15 @@ export default function AdminPanelModal({ isOpen, onClose }) {
                               <span className="text-[11px] text-[#737373] font-semibold">
                                 • {new Date(order.created_at).toLocaleString()}
                               </span>
+                              {order.guest_email || !order.user_id ? (
+                                <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[9px] font-extrabold uppercase rounded-md tracking-wider">
+                                  GUEST ORDER
+                                </span>
+                              ) : (
+                                <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[9px] font-extrabold uppercase rounded-md tracking-wider">
+                                  MEMBER
+                                </span>
+                              )}
                             </div>
                           </div>
 
@@ -235,20 +244,31 @@ export default function AdminPanelModal({ isOpen, onClose }) {
                           </div>
                         </div>
 
-                        {/* Customer Address Details Card */}
-                        {order.shipping_address && (
-                          <div className="bg-[#F8F8FA] border border-black/5 rounded-2xl p-4 text-xs font-sans grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {/* Customer Address & Notes Details Card */}
+                        {(order.shipping_address || order.guest_email || order.order_notes) && (
+                          <div className="bg-[#F8F8FA] border border-black/5 rounded-2xl p-4 text-xs font-sans grid grid-cols-1 md:grid-cols-3 gap-3">
                             <div>
                               <span className="text-[9.5px] font-bold text-[#C08A3E] uppercase tracking-wider block">CLIENT CONTACT</span>
-                              <p className="font-extrabold text-[#111111] text-xs">{order.shipping_address.fullName || 'Valued Client'}</p>
-                              <p className="text-[#555555] font-semibold text-[11px]">{order.shipping_address.phone || 'No phone'}</p>
+                              <p className="font-extrabold text-[#111111] text-xs">{order.shipping_address?.fullName || order.guest_name || 'Valued Client'}</p>
+                              <p className="text-[#555555] font-semibold text-[11px]">{order.shipping_address?.phone || order.guest_phone || 'No phone'}</p>
+                              {order.guest_email && (
+                                <p className="text-[#0284C7] font-semibold text-[10.5px] truncate">{order.guest_email}</p>
+                              )}
                             </div>
                             <div>
                               <span className="text-[9.5px] font-bold text-[#C08A3E] uppercase tracking-wider block">SHIPPING ADDRESS</span>
                               <p className="font-medium text-[#111111] text-[11px] leading-relaxed">
-                                {order.shipping_address.street || ''}, {order.shipping_address.city || ''}, {order.shipping_address.country || ''}
+                                {order.shipping_address?.street || ''}, {order.shipping_address?.city || ''}, {order.shipping_address?.postalCode || ''}, {order.shipping_address?.country || ''}
                               </p>
                             </div>
+                            {order.order_notes && (
+                              <div>
+                                <span className="text-[9.5px] font-bold text-[#C08A3E] uppercase tracking-wider block">SPECIAL INSTRUCTIONS</span>
+                                <p className="text-[#555555] italic text-[11px] bg-white p-2 rounded-lg border border-black/5">
+                                  "{order.order_notes}"
+                                </p>
+                              </div>
+                            )}
                           </div>
                         )}
 
