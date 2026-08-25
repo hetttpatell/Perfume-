@@ -5,6 +5,16 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { placeOrder, validateDiscountCode, fetchUserProfile } from '../services/api';
 
+export const INDIAN_STATES = [
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+  'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka',
+  'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram',
+  'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
+  'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+  'Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu',
+  'Delhi', 'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry'
+];
+
 export default function Checkout({ cartItems: propsCartItems, setCartItems, onOpenAccount }) {
   const navigate = useNavigate();
   const { isLoggedIn, user, promptLoginRequired } = useAuth();
@@ -24,10 +34,13 @@ export default function Checkout({ cartItems: propsCartItems, setCartItems, onOp
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [postalCode, setPostalCode] = useState('');
-  const [country, setCountry] = useState('France');
+  const [country, setCountry] = useState('India');
   const [orderNotes, setOrderNotes] = useState('');
   const [saveToProfile, setSaveToProfile] = useState(true);
-  const [emailMismatchError, setEmailMismatchError] = useState('');
+
+  // Real-time Field Validation State
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [touched, setTouched] = useState({});
 
   // Customization & Shipping State
   const [deliveryOption, setDeliveryOption] = useState('express');
@@ -49,6 +62,69 @@ export default function Checkout({ cartItems: propsCartItems, setCartItems, onOp
   const [formError, setFormError] = useState('');
   const [completedOrder, setCompletedOrder] = useState(null);
 
+  // Robust Field Validator
+  const validateField = (name, value, allValues = {}) => {
+    const currentEmail = allValues.email !== undefined ? allValues.email : email;
+    switch (name) {
+      case 'fullName':
+        if (!value || !value.trim()) return 'Full name is required';
+        if (value.trim().length < 3) return 'Full name must be at least 3 characters';
+        if (!/^[a-zA-Z\s.'-]+$/.test(value.trim())) return 'Full name should only contain letters';
+        return '';
+      case 'email':
+        if (!value || !value.trim()) return 'Email address is required';
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) return 'Enter a valid email address (e.g. name@domain.com)';
+        return '';
+      case 'confirmEmail':
+        if (!value || !value.trim()) return 'Please confirm your email address';
+        if (value.trim().toLowerCase() !== currentEmail.trim().toLowerCase()) return 'Email addresses do not match';
+        return '';
+      case 'phone': {
+        if (!value || !value.trim()) return 'Phone number is required for delivery updates';
+        const cleanDigits = value.replace(/\D/g, '');
+        if (cleanDigits.length === 10) {
+          if (!/^[6-9]\d{9}$/.test(cleanDigits)) return 'Please enter a 10-digit mobile number starting with 6, 7, 8, or 9';
+        } else if (cleanDigits.length === 12 && cleanDigits.startsWith('91')) {
+          if (!/^91[6-9]\d{9}$/.test(cleanDigits)) return 'Please enter a valid Indian mobile number';
+        } else {
+          return 'Please enter a valid 10-digit Indian phone number (e.g. 9876543210)';
+        }
+        return '';
+      }
+      case 'street':
+        if (!value || !value.trim()) return 'Street address is required';
+        if (value.trim().length < 5) return 'Please enter complete address (flat/house no., building, street)';
+        return '';
+      case 'city':
+        if (!value || !value.trim()) return 'City is required';
+        if (value.trim().length < 2) return 'City name must be at least 2 characters';
+        if (!/^[a-zA-Z\s.'-]+$/.test(value.trim())) return 'City name should only contain letters';
+        return '';
+      case 'state':
+        if (!value || !value.trim()) return 'Please select your State / UT';
+        return '';
+      case 'postalCode': {
+        if (!value || !value.trim()) return 'Postal PIN code is required';
+        const cleanPin = value.trim();
+        if (!/^\d{6}$/.test(cleanPin)) return 'PIN code must be exactly 6 numeric digits (e.g. 110001)';
+        if (/^0/.test(cleanPin)) return 'Indian PIN code cannot start with 0';
+        return '';
+      }
+      case 'country':
+        if (!value || !value.trim()) return 'Country is required';
+        return '';
+      default:
+        return '';
+    }
+  };
+
+  const handleBlur = (fieldName) => {
+    setTouched(prev => ({ ...prev, [fieldName]: true }));
+    const valMap = { fullName, email, confirmEmail, phone, street, city, state, postalCode, country };
+    const err = validateField(fieldName, valMap[fieldName], valMap);
+    setFieldErrors(prev => ({ ...prev, [fieldName]: err }));
+  };
+
   // Load user profile on mount to prefill form
   useEffect(() => {
     let isMounted = true;
@@ -64,11 +140,12 @@ export default function Checkout({ cartItems: propsCartItems, setCartItems, onOp
           setCity(p.city || '');
           setState(p.state || '');
           setPostalCode(p.postal_code || '');
-          setCountry(p.country || 'France');
+          setCountry('India');
         } else if (user) {
           setFullName(user.user_metadata?.full_name || '');
           setEmail(user.email || '');
           setPhone(user.user_metadata?.phone || '');
+          setCountry('India');
         }
         setLoadingProfile(false);
       });
@@ -116,31 +193,42 @@ export default function Checkout({ cartItems: propsCartItems, setCartItems, onOp
   const handleSubmitOrder = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
     setFormError('');
-    setEmailMismatchError('');
 
     if (cartItems.length === 0) {
       setFormError('Your bag is currently empty. Please add items before placing an order.');
       return;
     }
 
-    // Validation check
-    if (!fullName.trim() || !email.trim() || !phone.trim() || !street.trim() || !city.trim() || !postalCode.trim() || !country.trim()) {
-      setFormError('Please fill in all required shipping and contact details marked with *');
-      return;
-    }
+    // Run strict field validations across all address and contact fields
+    const allValues = { fullName, email, confirmEmail, phone, street, city, state, postalCode, country };
+    const fieldsToValidate = [
+      'fullName',
+      'email',
+      ...(!isLoggedIn ? ['confirmEmail'] : []),
+      'phone',
+      'street',
+      'city',
+      'state',
+      'postalCode',
+      'country'
+    ];
 
-    // Guest-specific: validate email confirmation
-    if (!isLoggedIn) {
-      if (!confirmEmail.trim()) {
-        setEmailMismatchError('Please confirm your email address');
-        setFormError('Please confirm your email address to proceed.');
-        return;
-      }
-      if (email.trim().toLowerCase() !== confirmEmail.trim().toLowerCase()) {
-        setEmailMismatchError('Email addresses do not match');
-        setFormError('Email addresses do not match. Please correct and try again.');
-        return;
-      }
+    const errors = {};
+    fieldsToValidate.forEach((field) => {
+      const err = validateField(field, allValues[field], allValues);
+      if (err) errors[field] = err;
+    });
+
+    // Mark all fields as touched to display validation indicators
+    const allTouched = {};
+    fieldsToValidate.forEach((f) => { allTouched[f] = true; });
+    setTouched(allTouched);
+    setFieldErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      const firstError = Object.values(errors)[0];
+      setFormError(`Please correct the highlighted fields: ${firstError}`);
+      return;
     }
 
     setIsSubmitting(true);
@@ -491,10 +579,30 @@ export default function Checkout({ cartItems: propsCartItems, setCartItems, onOp
                     autoComplete="name"
                     enterKeyHint="next"
                     value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="e.g. Éléonore Saint-Germain"
-                    className="w-full px-4 py-3 bg-[#F4F4F6] border border-black/10 rounded-xl text-base sm:text-xs font-sans text-[#111111] focus:outline-none focus:border-black focus:bg-white transition-colors min-h-[46px]"
+                    onBlur={() => handleBlur('fullName')}
+                    onChange={(e) => {
+                      setFullName(e.target.value);
+                      if (touched.fullName) {
+                        setFieldErrors(prev => ({ ...prev, fullName: validateField('fullName', e.target.value) }));
+                      }
+                    }}
+                    placeholder="e.g. Rohan Sharma"
+                    className={`w-full px-4 py-3 bg-[#F4F4F6] border rounded-xl text-base sm:text-xs font-sans text-[#111111] focus:outline-none focus:bg-white transition-colors min-h-[46px] ${
+                      touched.fullName && fieldErrors.fullName
+                        ? 'border-red-400 bg-red-50/30 focus:border-red-500'
+                        : touched.fullName && !fieldErrors.fullName && fullName
+                        ? 'border-emerald-500/50 bg-emerald-50/10 focus:border-black'
+                        : 'border-black/10 focus:border-black'
+                    }`}
                   />
+                  {touched.fullName && fieldErrors.fullName && (
+                    <p className="mt-1.5 text-[11px] font-semibold text-red-500 flex items-center gap-1.5 font-sans">
+                      <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>{fieldErrors.fullName}</span>
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -508,10 +616,30 @@ export default function Checkout({ cartItems: propsCartItems, setCartItems, onOp
                     autoComplete="email"
                     enterKeyHint="next"
                     value={email}
-                    onChange={(e) => { setEmail(e.target.value); setEmailMismatchError(''); }}
-                    placeholder="eleonore@maison-lune.com"
-                    className="w-full px-4 py-3 bg-[#F4F4F6] border border-black/10 rounded-xl text-base sm:text-xs font-sans text-[#111111] focus:outline-none focus:border-black focus:bg-white transition-colors min-h-[46px]"
+                    onBlur={() => handleBlur('email')}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (touched.email) {
+                        setFieldErrors(prev => ({ ...prev, email: validateField('email', e.target.value) }));
+                      }
+                    }}
+                    placeholder="rohan@example.com"
+                    className={`w-full px-4 py-3 bg-[#F4F4F6] border rounded-xl text-base sm:text-xs font-sans text-[#111111] focus:outline-none focus:bg-white transition-colors min-h-[46px] ${
+                      touched.email && fieldErrors.email
+                        ? 'border-red-400 bg-red-50/30 focus:border-red-500'
+                        : touched.email && !fieldErrors.email && email
+                        ? 'border-emerald-500/50 bg-emerald-50/10 focus:border-black'
+                        : 'border-black/10 focus:border-black'
+                    }`}
                   />
+                  {touched.email && fieldErrors.email && (
+                    <p className="mt-1.5 text-[11px] font-semibold text-red-500 flex items-center gap-1.5 font-sans">
+                      <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>{fieldErrors.email}</span>
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -528,16 +656,28 @@ export default function Checkout({ cartItems: propsCartItems, setCartItems, onOp
                     autoComplete="email"
                     enterKeyHint="next"
                     value={confirmEmail}
-                    onChange={(e) => { setConfirmEmail(e.target.value); setEmailMismatchError(''); }}
+                    onBlur={() => handleBlur('confirmEmail')}
+                    onChange={(e) => {
+                      setConfirmEmail(e.target.value);
+                      if (touched.confirmEmail) {
+                        setFieldErrors(prev => ({ ...prev, confirmEmail: validateField('confirmEmail', e.target.value, { email }) }));
+                      }
+                    }}
                     placeholder="Re-enter your email address"
-                    className={`w-full px-4 py-3 bg-[#F4F4F6] border rounded-xl text-base sm:text-xs font-sans text-[#111111] focus:outline-none focus:bg-white transition-colors min-h-[46px] ${emailMismatchError ? 'border-red-400 bg-red-50/50' : 'border-black/10 focus:border-black'}`}
+                    className={`w-full px-4 py-3 bg-[#F4F4F6] border rounded-xl text-base sm:text-xs font-sans text-[#111111] focus:outline-none focus:bg-white transition-colors min-h-[46px] ${
+                      touched.confirmEmail && fieldErrors.confirmEmail
+                        ? 'border-red-400 bg-red-50/30 focus:border-red-500'
+                        : touched.confirmEmail && !fieldErrors.confirmEmail && confirmEmail
+                        ? 'border-emerald-500/50 bg-emerald-50/10 focus:border-black'
+                        : 'border-black/10 focus:border-black'
+                    }`}
                   />
-                  {emailMismatchError && (
-                    <p className="mt-1.5 text-[10px] font-semibold text-red-500 flex items-center gap-1">
+                  {touched.confirmEmail && fieldErrors.confirmEmail && (
+                    <p className="mt-1.5 text-[11px] font-semibold text-red-500 flex items-center gap-1.5 font-sans">
                       <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      {emailMismatchError}
+                      <span>{fieldErrors.confirmEmail}</span>
                     </p>
                   )}
                 </div>
@@ -545,7 +685,7 @@ export default function Checkout({ cartItems: propsCartItems, setCartItems, onOp
 
               <div>
                 <label className="block text-[10px] font-sans font-extrabold tracking-[0.18em] text-[#111111] uppercase mb-1.5">
-                  PHONE NUMBER * (FOR DELIVERY UPDATES)
+                  PHONE NUMBER * (FOR COURIER UPDATES)
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-3.5 text-[#737373]">
@@ -560,23 +700,49 @@ export default function Checkout({ cartItems: propsCartItems, setCartItems, onOp
                     autoComplete="tel"
                     enterKeyHint="next"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+33 1 42 86 28 00 or +1 212 535 5500"
-                    className="w-full pl-11 pr-4 py-3 bg-[#F4F4F6] border border-black/10 rounded-xl text-base sm:text-xs font-sans text-[#111111] focus:outline-none focus:border-black focus:bg-white transition-colors min-h-[46px]"
+                    onBlur={() => handleBlur('phone')}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^\d+ ]/g, '').slice(0, 15);
+                      setPhone(val);
+                      if (touched.phone) {
+                        setFieldErrors(prev => ({ ...prev, phone: validateField('phone', val) }));
+                      }
+                    }}
+                    placeholder="+91 98765 43210 or 9876543210"
+                    className={`w-full pl-11 pr-4 py-3 bg-[#F4F4F6] border rounded-xl text-base sm:text-xs font-sans text-[#111111] focus:outline-none focus:bg-white transition-colors min-h-[46px] ${
+                      touched.phone && fieldErrors.phone
+                        ? 'border-red-400 bg-red-50/30 focus:border-red-500'
+                        : touched.phone && !fieldErrors.phone && phone
+                        ? 'border-emerald-500/50 bg-emerald-50/10 focus:border-black'
+                        : 'border-black/10 focus:border-black'
+                    }`}
                   />
                 </div>
+                {touched.phone && fieldErrors.phone && (
+                  <p className="mt-1.5 text-[11px] font-semibold text-red-500 flex items-center gap-1.5 font-sans">
+                    <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{fieldErrors.phone}</span>
+                  </p>
+                )}
               </div>
             </div>
 
             {/* 2. Shipping Address */}
             <div className="bg-white border border-black/10 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-xs space-y-4 sm:space-y-5">
-              <div className="border-b border-black/10 pb-3.5 sm:pb-4">
-                <span className="text-[9px] font-sans font-bold tracking-[0.25em] text-[#C08A3E] uppercase block">
-                  STEP 2
+              <div className="border-b border-black/10 pb-3.5 sm:pb-4 flex items-center justify-between">
+                <div>
+                  <span className="text-[9px] font-sans font-bold tracking-[0.25em] text-[#C08A3E] uppercase block">
+                    STEP 2
+                  </span>
+                  <h3 className="font-serif text-base sm:text-xl font-extrabold uppercase text-[#111111]">
+                    SHIPPING ADDRESS
+                  </h3>
+                </div>
+                <span className="text-[9.5px] font-extrabold tracking-widest uppercase px-2.5 py-1 bg-amber-500/10 text-amber-800 border border-amber-500/20 rounded-full">
+                  🇮🇳 INDIA ONLY
                 </span>
-                <h3 className="font-serif text-base sm:text-xl font-extrabold uppercase text-[#111111]">
-                  SHIPPING ADDRESS
-                </h3>
               </div>
 
               <div>
@@ -589,10 +755,30 @@ export default function Checkout({ cartItems: propsCartItems, setCartItems, onOp
                   autoComplete="address-line1"
                   enterKeyHint="next"
                   value={street}
-                  onChange={(e) => setStreet(e.target.value)}
-                  placeholder="31 Rue Cambon, Apt 4B"
-                  className="w-full px-4 py-3 bg-[#F4F4F6] border border-black/10 rounded-xl text-base sm:text-xs font-sans text-[#111111] focus:outline-none focus:border-black focus:bg-white transition-colors min-h-[46px]"
+                  onBlur={() => handleBlur('street')}
+                  onChange={(e) => {
+                    setStreet(e.target.value);
+                    if (touched.street) {
+                      setFieldErrors(prev => ({ ...prev, street: validateField('street', e.target.value) }));
+                    }
+                  }}
+                  placeholder="Flat/House No., Building Name, Street & Landmark"
+                  className={`w-full px-4 py-3 bg-[#F4F4F6] border rounded-xl text-base sm:text-xs font-sans text-[#111111] focus:outline-none focus:bg-white transition-colors min-h-[46px] ${
+                    touched.street && fieldErrors.street
+                      ? 'border-red-400 bg-red-50/30 focus:border-red-500'
+                      : touched.street && !fieldErrors.street && street
+                      ? 'border-emerald-500/50 bg-emerald-50/10 focus:border-black'
+                      : 'border-black/10 focus:border-black'
+                  }`}
                 />
+                {touched.street && fieldErrors.street && (
+                  <p className="mt-1.5 text-[11px] font-semibold text-red-500 flex items-center gap-1.5 font-sans">
+                    <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{fieldErrors.street}</span>
+                  </p>
+                )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -606,30 +792,74 @@ export default function Checkout({ cartItems: propsCartItems, setCartItems, onOp
                     autoComplete="address-level2"
                     enterKeyHint="next"
                     value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    placeholder="Paris"
-                    className="w-full px-4 py-3 bg-[#F4F4F6] border border-black/10 rounded-xl text-base sm:text-xs font-sans text-[#111111] focus:outline-none focus:border-black focus:bg-white transition-colors min-h-[46px]"
+                    onBlur={() => handleBlur('city')}
+                    onChange={(e) => {
+                      setCity(e.target.value);
+                      if (touched.city) {
+                        setFieldErrors(prev => ({ ...prev, city: validateField('city', e.target.value) }));
+                      }
+                    }}
+                    placeholder="e.g. Mumbai / Delhi"
+                    className={`w-full px-4 py-3 bg-[#F4F4F6] border rounded-xl text-base sm:text-xs font-sans text-[#111111] focus:outline-none focus:bg-white transition-colors min-h-[46px] ${
+                      touched.city && fieldErrors.city
+                        ? 'border-red-400 bg-red-50/30 focus:border-red-500'
+                        : touched.city && !fieldErrors.city && city
+                        ? 'border-emerald-500/50 bg-emerald-50/10 focus:border-black'
+                        : 'border-black/10 focus:border-black'
+                    }`}
                   />
+                  {touched.city && fieldErrors.city && (
+                    <p className="mt-1.5 text-[11px] font-semibold text-red-500 flex items-center gap-1.5 font-sans">
+                      <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>{fieldErrors.city}</span>
+                    </p>
+                  )}
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-sans font-extrabold tracking-[0.18em] text-[#111111] uppercase mb-1.5">
-                    STATE / PROVINCE
+                    STATE / UT *
                   </label>
-                  <input
-                    type="text"
-                    autoComplete="address-level1"
-                    enterKeyHint="next"
+                  <select
+                    required
                     value={state}
-                    onChange={(e) => setState(e.target.value)}
-                    placeholder="Île-de-France / NY"
-                    className="w-full px-4 py-3 bg-[#F4F4F6] border border-black/10 rounded-xl text-base sm:text-xs font-sans text-[#111111] focus:outline-none focus:border-black focus:bg-white transition-colors min-h-[46px]"
-                  />
+                    onBlur={() => handleBlur('state')}
+                    onChange={(e) => {
+                      setState(e.target.value);
+                      if (touched.state) {
+                        setFieldErrors(prev => ({ ...prev, state: validateField('state', e.target.value) }));
+                      }
+                    }}
+                    className={`w-full px-4 py-3 bg-[#F4F4F6] border rounded-xl text-base sm:text-xs font-sans text-[#111111] focus:outline-none focus:bg-white transition-colors min-h-[46px] cursor-pointer ${
+                      touched.state && fieldErrors.state
+                        ? 'border-red-400 bg-red-50/30 focus:border-red-500'
+                        : touched.state && !fieldErrors.state && state
+                        ? 'border-emerald-500/50 bg-emerald-50/10 focus:border-black'
+                        : 'border-black/10 focus:border-black'
+                    }`}
+                  >
+                    <option value="">Select State / UT</option>
+                    {INDIAN_STATES.map((st) => (
+                      <option key={st} value={st}>
+                        {st}
+                      </option>
+                    ))}
+                  </select>
+                  {touched.state && fieldErrors.state && (
+                    <p className="mt-1.5 text-[11px] font-semibold text-red-500 flex items-center gap-1.5 font-sans">
+                      <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>{fieldErrors.state}</span>
+                    </p>
+                  )}
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-sans font-extrabold tracking-[0.18em] text-[#111111] uppercase mb-1.5">
-                    POSTAL CODE *
+                    POSTAL PIN CODE * (6 DIGITS)
                   </label>
                   <input
                     type="text"
@@ -637,34 +867,51 @@ export default function Checkout({ cartItems: propsCartItems, setCartItems, onOp
                     inputMode="numeric"
                     autoComplete="postal-code"
                     enterKeyHint="done"
+                    maxLength={6}
                     value={postalCode}
-                    onChange={(e) => setPostalCode(e.target.value)}
-                    placeholder="75001"
-                    className="w-full px-4 py-3 bg-[#F4F4F6] border border-black/10 rounded-xl text-base sm:text-xs font-sans text-[#111111] focus:outline-none focus:border-black focus:bg-white transition-colors min-h-[46px]"
+                    onBlur={() => handleBlur('postalCode')}
+                    onChange={(e) => {
+                      const cleanDigits = e.target.value.replace(/\D/g, '').slice(0, 6);
+                      setPostalCode(cleanDigits);
+                      if (touched.postalCode) {
+                        setFieldErrors(prev => ({ ...prev, postalCode: validateField('postalCode', cleanDigits) }));
+                      }
+                    }}
+                    placeholder="e.g. 110001"
+                    className={`w-full px-4 py-3 bg-[#F4F4F6] border rounded-xl text-base sm:text-xs font-mono font-bold text-[#111111] tracking-wider focus:outline-none focus:bg-white transition-colors min-h-[46px] ${
+                      touched.postalCode && fieldErrors.postalCode
+                        ? 'border-red-400 bg-red-50/30 focus:border-red-500'
+                        : touched.postalCode && !fieldErrors.postalCode && postalCode
+                        ? 'border-emerald-500/50 bg-emerald-50/10 focus:border-black'
+                        : 'border-black/10 focus:border-black'
+                    }`}
                   />
+                  {touched.postalCode && fieldErrors.postalCode && (
+                    <p className="mt-1.5 text-[11px] font-semibold text-red-500 flex items-center gap-1.5 font-sans">
+                      <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>{fieldErrors.postalCode}</span>
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div>
                 <label className="block text-[10px] font-sans font-extrabold tracking-[0.18em] text-[#111111] uppercase mb-1.5">
-                  COUNTRY *
+                  DELIVERY COUNTRY *
                 </label>
-                <select
-                  value={country}
-                  onChange={(e) => setCountry(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#F4F4F6] border border-black/10 rounded-xl text-base sm:text-xs font-sans text-[#111111] focus:outline-none focus:border-black focus:bg-white transition-colors min-h-[46px]"
-                >
-                  <option value="France">France</option>
-                  <option value="United States">United States</option>
-                  <option value="United Kingdom">United Kingdom</option>
-                  <option value="Germany">Germany</option>
-                  <option value="Italy">Italy</option>
-                  <option value="Japan">Japan</option>
-                  <option value="United Arab Emirates">United Arab Emirates</option>
-                  <option value="Canada">Canada</option>
-                  <option value="Australia">Australia</option>
-                  <option value="India">India</option>
-                </select>
+                <div className="relative">
+                  <div className="w-full px-4 py-3 bg-[#F4F4F6] border border-black/10 rounded-xl text-base sm:text-xs font-sans font-bold text-[#111111] flex items-center justify-between min-h-[46px] select-none">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">🇮🇳</span>
+                      <span>India</span>
+                    </div>
+                    <span className="text-[9.5px] font-extrabold tracking-widest uppercase px-2 py-0.5 bg-[#C08A3E]/10 text-[#C08A3E] border border-[#C08A3E]/20 rounded-md">
+                      EXCLUSIVE DOMESTIC REGION
+                    </span>
+                  </div>
+                </div>
               </div>
 
               {/* Save to profile — only for authenticated users */}

@@ -107,7 +107,7 @@ export default function AccountModal({ isOpen, onClose, onOpenCart, onOpenAdmin,
   const [editCity, setEditCity] = useState('');
   const [editState, setEditState] = useState('');
   const [editPostalCode, setEditPostalCode] = useState('');
-  const [editCountry, setEditCountry] = useState('France');
+  const [editCountry, setEditCountry] = useState('India');
   const [profileSuccessMsg, setProfileSuccessMsg] = useState('');
   const [profileErrorMsg, setProfileErrorMsg] = useState('');
   const [profileSaving, setProfileSaving] = useState(false);
@@ -160,7 +160,7 @@ export default function AccountModal({ isOpen, onClose, onOpenCart, onOpenAdmin,
           setEditCity(p.city || user?.user_metadata?.city || '');
           setEditState(p.state || user?.user_metadata?.state || '');
           setEditPostalCode(p.postal_code || user?.user_metadata?.postal_code || '');
-          setEditCountry(p.country || user?.user_metadata?.country || 'France');
+          setEditCountry('India');
         }
       });
     }
@@ -798,14 +798,17 @@ export default function AccountModal({ isOpen, onClose, onOpenCart, onOpenAdmin,
                             <div className="grid grid-cols-2 gap-2">
                               <div>
                                 <label className="block text-[9.5px] font-sans font-bold tracking-wider text-[#111111] uppercase mb-1">
-                                  POSTAL CODE
+                                  PIN CODE (6 DIGITS)
                                 </label>
                                 <input
                                   type="text"
                                   required
+                                  maxLength={6}
+                                  inputMode="numeric"
                                   value={editPostalCode}
-                                  onChange={(e) => setEditPostalCode(e.target.value)}
-                                  className="w-full px-3 py-2 bg-white border border-black/10 rounded-lg text-xs font-sans text-[#111111] focus:outline-none focus:border-black"
+                                  onChange={(e) => setEditPostalCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                  placeholder="e.g. 110001"
+                                  className="w-full px-3 py-2 bg-white border border-black/10 rounded-lg text-xs font-mono font-bold text-[#111111] focus:outline-none focus:border-black"
                                 />
                               </div>
 
@@ -813,22 +816,10 @@ export default function AccountModal({ isOpen, onClose, onOpenCart, onOpenAdmin,
                                 <label className="block text-[9.5px] font-sans font-bold tracking-wider text-[#111111] uppercase mb-1">
                                   COUNTRY
                                 </label>
-                                <select
-                                  value={editCountry}
-                                  onChange={(e) => setEditCountry(e.target.value)}
-                                  className="w-full px-3 py-2 bg-white border border-black/10 rounded-lg text-xs font-sans text-[#111111] focus:outline-none focus:border-black"
-                                >
-                                  <option value="France">France</option>
-                                  <option value="United States">United States</option>
-                                  <option value="United Kingdom">United Kingdom</option>
-                                  <option value="Germany">Germany</option>
-                                  <option value="Italy">Italy</option>
-                                  <option value="Japan">Japan</option>
-                                  <option value="United Arab Emirates">United Arab Emirates</option>
-                                  <option value="Canada">Canada</option>
-                                  <option value="Australia">Australia</option>
-                                  <option value="India">India</option>
-                                </select>
+                                <div className="w-full px-3 py-2 bg-[#F4F4F6] border border-black/10 rounded-lg text-xs font-sans font-bold text-[#111111] flex items-center justify-between">
+                                  <span>🇮🇳 India</span>
+                                  <span className="text-[9px] text-[#C08A3E] font-extrabold uppercase">Domestic Only</span>
+                                </div>
                               </div>
                             </div>
 

@@ -56,8 +56,8 @@ export default function AdminPanelModal({ isOpen, onClose }) {
           prev.map(o => (o.id === orderId ? { ...o, status: newStatus } : o))
         );
         const stageObj = ORDER_STAGES.find(s => s.value === newStatus) || { label: newStatus };
-        setStatusMessage(`Order #${orderId.slice(0, 8).toUpperCase()} updated to "${stageObj.label}". Saved to database.`);
-        setTimeout(() => setStatusMessage(''), 4000);
+        setStatusMessage(`Order #${orderId.slice(0, 8).toUpperCase()} updated to "${stageObj.label}". Customer notified via Resend email.`);
+        setTimeout(() => setStatusMessage(''), 4500);
       } else {
         showAlertModal(res.error || 'Failed to update order status');
       }
