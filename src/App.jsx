@@ -16,12 +16,12 @@ import { useCart } from './context/CartContext';
 import { useAuth } from './context/AuthContext';
 import './App.css';
 
-// Automatically scroll to top of page on route changes
+// Automatically scroll instantly to top of page on route changes
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [pathname, search]);
   return null;
 }
 
@@ -103,7 +103,7 @@ function MainApp() {
   };
 
   return (
-    <main className="relative min-h-screen w-full bg-white flex flex-col justify-between overflow-x-hidden">
+    <main className="relative min-h-screen w-full bg-white flex flex-col justify-between overflow-x-clip">
       {/* Global Floating Luxury Navbar - Hidden on Admin routes */}
       {!isAdminRoute && (
         <Navbar

@@ -107,11 +107,9 @@ export default function NavbarLoader({
   // -------------------------------------------------------------
   useEffect(() => {
     if (isCompleted) {
-      document.body.style.overflow = '';
       return;
     }
 
-    document.body.style.overflow = 'hidden';
 
     const ctx = gsap.context(() => {
       const letterEls = loaderBrandGroupRef.current
@@ -278,7 +276,6 @@ export default function NavbarLoader({
             duration: 0.6,
             ease: 'power2.out',
             onComplete: () => {
-              document.body.style.overflow = '';
               setIsCompleted(true);
               try {
                 sessionStorage.setItem('perfume_has_visited', 'true');
@@ -295,7 +292,6 @@ export default function NavbarLoader({
 
     // Failsafe safety timeout (3.5s) to guarantee screen unlock
     const safetyTimeout = setTimeout(() => {
-      document.body.style.overflow = '';
       setIsCompleted(true);
       if (onStartExitRef.current) onStartExitRef.current();
       if (onCompleteRef.current) onCompleteRef.current();
@@ -304,7 +300,6 @@ export default function NavbarLoader({
     return () => {
       ctx.revert();
       clearTimeout(safetyTimeout);
-      document.body.style.overflow = '';
     };
   }, [isCompleted]);
 

@@ -8,8 +8,8 @@ import OlfactoryExperience from './OlfactoryExperience';
 import Navbar from './Navbar';
 import Loader from './Loader';
 import AccountModal from './AccountModal';
-import { SLIDES } from '../utils/slidesData';
-import { fetchHeroProducts } from '../services/api';
+import { SLIDES, mapProductsToSlides } from '../utils/slidesData';
+import { fetchHeroProducts, getCachedHeroProducts } from '../services/api';
 import { useCart } from '../context/CartContext';
 const HERO_SVG = '/SVGs/Perfume-SVG.png';
 
@@ -285,7 +285,13 @@ export default function HeroSlider({
   onReplayLoader,
 }) {
   const navigate = useNavigate();
-  const [slidesList, setSlidesList] = useState(SLIDES);
+  const [slidesList, setSlidesList] = useState(() => {
+    const cached = getCachedHeroProducts();
+    if (cached && cached.length > 0) {
+      return mapProductsToSlides(cached);
+    }
+    return SLIDES;
+  });
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slideDirection, setSlideDirection] = useState('next');
   const [displayedSlideIndex, setDisplayedSlideIndex] = useState(0);
@@ -313,46 +319,24 @@ export default function HeroSlider({
   useEffect(() => {
     let isMounted = true;
 
-    // Always force refresh from API to guarantee fresh live data from database
-    fetchHeroProducts(true).then((heroProds) => {
+    // Immediately fetch hero products via fast-path direct Supabase or local cache
+    fetchHeroProducts(false).then((heroProds) => {
       if (!isMounted) return;
 
-      let slidesToSet = SLIDES;
       if (heroProds && heroProds.length > 0) {
-        slidesToSet = heroProds.map((prod, index) => ({
-          id: String(index + 1).padStart(2, '0'),
-          productId: prod.id,
-          shortTitle: prod.name,
-          stepLabel: prod.heroSubtitle || prod.subtitle || prod.category,
-          title: prod.name,
-          subtitle: prod.heroSubtitle || prod.frenchName || prod.subtitle,
-          oneLiner: prod.heroQuote || prod.description,
-          tagline: prod.badge || 'HAUTE COUTURE',
-          description: prod.description,
-          bg: '#FFFFFF',
-          text: '#111111',
-          secondaryText: '#555555',
-          accent: '#C08A3E',
-          noteCategory: prod.category,
-          keyNotes: [
-            prod.heroNote1 || prod.notes?.top?.split(',')[0] || 'Galbanum',
-            prod.heroNote2 || prod.notes?.heart?.split(',')[0] || 'Iris Pallida',
-            prod.heroNote3 || prod.notes?.base?.split(',')[0] || 'Vetiver'
-          ],
-          image: prod.heroImageUrl || prod.image,
-          pose: { rotation: [0, 0, 0] }
-        }));
-      }
+        const slidesToSet = mapProductsToSlides(heroProds);
+        setSlidesList(slidesToSet);
 
-      setSlidesList(slidesToSet);
-
-      // Preload primary hero bottle image before telling loader we're ready
-      const mainHeroImg = slidesToSet[0]?.image;
-      if (mainHeroImg) {
-        const img = new Image();
-        img.src = mainHeroImg;
-        img.onload = () => { if (isMounted && onModelLoaded) onModelLoaded(); };
-        img.onerror = () => { if (isMounted && onModelLoaded) onModelLoaded(); };
+        // Preload primary hero bottle image
+        const mainHeroImg = slidesToSet[0]?.image;
+        if (mainHeroImg && typeof mainHeroImg === 'string' && !mainHeroImg.startsWith('data:')) {
+          const img = new Image();
+          img.src = mainHeroImg;
+          img.onload = () => { if (isMounted && onModelLoaded) onModelLoaded(); };
+          img.onerror = () => { if (isMounted && onModelLoaded) onModelLoaded(); };
+        } else {
+          if (onModelLoaded) onModelLoaded();
+        }
       } else {
         if (onModelLoaded) onModelLoaded();
       }
@@ -715,7 +699,7 @@ export default function HeroSlider({
         ref={containerRef}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className="relative w-full min-h-[100dvh] md:min-h-screen flex flex-col justify-between overflow-hidden select-none transition-colors duration-300 touch-pan-y"
+        className="relative w-full min-h-[100dvh] md:min-h-screen flex flex-col justify-between overflow-hidden select-none transition-colors duration-300"
         style={{ backgroundColor: activeSlideData.bg || '#FFFFFF', color: activeSlideData.text || '#111111' }}
         aria-label="Lune Interactive Fragrance Showcase"
       >
@@ -780,12 +764,10 @@ export default function HeroSlider({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </button>
-
               <button
                 onClick={() => {
                   const targetId = activeSlideData?.productId || activeSlideData?.id || 'p1';
                   navigate(`/product/${targetId}`);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 className="px-5 sm:px-7 py-2.5 sm:py-3 text-[10px] sm:text-[11px] font-sans font-semibold tracking-[0.2em] uppercase text-[#111111] hover:bg-[#111111] hover:text-white bg-white border border-black/12 rounded-full transition-all duration-200 cursor-pointer active:scale-[0.97] flex items-center justify-center gap-2 shadow-sm hover:shadow-md group min-h-[40px] sm:min-h-[44px]"
               >

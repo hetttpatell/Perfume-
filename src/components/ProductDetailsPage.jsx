@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { fetchProductById, apiClient, toggleWishlistItem, fetchUserWishlist } from '../services/api';
+import { fetchProductById, apiClient, toggleWishlistItem, fetchUserWishlist, getCachedProducts } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import Footer from './Footer';
@@ -24,13 +24,23 @@ export default function ProductDetailsPage({
   const setIsCartOpen = propsSetIsCartOpen || contextSetIsCartOpen;
 
 
-  const [dbProduct, setDbProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [dbProduct, setDbProduct] = useState(() => {
+    if (!id) return null;
+    const cached = getCachedProducts();
+    return cached.find(p => p.id === id) || null;
+  });
+  const [loading, setLoading] = useState(() => {
+    if (!id) return false;
+    const cached = getCachedProducts();
+    return !cached.some(p => p.id === id);
+  });
 
   useEffect(() => {
     let isMounted = true;
-    setLoading(true);
     if (id) {
+      if (!dbProduct) {
+        setLoading(true);
+      }
       fetchProductById(id)
         .then((p) => {
           if (isMounted && p) setDbProduct(p);

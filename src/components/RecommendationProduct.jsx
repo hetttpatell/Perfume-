@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchProducts } from '../services/api';
+import { fetchProducts, getCachedProducts } from '../services/api';
 
 /**
  * RecommendationProduct — shows related products based on the currently
@@ -10,7 +10,7 @@ import { fetchProducts } from '../services/api';
  */
 export default function RecommendationProduct({ currentProductId }) {
   const navigate = useNavigate();
-  const [allProducts, setAllProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState(() => getCachedProducts());
 
   // Fetch live products from database
   useEffect(() => {
@@ -87,7 +87,6 @@ export default function RecommendationProduct({ currentProductId }) {
               key={product.id}
               onClick={() => {
                 navigate(`/product/${product.id}`);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
               className="flex flex-col bg-[#F4F4F6] border border-black/5 rounded-xs overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 relative group cursor-pointer"
             >
@@ -141,7 +140,6 @@ export default function RecommendationProduct({ currentProductId }) {
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(`/product/${product.id}`);
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
                     className="w-full py-2 sm:py-3 text-[9px] xs:text-[10px] sm:text-xs font-sans font-extrabold tracking-[0.2em] uppercase text-white bg-[#111111] hover:bg-black transition-all duration-200 shadow-sm cursor-pointer active:scale-[0.98] text-center"
                   >

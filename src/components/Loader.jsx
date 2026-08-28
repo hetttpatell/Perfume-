@@ -13,27 +13,17 @@ export default function Loader({ onStartExit, onComplete, isModelLoaded = false 
 
   const onStartExitRef = useRef(onStartExit);
   const onCompleteRef = useRef(onComplete);
-  const isModelLoadedRef = useRef(isModelLoaded);
 
   useEffect(() => {
     onStartExitRef.current = onStartExit;
     onCompleteRef.current = onComplete;
   }, [onStartExit, onComplete]);
 
-  useEffect(() => {
-    isModelLoadedRef.current = isModelLoaded;
-    if (isModelLoaded && mainTlRef.current && mainTlRef.current.paused()) {
-      mainTlRef.current.play();
-    }
-  }, [isModelLoaded]);
-
   const setLetterRef = useCallback((el, i) => {
     letterRefs.current[i] = el;
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = 'hidden';
-
     letterRefs.current.forEach((el) => {
       if (el) {
         gsap.set(el, {
@@ -73,46 +63,46 @@ export default function Loader({ onStartExit, onComplete, isModelLoaded = false 
         {
           opacity: 1,
           y: 0,
-          duration: 0.5,
+          duration: 0.4,
           ease: 'power2.out',
         },
         0
       );
     }
 
-    // 2. Staggered reveal of letter typography ("P E R F U M E")
+    // 2. Staggered reveal of letter typography
     mainTl.to(
       letterRefs.current,
       {
         yPercent: 0,
         opacity: 1,
-        duration: 1.2,
-        stagger: 0.07,
+        duration: 1.0,
+        stagger: 0.06,
         ease: 'power4.out',
       },
-      0.1
+      0.08
     );
 
-    // 3. Subtitle fade in ("HAUTE PARFUMERIE")
+    // 3. Subtitle fade in
     if (subTitleRef.current) {
       mainTl.to(
         subTitleRef.current,
         {
           opacity: 1,
           y: 0,
-          duration: 0.6,
+          duration: 0.5,
           ease: 'power2.out',
         },
-        0.8
+        0.5
       );
     }
 
-    // 4. Smooth numerical progression 0% -> 100% over 2.0s
+    // 4. Smooth numerical progression 0% -> 100% over 1.2s
     mainTl.to(
       progressObj,
       {
         value: 100,
-        duration: 2.0,
+        duration: 1.2,
         ease: 'power1.out',
         onUpdate: () => {
           const currentVal = Math.round(progressObj.value);
@@ -127,18 +117,7 @@ export default function Loader({ onStartExit, onComplete, isModelLoaded = false 
       0
     );
 
-    // 5. Handshake Pause Check: pause if 3D model not ready yet at 2.0s
-    mainTl.call(
-      () => {
-        if (!isModelLoadedRef.current) {
-          mainTl.pause();
-        }
-      },
-      [],
-      2.0
-    );
-
-    // 6. Fade counter out gently
+    // 5. Fade counter out gently
     if (counterRef.current) {
       mainTl.to(
         counterRef.current,
@@ -148,30 +127,30 @@ export default function Loader({ onStartExit, onComplete, isModelLoaded = false 
           duration: 0.3,
           ease: 'power2.out',
         },
-        2.0
+        1.25
       );
     }
 
-    // 7. Trigger start exit callback right as curtain starts lifting
+    // 6. Trigger start exit callback
     mainTl.call(
       () => {
         if (onStartExitRef.current) onStartExitRef.current();
       },
       [],
-      2.1
+      1.3
     );
 
-    // 8. Multi-layered silk curtain exit: brand text floats up faster while container slides up smoothly
+    // 7. Silk curtain exit: brand text floats up while container slides up
     if (brandGroupRef.current) {
       mainTl.to(
         brandGroupRef.current,
         {
-          y: -80,
+          y: -70,
           opacity: 0,
-          duration: 0.8,
+          duration: 0.7,
           ease: 'power3.in',
         },
-        2.1
+        1.3
       );
     }
 
@@ -180,33 +159,28 @@ export default function Loader({ onStartExit, onComplete, isModelLoaded = false 
         containerRef.current,
         {
           yPercent: -100,
-          duration: 1.2,
+          duration: 0.9,
           ease: 'power4.inOut',
           onComplete: () => {
-            document.body.style.overflow = '';
             if (onCompleteRef.current) onCompleteRef.current();
           },
         },
-        2.1
+        1.3
       );
     }
 
-    // Safety fallback timeout (5s max)
+    // Safety fallback timeout
     const safetyTimeout = setTimeout(() => {
-      if (mainTlRef.current && mainTlRef.current.paused()) {
-        mainTlRef.current.play();
-      }
-    }, 5000);
+      if (onCompleteRef.current) onCompleteRef.current();
+    }, 2500);
 
     return () => {
       mainTl.kill();
       clearTimeout(safetyTimeout);
-      document.body.style.overflow = '';
     };
   }, []);
 
   return (
-    /* Previous theme: bg-[#FAFAFA] */
     <div
       ref={containerRef}
       className="fixed inset-0 z-50 bg-white w-screen h-screen flex flex-col justify-between items-center select-none pointer-events-auto overflow-hidden transform-gpu"

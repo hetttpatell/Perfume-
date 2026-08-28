@@ -94,36 +94,31 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
 
     if (targetId === 'products') {
       navigate('/collection');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
     if (targetId === 'about') {
       navigate('/about');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
     if (targetId === 'contact') {
       navigate('/contact');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
     if (location.pathname !== '/') {
       navigate('/');
-      setTimeout(() => {
-        if (targetId === 'hero') {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        } else {
+      if (targetId !== 'hero') {
+        setTimeout(() => {
           const elem = document.getElementById(targetId);
           if (elem) {
             const yOffset = -90;
             const y = elem.getBoundingClientRect().top + window.pageYOffset + yOffset;
             window.scrollTo({ top: y, behavior: 'smooth' });
           }
-        }
-      }, 100);
+        }, 150);
+      }
       return;
     }
 
@@ -131,6 +126,7 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
+
     const elem = document.getElementById(targetId);
     if (elem) {
       const yOffset = -90;

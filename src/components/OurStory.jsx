@@ -167,7 +167,6 @@ export default function OurStory() {
             <button
               onClick={() => {
                 navigate('/about');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
               className="px-8 py-3 border border-[#111111] text-[#111111] hover:bg-[#111111] hover:text-white font-sans font-bold text-[11px] tracking-[0.25em] uppercase transition-all duration-300 cursor-pointer active:scale-95"
             >

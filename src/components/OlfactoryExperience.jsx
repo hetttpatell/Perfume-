@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchProducts, fetchCategories } from '../services/api';
+import { fetchProducts, fetchCategories, getCachedProducts } from '../services/api';
 import { useCart } from '../context/CartContext';
 import CartDrawer from './CartDrawer';
 import OurStory from './OurStory';
@@ -17,19 +17,21 @@ export default function OlfactoryExperience({
   const navigate = useNavigate();
   const { cartItems: contextCartItems, isCartOpen: contextIsCartOpen, setIsCartOpen: contextSetIsCartOpen } = useCart();
   const [activeCategory, setActiveCategory] = useState('ALL');
-  const [productsList, setProductsList] = useState([]);
+  const [productsList, setProductsList] = useState(() => getCachedProducts());
   const [dbCategories, setDbCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => getCachedProducts().length === 0);
 
   // Fetch live products and categories from database on mount
   useEffect(() => {
     let isMounted = true;
-    setLoading(true);
+    if (productsList.length === 0) {
+      setLoading(true);
+    }
 
     Promise.all([fetchProducts(), fetchCategories()])
       .then(([prods, cats]) => {
         if (isMounted) {
-          if (Array.isArray(prods)) setProductsList(prods);
+          if (Array.isArray(prods) && prods.length > 0) setProductsList(prods);
           if (Array.isArray(cats)) setDbCategories(cats);
         }
       })
