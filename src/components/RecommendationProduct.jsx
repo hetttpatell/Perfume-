@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { fetchProducts, getCachedProducts } from '../services/api';
+import { useCart } from '../context/CartContext';
 
 /**
  * RecommendationProduct — shows related products based on the currently
@@ -10,7 +12,9 @@ import { fetchProducts, getCachedProducts } from '../services/api';
  */
 export default function RecommendationProduct({ currentProductId }) {
   const navigate = useNavigate();
+  const { addItemToCart } = useCart();
   const [allProducts, setAllProducts] = useState(() => getCachedProducts());
+  const [addedProductId, setAddedProductId] = useState(null);
 
   // Fetch live products from database
   useEffect(() => {
@@ -57,6 +61,15 @@ export default function RecommendationProduct({ currentProductId }) {
     // Merge in priority order, cap at 3
     return [...sameCategory, ...noteMatches, ...rest].slice(0, 3);
   }, [currentProductId, allProducts]);
+
+  const handleAddToBag = (e, product) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const defaultSize = product.sizes?.[0] || { size: 'Full Size', price: product.price };
+    addItemToCart(product, defaultSize, 1);
+    setAddedProductId(product.id);
+    setTimeout(() => setAddedProductId(null), 1600);
+  };
 
   if (recommendations.length === 0) return null;
 
@@ -125,7 +138,7 @@ export default function RecommendationProduct({ currentProductId }) {
                   </h3>
                 </div>
 
-                {/* Price & Full Width SHOP CTA Button */}
+                {/* Price & Add to Bag */}
                 <div className="flex flex-col gap-2 pt-2 border-t border-black/10 mt-1">
                   <div className="flex items-center justify-between">
                     <span className="font-sans font-extrabold text-xs sm:text-sm md:text-base text-[#111111]">
@@ -137,13 +150,36 @@ export default function RecommendationProduct({ currentProductId }) {
                   </div>
 
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/product/${product.id}`);
-                    }}
-                    className="w-full py-2 sm:py-3 text-[9px] xs:text-[10px] sm:text-xs font-sans font-extrabold tracking-[0.2em] uppercase text-white bg-[#111111] hover:bg-black transition-all duration-200 shadow-sm cursor-pointer active:scale-[0.98] text-center"
+                    onClick={(e) => handleAddToBag(e, product)}
+                    className={`w-full py-2 sm:py-3 text-[9px] xs:text-[10px] sm:text-xs font-sans font-extrabold tracking-[0.2em] uppercase transition-all duration-300 shadow-sm cursor-pointer active:scale-[0.98] text-center flex items-center justify-center gap-2 ${
+                      addedProductId === product.id
+                        ? 'bg-[#1a7a3a] text-white'
+                        : 'bg-[#111111] text-white hover:bg-[#C08A3E]'
+                    }`}
                   >
-                    EXPLORE CREATION
+                    {addedProductId === product.id ? (
+                      <>
+                        <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <motion.path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2.5}
+                            d="M5 13l4 4L19 7"
+                            initial={{ pathLength: 0 }}
+                            animate={{ pathLength: 1 }}
+                            transition={{ duration: 0.35, ease: 'easeOut' }}
+                          />
+                        </svg>
+                        ADDED TO BAG
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                        ADD TO BAG
+                      </>
+                    )}
                   </button>
                 </div>
               </div>

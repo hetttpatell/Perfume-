@@ -6,7 +6,6 @@ import { useCart } from '../context/CartContext';
 import CartDrawer from './CartDrawer';
 import Footer from './Footer';
 
-
 import luminousHeroBg from '../assets/lune_luminous_hero_bg.png';
 import mobileHeroBg from '../assets/lune_hero_mobile.png';
 
@@ -20,33 +19,24 @@ const SORT_OPTIONS = [
   { value: 'rating', label: 'HIGHEST RATED' },
 ];
 
-function CustomSortDropdown({ value, onChange }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  const selectedOption = SORT_OPTIONS.find(opt => opt.value === value) || SORT_OPTIONS[0];
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+// ──────────────────────────────────────────────────────────────────────────────
+// Collapsible Filter Section Component
+// ──────────────────────────────────────────────────────────────────────────────
+function FilterSection({ title, defaultOpen = true, children }) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div ref={dropdownRef} className="relative shrink-0 select-none">
-      {/* Trigger Button */}
+    <div className="border-b border-black/8">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="px-4 py-2.5 bg-[#F9F9FB] hover:bg-white border border-black/15 hover:border-black/40 text-[10px] sm:text-xs font-sans font-extrabold tracking-[0.18em] text-[#111111] uppercase flex items-center justify-between gap-3 min-w-[160px] sm:min-w-[190px] transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-xs"
+        className="w-full flex items-center justify-between py-4 px-0 text-left cursor-pointer group"
       >
-        <span className="truncate">{selectedOption.label}</span>
+        <span className="font-serif font-bold text-[13px] tracking-wide text-[#111111] uppercase">
+          {title}
+        </span>
         <svg
-          className={`w-3.5 h-3.5 text-[#555555] shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-[#111111]' : ''}`}
+          className={`w-3.5 h-3.5 text-[#888888] group-hover:text-[#111111] transition-all duration-300 ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -54,46 +44,45 @@ function CustomSortDropdown({ value, onChange }) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
-
-      {/* Floating Menu Popup */}
-      <AnimatePresence>
+      <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 6, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 4, scale: 0.98 }}
-            transition={{ duration: 0.16, ease: 'easeOut' }}
-            className="absolute right-0 top-full mt-1.5 w-full min-w-[200px] bg-white border border-black/15 shadow-xl z-50 overflow-hidden py-1"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            className="overflow-hidden"
           >
-            {SORT_OPTIONS.map((opt) => {
-              const isSelected = opt.value === value;
-              return (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => {
-                    onChange(opt.value);
-                    setIsOpen(false);
-                  }}
-                  className={`w-full px-4 py-2.5 text-left text-[10px] sm:text-xs font-sans font-extrabold tracking-[0.15em] uppercase flex items-center justify-between transition-colors duration-150 cursor-pointer ${
-                    isSelected
-                      ? 'bg-[#111111] text-white'
-                      : 'text-[#333333] hover:bg-[#F4F4F6] hover:text-[#111111]'
-                  }`}
-                >
-                  <span>{opt.label}</span>
-                  {isSelected && (
-                    <svg className="w-3.5 h-3.5 text-[#C08A3E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                    </svg>
-                  )}
-                </button>
-              );
-            })}
+            <div className="pb-5">
+              {children}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Mobile Filter Drawer Toggle
+// ──────────────────────────────────────────────────────────────────────────────
+function MobileFilterButton({ isOpen, onClick, activeFiltersCount }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 px-6 py-3 bg-[#111111] text-white text-[11px] font-sans font-extrabold tracking-[0.2em] uppercase shadow-2xl hover:bg-black transition-all cursor-pointer rounded-full"
+    >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+      </svg>
+      <span>{isOpen ? 'CLOSE FILTERS' : 'FILTERS'}</span>
+      {activeFiltersCount > 0 && (
+        <span className="w-5 h-5 flex items-center justify-center bg-[#C08A3E] text-white text-[9px] font-bold rounded-full">
+          {activeFiltersCount}
+        </span>
+      )}
+    </button>
   );
 }
 
@@ -104,13 +93,25 @@ export default function Collectionproducts({
   setIsCartOpen: parentSetIsCartOpen,
 }) {
   const navigate = useNavigate();
-  const { cartItems: contextCartItems, setCartItems: contextSetCartItems, isCartOpen: contextIsCartOpen, setIsCartOpen: contextSetIsCartOpen } = useCart();
+  const { cartItems: contextCartItems, setCartItems: contextSetCartItems, isCartOpen: contextIsCartOpen, setIsCartOpen: contextSetIsCartOpen, addItemToCart } = useCart();
   const [activeCategory, setActiveCategory] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('recommended');
   const [productsList, setProductsList] = useState(() => getCachedProducts());
   const [dbCategories, setDbCategories] = useState([]);
   const [loading, setLoading] = useState(() => getCachedProducts().length === 0);
+
+  // Price range filter state
+  const [priceMin, setPriceMin] = useState('');
+  const [priceMax, setPriceMax] = useState('');
+  const [appliedPriceMin, setAppliedPriceMin] = useState('');
+  const [appliedPriceMax, setAppliedPriceMax] = useState('');
+
+  // Add to bag confirmation state
+  const [addedProductId, setAddedProductId] = useState(null);
+
+  // Mobile filter drawer
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
   const cartItems = parentCartItems !== undefined ? parentCartItems : contextCartItems;
   const setCartItems = parentSetCartItems || contextSetCartItems;
@@ -160,7 +161,7 @@ export default function Collectionproducts({
     return counts;
   }, [productsList]);
 
-  // Dynamic Categories Tabs from Database
+  // Dynamic Categories from Database
   const categoriesTabs = useMemo(() => {
     const defaultTabs = [
       { id: 'ALL', label: 'ALL CREATIONS', count: categoryCounts['ALL'] || 0 }
@@ -175,6 +176,15 @@ export default function Collectionproducts({
     });
     return [...defaultTabs, ...fetchedTabs];
   }, [dbCategories, categoryCounts]);
+
+  // Count active filters
+  const activeFiltersCount = useMemo(() => {
+    let count = 0;
+    if (activeCategory !== 'ALL') count++;
+    if (appliedPriceMin || appliedPriceMax) count++;
+    if (searchQuery.trim()) count++;
+    return count;
+  }, [activeCategory, appliedPriceMin, appliedPriceMax, searchQuery]);
 
   // Dynamic Filtering & Sorting based on live database records
   const filteredProducts = useMemo(() => {
@@ -201,6 +211,14 @@ export default function Collectionproducts({
       );
     }
 
+    // Price range filter
+    if (appliedPriceMin) {
+      result = result.filter(p => Number(p.price) >= Number(appliedPriceMin));
+    }
+    if (appliedPriceMax) {
+      result = result.filter(p => Number(p.price) <= Number(appliedPriceMax));
+    }
+
     if (sortBy === 'price-low') {
       result.sort((a, b) => Number(a.price) - Number(b.price));
     } else if (sortBy === 'price-high') {
@@ -210,31 +228,30 @@ export default function Collectionproducts({
     }
 
     return result;
-  }, [productsList, activeCategory, searchQuery, sortBy]);
+  }, [productsList, activeCategory, searchQuery, sortBy, appliedPriceMin, appliedPriceMax]);
 
-  const tabsContainerRef = useRef(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-
-  const checkScroll = () => {
-    if (tabsContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = tabsContainerRef.current;
-      setCanScrollLeft(scrollLeft > 5);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 5);
-    }
+  const handleApplyPrice = () => {
+    setAppliedPriceMin(priceMin);
+    setAppliedPriceMax(priceMax);
   };
 
-  useEffect(() => {
-    checkScroll();
-    window.addEventListener('resize', checkScroll);
-    return () => window.removeEventListener('resize', checkScroll);
-  }, [categoriesTabs]);
+  const handleClearAllFilters = () => {
+    setActiveCategory('ALL');
+    setSearchQuery('');
+    setSortBy('recommended');
+    setPriceMin('');
+    setPriceMax('');
+    setAppliedPriceMin('');
+    setAppliedPriceMax('');
+  };
 
-  const scrollTabs = (direction) => {
-    if (tabsContainerRef.current) {
-      const scrollAmount = direction === 'left' ? -220 : 220;
-      tabsContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
+  const handleAddToBag = (e, product) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const defaultSize = product.sizes?.[0] || { size: 'Full Size', price: product.price };
+    addItemToCart(product, defaultSize, 1);
+    setAddedProductId(product.id);
+    setTimeout(() => setAddedProductId(null), 1600);
   };
 
   const handleUpdateQuantity = (index, newQty) => {
@@ -253,10 +270,183 @@ export default function Collectionproducts({
     setCartItems((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // ────────────────────────────────────────────────────────────────────────────
+  // SIDEBAR FILTER PANEL CONTENT (shared between desktop & mobile)
+  // ────────────────────────────────────────────────────────────────────────────
+  const FilterPanelContent = () => (
+    <>
+      {/* Sidebar Header */}
+      <div className="mb-2">
+        <h2 className="font-serif font-black text-[22px] tracking-tight text-[#111111] uppercase leading-tight">
+          LA COLLECTION
+        </h2>
+        <div className="mt-3 flex items-center justify-between">
+          <span className="text-[10px] font-sans font-medium text-[#999999] tracking-wider uppercase">
+            Refine by
+          </span>
+          {activeFiltersCount > 0 && (
+            <button
+              onClick={handleClearAllFilters}
+              className="text-[10px] font-sans font-bold text-[#C08A3E] hover:text-[#111111] tracking-wider uppercase transition-colors cursor-pointer"
+            >
+              Clear all
+            </button>
+          )}
+        </div>
+
+        {/* Active filters tags */}
+        {activeFiltersCount > 0 ? (
+          <div className="mt-2.5 flex flex-wrap gap-1.5">
+            {activeCategory !== 'ALL' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#F4F4F6] text-[9px] font-sans font-bold text-[#333333] tracking-wider uppercase">
+                {activeCategory}
+                <button onClick={() => setActiveCategory('ALL')} className="ml-0.5 text-[#999999] hover:text-[#111111] cursor-pointer">✕</button>
+              </span>
+            )}
+            {(appliedPriceMin || appliedPriceMax) && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#F4F4F6] text-[9px] font-sans font-bold text-[#333333] tracking-wider uppercase">
+                ₹{appliedPriceMin || '0'} – ₹{appliedPriceMax || '∞'}
+                <button onClick={() => { setPriceMin(''); setPriceMax(''); setAppliedPriceMin(''); setAppliedPriceMax(''); }} className="ml-0.5 text-[#999999] hover:text-[#111111] cursor-pointer">✕</button>
+              </span>
+            )}
+            {searchQuery.trim() && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#F4F4F6] text-[9px] font-sans font-bold text-[#333333] tracking-wider uppercase">
+                "{searchQuery}"
+                <button onClick={() => setSearchQuery('')} className="ml-0.5 text-[#999999] hover:text-[#111111] cursor-pointer">✕</button>
+              </span>
+            )}
+          </div>
+        ) : (
+          <p className="mt-2 text-[10px] font-sans text-[#BBBBBB] tracking-wide">
+            No filters applied
+          </p>
+        )}
+      </div>
+
+      {/* ── Search ── */}
+      <FilterSection title="Search" defaultOpen={true}>
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search creations..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-8 pr-8 py-2.5 bg-[#FAFAFA] border border-black/10 text-[11px] font-sans text-[#111111] tracking-wide focus:outline-none focus:border-black/30 transition-all placeholder:text-[#AAAAAA]"
+          />
+          <svg className="w-3.5 h-3.5 text-[#AAAAAA] absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-[#999999] hover:text-[#111111] cursor-pointer"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      </FilterSection>
+
+      {/* ── Category ── */}
+      <FilterSection title="Category" defaultOpen={true}>
+        <div className="flex flex-col gap-0.5">
+          {categoriesTabs.map((cat) => {
+            const isActive = activeCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => {
+                  setActiveCategory(cat.id);
+                  setIsMobileFilterOpen(false);
+                }}
+                className={`group flex items-center justify-between px-2.5 py-2 text-left transition-all duration-200 cursor-pointer ${
+                  isActive
+                    ? 'bg-[#111111] text-white'
+                    : 'text-[#444444] hover:bg-[#F6F6F8] hover:text-[#111111]'
+                }`}
+              >
+                <span className="text-[11px] font-sans font-semibold tracking-wide uppercase">
+                  {cat.label}
+                </span>
+                {cat.count > 0 && (
+                  <span className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full transition-colors ${
+                    isActive ? 'bg-white/20 text-white/80' : 'bg-[#EAEAEA] text-[#888888]'
+                  }`}>
+                    {cat.count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </FilterSection>
+
+      {/* ── Price Range ── */}
+      <FilterSection title="Price" defaultOpen={true}>
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <input
+              type="number"
+              placeholder="Min."
+              value={priceMin}
+              onChange={(e) => setPriceMin(e.target.value)}
+              className="w-full py-2.5 px-3 bg-[#FAFAFA] border border-black/10 text-[11px] font-sans text-[#111111] focus:outline-none focus:border-black/30 transition-all placeholder:text-[#BBBBBB]"
+            />
+          </div>
+          <span className="text-[#CCCCCC] text-xs font-light">–</span>
+          <div className="relative flex-1">
+            <input
+              type="number"
+              placeholder="Max."
+              value={priceMax}
+              onChange={(e) => setPriceMax(e.target.value)}
+              className="w-full py-2.5 px-3 bg-[#FAFAFA] border border-black/10 text-[11px] font-sans text-[#111111] focus:outline-none focus:border-black/30 transition-all placeholder:text-[#BBBBBB]"
+            />
+          </div>
+        </div>
+        <button
+          onClick={handleApplyPrice}
+          className="mt-3 w-full py-2.5 bg-[#111111] text-white text-[10px] font-sans font-extrabold tracking-[0.2em] uppercase hover:bg-black transition-colors cursor-pointer"
+        >
+          UPDATE
+        </button>
+      </FilterSection>
+
+      {/* ── Sort By ── */}
+      <FilterSection title="Sort By" defaultOpen={false}>
+        <div className="flex flex-col gap-0.5">
+          {SORT_OPTIONS.map((opt) => {
+            const isSelected = opt.value === sortBy;
+            return (
+              <button
+                key={opt.value}
+                onClick={() => setSortBy(opt.value)}
+                className={`flex items-center justify-between px-2.5 py-2 text-left transition-all duration-200 cursor-pointer ${
+                  isSelected
+                    ? 'bg-[#111111] text-white'
+                    : 'text-[#444444] hover:bg-[#F6F6F8] hover:text-[#111111]'
+                }`}
+              >
+                <span className="text-[11px] font-sans font-semibold tracking-wide uppercase">
+                  {opt.label}
+                </span>
+                {isSelected && (
+                  <svg className="w-3.5 h-3.5 text-[#C08A3E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </FilterSection>
+    </>
+  );
+
   return (
-    <div className="w-full min-h-screen bg-white text-[#111111] font-sans pt-0 sm:pt-24 md:pt-28 pb-12 overflow-x-hidden selection:bg-[#111111] selection:text-white">
+    <div className="w-full min-h-screen bg-white text-[#111111] font-sans pt-0 sm:pt-24 md:pt-28 pb-0 overflow-x-hidden selection:bg-[#111111] selection:text-white">
       {/* ── 1. DEDICATED RESPONSIVE HERO BANNER ── */}
-      <section className="relative w-full overflow-hidden bg-[#0F2230] text-white min-h-[310px] sm:min-h-[380px] lg:min-h-[440px] sm:aspect-[16/9] lg:aspect-[10/3] flex items-center border-b border-black/10 shadow-[0_15px_40px_rgba(0,0,0,0.15)]">
+      <section className="relative w-full overflow-hidden bg-[#0F2230] text-white min-h-[310px] sm:min-h-[380px] lg:min-h-[440px] sm:aspect-[16/9] lg:aspect-[10/3] flex items-center border-b border-black/10">
         {/* Background Images */}
         <picture className="absolute inset-0 w-full h-full">
           <source media="(max-width: 639px)" srcSet={mobileHeroBg} />
@@ -286,187 +476,200 @@ export default function Collectionproducts({
         </div>
       </section>
 
-      {/* ── 2. Dynamic Category Navigation Bar (Scrollable for Infinite Future Categories) ── */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-5">
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between border-b border-black/10 pb-4 gap-4 sm:gap-6">
-          
-          {/* Category Tabs Wrapper with Left/Right Overflow Scroll Controls */}
-          <div className="relative flex-1 min-w-0 flex items-center">
-            {/* Scroll Left Button */}
-            {canScrollLeft && (
-              <button
-                type="button"
-                onClick={() => scrollTabs('left')}
-                className="absolute left-0 z-20 p-1.5 bg-white/95 backdrop-blur-sm border border-black/15 shadow-md text-[#111111] hover:bg-[#111111] hover:text-white transition-all cursor-pointer rounded-full -translate-x-2"
-                aria-label="Scroll categories left"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-            )}
+      {/* ── 2. SIDEBAR + PRODUCTS LAYOUT ── */}
+      <div className="w-full max-w-[1440px] mx-auto">
+        <div className="flex relative">
 
-            {/* Dynamic Category Tabs Container */}
-            <div
-              ref={tabsContainerRef}
-              onScroll={checkScroll}
-              className="flex items-center gap-5 sm:gap-8 overflow-x-auto no-scrollbar pb-2 md:pb-0 scroll-smooth w-full select-none"
-            >
-              {categoriesTabs.map((cat) => {
-                const isActive = activeCategory === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={(e) => {
-                      setActiveCategory(cat.id);
-                      e.currentTarget.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-                    }}
-                    className={`relative pb-3 text-[10.5px] sm:text-xs font-sans font-extrabold tracking-[0.22em] uppercase transition-colors duration-200 whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-2 ${
-                      isActive ? 'text-[#111111]' : 'text-[#777777] hover:text-[#111111]'
-                    }`}
-                  >
-                    <span>{cat.label}</span>
-                    {cat.count > 0 && (
-                      <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full transition-colors ${
-                        isActive ? 'bg-[#111111] text-white' : 'bg-[#EAEAEA] text-[#666666]'
-                      }`}>
-                        {cat.count}
-                      </span>
-                    )}
-                    {isActive && (
-                      <motion.span
-                        layoutId="collectionTabLine"
-                        className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#111111]"
-                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                      />
-                    )}
-                  </button>
-                );
-              })}
+          {/* ── LEFT SIDEBAR (Desktop — fixed position, non-scrollable) ── */}
+          <aside className="hidden lg:block w-[280px] xl:w-[300px] shrink-0 sticky top-28 self-start h-[calc(100vh-7rem)] overflow-y-auto overflow-x-hidden border-r border-black/8 bg-white">
+            <div className="px-6 xl:px-7 py-7">
+              <FilterPanelContent />
             </div>
+          </aside>
 
-            {/* Scroll Right Button */}
-            {canScrollRight && (
-              <button
-                type="button"
-                onClick={() => scrollTabs('right')}
-                className="absolute right-0 z-20 p-1.5 bg-white/95 backdrop-blur-sm border border-black/15 shadow-md text-[#111111] hover:bg-[#111111] hover:text-white transition-all cursor-pointer rounded-full translate-x-2"
-                aria-label="Scroll categories right"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            )}
-          </div>
-
-          {/* Search Box & Custom Sort Dropdown */}
-          <div className="flex items-center gap-3 w-full md:w-auto shrink-0">
-            {/* Luxury Search Input */}
-            <div className="relative flex-1 md:w-56 lg:w-64">
-              <input
-                type="text"
-                placeholder="SEARCH CREATIONS..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-8 pr-7 py-2.5 bg-[#F9F9FB] border border-black/15 text-[10px] sm:text-xs font-sans text-[#111111] tracking-wider uppercase focus:outline-none focus:border-black transition-all placeholder:text-[#999999] shadow-2xs"
-              />
-              <svg className="w-3.5 h-3.5 text-[#737373] absolute left-2.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-2.5 text-xs text-[#737373] hover:text-[#111111]"
+          {/* ── MOBILE FILTER DRAWER OVERLAY ── */}
+          <AnimatePresence>
+            {isMobileFilterOpen && (
+              <>
+                {/* Backdrop */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="fixed inset-0 bg-black/40 z-40 lg:hidden"
+                  onClick={() => setIsMobileFilterOpen(false)}
+                />
+                {/* Drawer */}
+                <motion.aside
+                  initial={{ x: '-100%' }}
+                  animate={{ x: 0 }}
+                  exit={{ x: '-100%' }}
+                  transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+                  className="fixed left-0 top-0 h-full w-[300px] max-w-[85vw] bg-white z-50 shadow-2xl overflow-y-auto lg:hidden"
                 >
-                  ✕
+                  <div className="px-6 py-6">
+                    {/* Close button */}
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-[10px] font-sans font-extrabold tracking-[0.25em] uppercase text-[#999999]">
+                        FILTERS
+                      </span>
+                      <button
+                        onClick={() => setIsMobileFilterOpen(false)}
+                        className="w-8 h-8 flex items-center justify-center text-[#777777] hover:text-[#111111] hover:bg-[#F4F4F6] transition-colors cursor-pointer"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                    <FilterPanelContent />
+                  </div>
+                </motion.aside>
+              </>
+            )}
+          </AnimatePresence>
+
+          {/* ── RIGHT CONTENT AREA (scrollable products grid) ── */}
+          <main className="flex-1 min-w-0">
+            {/* Top bar with result count and sort (small inline sort for desktop) */}
+            <div className="flex items-center justify-between px-5 sm:px-6 lg:px-8 py-4 border-b border-black/6 bg-[#FCFCFD]">
+              <div className="flex items-center gap-3">
+                {/* Mobile filter toggle */}
+                <button
+                  type="button"
+                  onClick={() => setIsMobileFilterOpen(true)}
+                  className="lg:hidden flex items-center gap-2 px-3 py-2 border border-black/12 text-[10px] font-sans font-extrabold tracking-[0.15em] uppercase text-[#333333] hover:bg-[#F4F4F6] transition-all cursor-pointer"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                  </svg>
+                  FILTERS
+                  {activeFiltersCount > 0 && (
+                    <span className="w-4 h-4 flex items-center justify-center bg-[#111111] text-white text-[8px] font-bold rounded-full">
+                      {activeFiltersCount}
+                    </span>
+                  )}
                 </button>
-              )}
+
+                <span className="text-[11px] font-sans text-[#999999] tracking-wide">
+                  <span className="font-bold text-[#555555]">{filteredProducts.length}</span> {filteredProducts.length === 1 ? 'product' : 'products'}
+                </span>
+              </div>
             </div>
 
-            {/* Custom Luxury Sort Select Dropdown */}
-            <CustomSortDropdown value={sortBy} onChange={setSortBy} />
-          </div>
-        </div>
-      </section>
+            {/* ── 3. Main Studio Products Grid ── */}
+            <section className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+              {loading ? (
+                <div className="py-24 text-center text-sm font-sans text-[#555555]">
+                  Loading Maison Lune live collection...
+                </div>
+              ) : filteredProducts.length === 0 ? (
+                <div className="w-full py-16 text-center bg-[#F4F4F6] border border-black/10">
+                  <p className="font-serif text-lg text-[#555555] uppercase">No Creations Found</p>
+                  <p className="font-sans text-xs text-[#777777] mt-1">Try resetting your search query or category filters.</p>
+                  <button
+                    onClick={handleClearAllFilters}
+                    className="mt-4 px-6 py-2.5 bg-[#111111] text-white text-[10px] font-sans font-extrabold tracking-[0.2em] uppercase hover:bg-black transition-colors cursor-pointer"
+                  >
+                    RESET ALL FILTERS
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-2.5 sm:gap-5 md:gap-6">
+                  {filteredProducts.map((product) => (
+                    <div
+                      key={product.id}
+                      onClick={() => navigate(`/product/${product.id}`)}
+                      className="group cursor-pointer bg-[#F4F4F6] border border-black/10 flex flex-col justify-between overflow-hidden transition-all duration-300 hover:shadow-lg rounded-none"
+                    >
+                    <div>
+                      {/* Image Container */}
+                      <div className="relative w-full aspect-square bg-[#F5F5F7] overflow-hidden rounded-none border-b border-black/5">
+                        {/* Primary Image */}
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-0"
+                        />
 
-      {/* ── 3. Main Studio Products Grid (Live Data from Supabase) ── */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-8">
-        {loading ? (
-          <div className="py-24 text-center text-sm font-sans text-[#555555]">
-            Loading Maison Lune live collection...
-          </div>
-        ) : filteredProducts.length === 0 ? (
-          <div className="w-full py-16 text-center bg-[#F4F4F6] border border-black/10">
-            <p className="font-serif text-lg text-[#555555] uppercase">No Creations Found</p>
-            <p className="font-sans text-xs text-[#777777] mt-1">Try resetting your search query or category filters.</p>
-            <button
-              onClick={() => { setActiveCategory('ALL'); setSearchQuery(''); }}
-              className="mt-4 px-6 py-2.5 bg-[#111111] text-white text-[10px] font-sans font-extrabold tracking-[0.2em] uppercase hover:bg-black transition-colors cursor-pointer"
-            >
-              RESET ALL FILTERS
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-6 md:gap-6 lg:gap-8">
-            {filteredProducts.map((product) => (
-              <div
-                key={product.id}
-                onClick={() => navigate(`/product/${product.id}`)}
-                className="group cursor-pointer bg-[#F4F4F6] border border-black/10 flex flex-col justify-between overflow-hidden transition-all duration-300 hover:shadow-lg rounded-none"
-              >
-                <div>
-                  {/* Image Container — 100% Full Edge-to-Edge Image with Sub-Image Hover */}
-                  <div className="relative w-full aspect-square bg-[#F5F5F7] overflow-hidden rounded-none border-b border-black/5">
-                    {/* Primary Image */}
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-0"
-                    />
+                        {/* Secondary Hover Sub-Image */}
+                        <img
+                          src={product.galleryImages?.[1] || product.galleryImages?.[0] || product.image}
+                          alt={`${product.name} alternate view`}
+                          className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                        />
 
-                    {/* Secondary Hover Sub-Image */}
-                    <img
-                      src={product.galleryImages?.[1] || product.galleryImages?.[0] || product.image}
-                      alt={`${product.name} alternate view`}
-                      className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                    />
+                        {product.badge && (
+                          <span className="absolute top-2.5 left-2.5 z-10 px-2 py-0.5 bg-[#111111]/85 backdrop-blur-md text-white text-[8px] font-sans font-extrabold tracking-wider uppercase rounded-none shadow-xs">
+                            {product.badge}
+                          </span>
+                        )}
+                      </div>
 
-                    {product.badge && (
-                      <span className="absolute top-2.5 left-2.5 z-10 px-2 py-0.5 bg-[#111111]/85 backdrop-blur-md text-white text-[8px] font-sans font-extrabold tracking-wider uppercase rounded-none shadow-xs">
-                        {product.badge}
+                      {/* Title & Subtitle Info */}
+                      <div className="p-3 sm:p-4 pb-0">
+                        <span className="text-[9px] font-sans font-extrabold text-[#C08A3E] tracking-widest uppercase block mb-0.5">
+                          {product.category}
+                        </span>
+                        <h3 className="font-serif font-black text-sm sm:text-base text-[#111111] tracking-tight uppercase line-clamp-1">
+                          {product.name}
+                        </h3>
+                        <p className="text-[11px] font-sans text-gray-500 font-medium line-clamp-1">
+                          {product.frenchName || product.subtitle || 'Extrait de Parfum'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Price & Add to Bag Footer */}
+                    <div className="p-3 sm:p-4 pt-3 border-t border-black/10 flex items-center justify-between mt-2 gap-2">
+                      <span className="font-serif font-black text-sm text-[#111111] shrink-0">
+                        $ {product.price}
                       </span>
-                    )}
+                      <button
+                        onClick={(e) => handleAddToBag(e, product)}
+                        className={`relative flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 text-[9px] sm:text-[10px] font-sans font-extrabold tracking-[0.15em] uppercase transition-all duration-300 cursor-pointer overflow-hidden ${
+                          addedProductId === product.id
+                            ? 'bg-[#1a7a3a] text-white'
+                            : 'bg-[#111111] text-white hover:bg-[#C08A3E]'
+                        }`}
+                      >
+                        {addedProductId === product.id ? (
+                          <>
+                            <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <motion.path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2.5}
+                                d="M5 13l4 4L19 7"
+                                initial={{ pathLength: 0 }}
+                                animate={{ pathLength: 1 }}
+                                transition={{ duration: 0.35, ease: 'easeOut' }}
+                              />
+                            </svg>
+                            <span className="hidden sm:inline">ADDED</span>
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            </svg>
+                            <span className="hidden sm:inline">ADD TO BAG</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
-
-                  {/* Title & Subtitle Info */}
-                  <div className="p-3 sm:p-4 pb-0">
-                    <span className="text-[9px] font-sans font-extrabold text-[#C08A3E] tracking-widest uppercase block mb-0.5">
-                      {product.category}
-                    </span>
-                    <h3 className="font-serif font-black text-sm sm:text-base text-[#111111] tracking-tight uppercase line-clamp-1">
-                      {product.name}
-                    </h3>
-                    <p className="text-[11px] font-sans text-gray-500 font-medium line-clamp-1">
-                      {product.frenchName || product.subtitle || 'Extrait de Parfum'}
-                    </p>
-                  </div>
+                  ))}
                 </div>
+              )}
+            </section>
 
-                {/* Price & Action Footer */}
-                <div className="p-3 sm:p-4 pt-3 border-t border-black/10 flex items-center justify-between mt-2">
-                  <span className="font-serif font-black text-sm text-[#111111]">
-                    $ {product.price}
-                  </span>
-                  <span className="text-[9px] font-sans font-extrabold tracking-widest uppercase text-gray-900 group-hover:text-[#C08A3E] transition-colors">
-                    DISCOVER &rarr;
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
+            {/* Footer inside scrollable area */}
+            <Footer />
+          </main>
+        </div>
+      </div>
 
       {/* Global Shopping Cart Drawer */}
       <CartDrawer
@@ -477,8 +680,6 @@ export default function Collectionproducts({
         onRemoveItem={handleRemoveItem}
         onCheckout={() => setCartItems([])}
       />
-
-      <Footer />
     </div>
   );
 }

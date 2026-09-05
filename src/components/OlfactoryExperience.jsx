@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { fetchProducts, fetchCategories, getCachedProducts } from '../services/api';
 import { useCart } from '../context/CartContext';
 import CartDrawer from './CartDrawer';
@@ -15,11 +16,12 @@ export default function OlfactoryExperience({
   setIsCartOpen: parentSetIsCartOpen,
 }) {
   const navigate = useNavigate();
-  const { cartItems: contextCartItems, isCartOpen: contextIsCartOpen, setIsCartOpen: contextSetIsCartOpen } = useCart();
+  const { cartItems: contextCartItems, isCartOpen: contextIsCartOpen, setIsCartOpen: contextSetIsCartOpen, addItemToCart } = useCart();
   const [activeCategory, setActiveCategory] = useState('ALL');
   const [productsList, setProductsList] = useState(() => getCachedProducts());
   const [dbCategories, setDbCategories] = useState([]);
   const [loading, setLoading] = useState(() => getCachedProducts().length === 0);
+  const [addedProductId, setAddedProductId] = useState(null);
 
   // Fetch live products and categories from database on mount
   useEffect(() => {
@@ -71,6 +73,15 @@ export default function OlfactoryExperience({
     if (catId === 'ALL') return active.length;
     if (catId === 'FEATURED') return active.filter(p => p.isFeatured || p.is_featured).length;
     return active.filter(p => p.category?.toUpperCase() === catId.toUpperCase()).length;
+  };
+
+  const handleAddToBag = (e, product) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const defaultSize = product.sizes?.[0] || { size: 'Full Size', price: product.price };
+    addItemToCart(product, defaultSize, 1);
+    setAddedProductId(product.id);
+    setTimeout(() => setAddedProductId(null), 1600);
   };
 
   const handleUpdateQuantity = (index, newQty) => {
@@ -181,35 +192,55 @@ export default function OlfactoryExperience({
               </div>
 
               {/* Bottom Content Area */}
-              <div className="p-2.5 xs:p-3 sm:p-5 flex flex-col justify-between flex-1 bg-[#F4F4F6] gap-2 sm:gap-3">
+              <div className="p-2.5 xs:p-3 sm:p-4 flex flex-col justify-between flex-1 bg-white gap-1.5 sm:gap-2">
                 <div>
-                  <p className="font-sans text-[8px] xs:text-[8.5px] sm:text-[10px] text-[#555555] font-bold tracking-wider uppercase mb-0.5 sm:mb-1 line-clamp-1">
-                    {product.subtitle}
-                  </p>
-                  <h3 className="font-sans font-extrabold text-[11px] xs:text-xs sm:text-sm md:text-base text-[#111111] uppercase tracking-wide leading-tight sm:leading-snug line-clamp-2 min-h-[2rem] sm:min-h-0">
+                  <span className="text-[8px] xs:text-[9px] font-sans font-extrabold text-[#C08A3E] tracking-widest uppercase block mb-0.5">
+                    {product.category}
+                  </span>
+                  <h3 className="font-serif font-black text-[11px] xs:text-xs sm:text-sm md:text-base text-[#111111] uppercase tracking-tight leading-tight sm:leading-snug line-clamp-2 min-h-[2rem] sm:min-h-0">
                     {product.name}
                   </h3>
+                  <p className="text-[10px] font-sans text-gray-500 font-medium line-clamp-1 mt-0.5">
+                    {product.frenchName || product.subtitle || 'Extrait de Parfum'}
+                  </p>
                 </div>
 
-                {/* Price & Full Width SHOP CTA Button */}
-                <div className="flex flex-col gap-2 pt-2 border-t border-black/10 mt-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-sans font-extrabold text-xs sm:text-sm md:text-base text-[#111111]">
-                      {product.priceFormatted}
-                    </span>
-                    <span className="text-[8.5px] sm:text-[10px] font-sans font-semibold tracking-widest text-[#555555] uppercase">
-                      {product.sizes ? product.sizes[0].size : '100ML'}
-                    </span>
-                  </div>
-
+                {/* Price & Add to Bag */}
+                <div className="flex items-center justify-between pt-2 border-t border-black/10 mt-1 gap-2">
+                  <span className="font-serif font-black text-xs sm:text-sm text-[#111111] shrink-0">
+                    $ {product.price}
+                  </span>
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/product/${product.id}`);
-                    }}
-                    className="w-full py-2 sm:py-3 text-[9px] xs:text-[10px] sm:text-xs font-sans font-extrabold tracking-[0.2em] uppercase text-white bg-[#111111] hover:bg-black transition-all duration-200 shadow-sm cursor-pointer active:scale-[0.98] text-center"
+                    onClick={(e) => handleAddToBag(e, product)}
+                    className={`relative flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-[8px] sm:text-[10px] font-sans font-extrabold tracking-[0.15em] uppercase transition-all duration-300 cursor-pointer overflow-hidden ${
+                      addedProductId === product.id
+                        ? 'bg-[#1a7a3a] text-white'
+                        : 'bg-[#111111] text-white hover:bg-[#C08A3E]'
+                    }`}
                   >
-                    EXPLORE CREATION
+                    {addedProductId === product.id ? (
+                      <>
+                        <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <motion.path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2.5}
+                            d="M5 13l4 4L19 7"
+                            initial={{ pathLength: 0 }}
+                            animate={{ pathLength: 1 }}
+                            transition={{ duration: 0.35, ease: 'easeOut' }}
+                          />
+                        </svg>
+                        <span className="hidden sm:inline">ADDED</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                        <span className="hidden sm:inline">ADD TO BAG</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
