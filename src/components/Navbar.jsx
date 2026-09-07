@@ -11,13 +11,7 @@ const PRODUCT_CATEGORIES = [
   { id: 'luxurious-combo',  label: 'Luxurious Combo',  categoryKey: 'Luxurious Combo' },
 ];
 
-// Desktop Left Zone Navigation Links: Home + Categories
-const DESKTOP_LEFT_LINKS = [
-  { id: 'home', label: 'Home' },
-  ...PRODUCT_CATEGORIES,
-];
-
-// Complete Navigation Links (Mobile Drawer & Routing)
+// All Navigation Links: Home + Categories + Contact
 const NAV_LINKS = [
   { id: 'home', label: 'Home' },
   ...PRODUCT_CATEGORIES,
@@ -118,23 +112,23 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
         }`}
       >
         <nav
-          className={`pointer-events-auto transition-all duration-300 ease-out relative grid grid-cols-[1fr_auto_1fr] items-center select-none transform-gpu rounded-full ${
+          className={`pointer-events-auto transition-all duration-300 ease-out relative flex items-center justify-between select-none transform-gpu rounded-full ${
             isScrolled
-              ? 'mt-2.5 sm:mt-3 py-2 sm:py-2.5 md:py-3 px-4 sm:px-5 md:px-6 w-[96%] sm:w-[94%] md:w-[92%] lg:w-[90%] max-w-6xl bg-white/95 backdrop-blur-2xl shadow-[0_6px_28px_rgba(0,0,0,0.08)] border border-black/8'
-              : 'mt-3 sm:mt-3.5 md:mt-4 py-2.5 sm:py-3 md:py-3.5 px-4 sm:px-6 md:px-7 w-[96%] sm:w-[94%] md:w-[92%] lg:w-[90%] max-w-6xl bg-white/90 backdrop-blur-xl shadow-[0_6px_24px_rgba(0,0,0,0.06)] border border-black/8'
+              ? 'mt-2.5 sm:mt-3 py-2 sm:py-2.5 md:py-3 px-4 sm:px-5 md:px-6 w-[96%] sm:w-[94%] md:w-[92%] lg:w-[90%] max-w-7xl bg-white/95 backdrop-blur-2xl shadow-[0_6px_28px_rgba(0,0,0,0.08)] border border-black/8'
+              : 'mt-3 sm:mt-3.5 md:mt-4 py-2.5 sm:py-3 md:py-3.5 px-4 sm:px-6 md:px-7 w-[96%] sm:w-[94%] md:w-[92%] lg:w-[90%] max-w-7xl bg-white/90 backdrop-blur-xl shadow-[0_6px_24px_rgba(0,0,0,0.06)] border border-black/8'
           }`}
         >
-          {/* 1. LEFT ZONE: Desktop Home & Category Links + Mobile Hamburger */}
+          {/* 1. LEFT ZONE: All Primary Navigation Links (Home + Categories + Contact) + Mobile Hamburger */}
           <div className="flex items-center justify-start min-w-0">
-            {/* Desktop Navigation Links: Home + Categories (md screens 768px+) */}
+            {/* Desktop Navigation Links (md screens 768px+) */}
             <div className="hidden md:flex items-center gap-0.5 lg:gap-1 xl:gap-1.5">
-              {DESKTOP_LEFT_LINKS.map((link) => {
+              {NAV_LINKS.map((link) => {
                 const isActive = activeNavId === link.id;
                 return (
                   <button
                     key={link.id}
                     onClick={() => handleNavClick(link)}
-                    className={`relative px-1.5 md:px-2 lg:px-2.5 xl:px-3 py-1 lg:py-1.5 text-[9px] md:text-[9.5px] lg:text-[10.5px] xl:text-[11.5px] font-sans font-semibold tracking-[0.04em] lg:tracking-[0.08em] xl:tracking-[0.1em] uppercase transition-all duration-200 cursor-pointer whitespace-nowrap ${
+                    className={`relative px-1.5 md:px-1.5 lg:px-2.5 xl:px-3 py-1 lg:py-1.5 text-[8.5px] md:text-[9px] lg:text-[10px] xl:text-[11px] font-sans font-semibold tracking-[0.04em] lg:tracking-[0.07em] xl:tracking-[0.09em] uppercase transition-all duration-200 cursor-pointer whitespace-nowrap ${
                       isActive ? 'text-[#111111] font-bold' : 'text-[#666666] hover:text-[#111111]'
                     }`}
                   >
@@ -177,8 +171,8 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
             </button>
           </div>
 
-          {/* 2. CENTER ZONE: In-Flow Perfectly Centered Luxury Brand Logo */}
-          <div className="flex items-center justify-center px-2 sm:px-4 lg:px-6 shrink-0">
+          {/* 2. SHIFTED-RIGHT LOGO ZONE: Shifted to the right of Contact */}
+          <div className="flex items-center justify-center px-2 sm:px-3 lg:px-4 shrink-0">
             <button
               onClick={() => handleNavClick({ id: 'home' })}
               className="flex items-center justify-center cursor-pointer group select-none transition-transform duration-300 hover:scale-105 active:scale-95 bg-transparent border-0 p-0"
@@ -193,75 +187,55 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
             </button>
           </div>
 
-          {/* 3. RIGHT ZONE: Contact link (positioned right after logo) + Account & Shopping Bag */}
-          <div className="flex items-center justify-between min-w-0 pl-1 md:pl-2 lg:pl-3">
-            {/* Desktop Contact Link: sits naturally right after center logo */}
-            <button
-              onClick={() => handleNavClick({ id: 'contact' })}
-              className={`hidden md:block relative px-1.5 md:px-2 lg:px-2.5 xl:px-3 py-1 lg:py-1.5 text-[9px] md:text-[9.5px] lg:text-[10.5px] xl:text-[11.5px] font-sans font-semibold tracking-[0.04em] lg:tracking-[0.08em] xl:tracking-[0.1em] uppercase transition-all duration-200 cursor-pointer whitespace-nowrap ${
-                activeNavId === 'contact' ? 'text-[#111111] font-bold' : 'text-[#666666] hover:text-[#111111]'
-              }`}
-            >
-              {activeNavId === 'contact' && (
-                <motion.span
-                  layoutId="navbarActivePill"
-                  className="absolute inset-0 bg-black/5 rounded-full border border-black/10"
-                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                />
-              )}
-              <span className="relative z-10">Contact</span>
-            </button>
-
-            {/* Right Action Icons: Account + Shopping Bag */}
-            <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 shrink-0 ml-auto">
-              {!isLoggedIn ? (
-                <button
-                  onClick={onOpenAccount}
-                  className="hidden md:flex items-center gap-1.5 px-2 md:px-2.5 lg:px-3.5 py-1 lg:py-1.5 rounded-full border border-black/12 bg-white/70 hover:bg-[#111111] text-[#111111] hover:text-white hover:border-[#111111] transition-all duration-300 cursor-pointer text-[9px] md:text-[9.5px] lg:text-[11px] font-sans font-bold tracking-[0.1em] uppercase active:scale-95 shadow-2xs group whitespace-nowrap"
-                >
-                  <svg
-                    className="w-3.5 h-3.5 text-[#C08A3E] group-hover:text-white transition-colors duration-300"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.8}
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                  </svg>
-                  <span>Sign In</span>
-                </button>
-              ) : (
-                <button
-                  onClick={onOpenAccount}
-                  className="hidden md:flex items-center gap-1.5 lg:gap-2 text-[9px] md:text-[9.5px] lg:text-[11px] xl:text-[11.5px] font-sans font-medium tracking-[0.1em] uppercase text-[#1A1A1A] hover:text-[#C08A3E] transition-colors duration-300 cursor-pointer whitespace-nowrap"
-                >
-                  <div className="w-4.5 h-4.5 lg:w-5 lg:h-5 rounded-full bg-[#111111] text-white text-[9px] lg:text-[9.5px] font-serif font-black flex items-center justify-center shadow-xs" style={{ width: 20, height: 20 }}>
-                    {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || 'L'}
-                  </div>
-                  <span>Account</span>
-                </button>
-              )}
-
+          {/* 3. RIGHT ZONE: Account & Shopping Bag */}
+          <div className="flex items-center justify-end gap-1.5 sm:gap-2 lg:gap-3 shrink-0">
+            {!isLoggedIn ? (
               <button
-                onClick={onOpenCart}
-                className="relative flex items-center gap-1.5 px-2.5 sm:px-3 lg:px-3.5 py-1 lg:py-1.5 rounded-full bg-[#111111] hover:bg-black/80 text-white transition-all duration-300 cursor-pointer shadow-xs group active:scale-95 shrink-0"
-                aria-label="View Shopping Bag"
+                onClick={onOpenAccount}
+                className="hidden md:flex items-center gap-1.5 px-2 md:px-2.5 lg:px-3.5 py-1 lg:py-1.5 rounded-full border border-black/12 bg-white/70 hover:bg-[#111111] text-[#111111] hover:text-white hover:border-[#111111] transition-all duration-300 cursor-pointer text-[9px] md:text-[9.5px] lg:text-[11px] font-sans font-bold tracking-[0.1em] uppercase active:scale-95 shadow-2xs group whitespace-nowrap"
               >
-                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#F3E5AB] group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="w-3.5 h-3.5 text-[#C08A3E] group-hover:text-white transition-colors duration-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={1.8}
-                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                   />
                 </svg>
-                <span className="text-[10px] sm:text-[11px] lg:text-xs font-sans font-bold tracking-widest">{cartCount}</span>
+                <span>Sign In</span>
               </button>
-            </div>
+            ) : (
+              <button
+                onClick={onOpenAccount}
+                className="hidden md:flex items-center gap-1.5 lg:gap-2 text-[9px] md:text-[9.5px] lg:text-[11px] xl:text-[11.5px] font-sans font-medium tracking-[0.1em] uppercase text-[#1A1A1A] hover:text-[#C08A3E] transition-colors duration-300 cursor-pointer whitespace-nowrap"
+              >
+                <div className="w-4.5 h-4.5 lg:w-5 lg:h-5 rounded-full bg-[#111111] text-white text-[9px] lg:text-[9.5px] font-serif font-black flex items-center justify-center shadow-xs" style={{ width: 20, height: 20 }}>
+                  {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || 'L'}
+                </div>
+                <span>Account</span>
+              </button>
+            )}
+
+            <button
+              onClick={onOpenCart}
+              className="relative flex items-center gap-1.5 px-2.5 sm:px-3 lg:px-3.5 py-1 lg:py-1.5 rounded-full bg-[#111111] hover:bg-black/80 text-white transition-all duration-300 cursor-pointer shadow-xs group active:scale-95 shrink-0"
+              aria-label="View Shopping Bag"
+            >
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#F3E5AB] group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.8}
+                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                />
+              </svg>
+              <span className="text-[10px] sm:text-[11px] lg:text-xs font-sans font-bold tracking-widest">{cartCount}</span>
+            </button>
           </div>
         </nav>
       </header>
