@@ -17,6 +17,13 @@ const DESKTOP_LEFT_LINKS = [
   ...PRODUCT_CATEGORIES,
 ];
 
+// Complete Navigation Links (Mobile Drawer & Routing)
+const NAV_LINKS = [
+  { id: 'home', label: 'Home' },
+  ...PRODUCT_CATEGORIES,
+  { id: 'contact', label: 'Contact' },
+];
+
 export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpenCart, onOpenAccount }) {
   const { isLoggedIn, user } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -42,13 +49,6 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
     if (location.pathname === '/') return 'home';
     return '';
   }, [location.pathname, searchParams]);
-
-  // ─── Combined nav links: Home + Categories + Contact ───────────────────────
-  const navLinks = useMemo(() => [
-    { id: 'home', label: 'Home' },
-    ...PRODUCT_CATEGORIES,
-    { id: 'contact', label: 'Contact' },
-  ], []);
 
   // Lock background scrolling when mobile menu drawer is open
   useEffect(() => {
@@ -134,7 +134,7 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
                   <button
                     key={link.id}
                     onClick={() => handleNavClick(link)}
-                    className={`relative px-1.5 md:px-2 lg:px-3 py-1 lg:py-1.5 text-[9px] md:text-[9.5px] lg:text-[11px] xl:text-[11.5px] font-sans font-semibold tracking-[0.05em] lg:tracking-[0.1em] uppercase transition-all duration-200 cursor-pointer whitespace-nowrap ${
+                    className={`relative px-1.5 md:px-2 lg:px-2.5 xl:px-3 py-1 lg:py-1.5 text-[9px] md:text-[9.5px] lg:text-[10.5px] xl:text-[11.5px] font-sans font-semibold tracking-[0.04em] lg:tracking-[0.08em] xl:tracking-[0.1em] uppercase transition-all duration-200 cursor-pointer whitespace-nowrap ${
                       isActive ? 'text-[#111111] font-bold' : 'text-[#666666] hover:text-[#111111]'
                     }`}
                   >
@@ -149,8 +149,8 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
                     <span className="relative z-10">
                       {link.id === 'luxurious-combo' ? (
                         <>
-                          <span className="inline lg:hidden">Combos</span>
-                          <span className="hidden lg:inline">{link.label}</span>
+                          <span className="inline xl:hidden">Combos</span>
+                          <span className="hidden xl:inline">{link.label}</span>
                         </>
                       ) : (
                         link.label
@@ -193,18 +193,18 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
             </button>
           </div>
 
-          {/* 3. RIGHT ZONE: Contact, Account & Shopping Bag */}
-          <div className="flex items-center justify-end gap-1.5 sm:gap-2 lg:gap-3 min-w-0">
-            {/* Desktop Contact Link */}
+          {/* 3. RIGHT ZONE: Contact link (positioned right after logo) + Account & Shopping Bag */}
+          <div className="flex items-center justify-between min-w-0 pl-1 md:pl-2 lg:pl-3">
+            {/* Desktop Contact Link: sits naturally right after center logo */}
             <button
               onClick={() => handleNavClick({ id: 'contact' })}
-              className={`hidden md:block relative px-1.5 md:px-2 lg:px-3 py-1 lg:py-1.5 text-[9px] md:text-[9.5px] lg:text-[11px] xl:text-[11.5px] font-sans font-semibold tracking-[0.05em] lg:tracking-[0.1em] uppercase transition-all duration-200 cursor-pointer whitespace-nowrap ${
+              className={`hidden md:block relative px-1.5 md:px-2 lg:px-2.5 xl:px-3 py-1 lg:py-1.5 text-[9px] md:text-[9.5px] lg:text-[10.5px] xl:text-[11.5px] font-sans font-semibold tracking-[0.04em] lg:tracking-[0.08em] xl:tracking-[0.1em] uppercase transition-all duration-200 cursor-pointer whitespace-nowrap ${
                 activeNavId === 'contact' ? 'text-[#111111] font-bold' : 'text-[#666666] hover:text-[#111111]'
               }`}
             >
               {activeNavId === 'contact' && (
                 <motion.span
-                  layoutId="navbarActivePillRight"
+                  layoutId="navbarActivePill"
                   className="absolute inset-0 bg-black/5 rounded-full border border-black/10"
                   transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                 />
@@ -212,53 +212,56 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
               <span className="relative z-10">Contact</span>
             </button>
 
-            {!isLoggedIn ? (
-              <button
-                onClick={onOpenAccount}
-                className="hidden md:flex items-center gap-1.5 px-2 md:px-2.5 lg:px-3.5 py-1 lg:py-1.5 rounded-full border border-black/12 bg-white/70 hover:bg-[#111111] text-[#111111] hover:text-white hover:border-[#111111] transition-all duration-300 cursor-pointer text-[9px] md:text-[9.5px] lg:text-[11px] font-sans font-bold tracking-[0.1em] uppercase active:scale-95 shadow-2xs group whitespace-nowrap"
-              >
-                <svg
-                  className="w-3.5 h-3.5 text-[#C08A3E] group-hover:text-white transition-colors duration-300"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            {/* Right Action Icons: Account + Shopping Bag */}
+            <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 shrink-0 ml-auto">
+              {!isLoggedIn ? (
+                <button
+                  onClick={onOpenAccount}
+                  className="hidden md:flex items-center gap-1.5 px-2 md:px-2.5 lg:px-3.5 py-1 lg:py-1.5 rounded-full border border-black/12 bg-white/70 hover:bg-[#111111] text-[#111111] hover:text-white hover:border-[#111111] transition-all duration-300 cursor-pointer text-[9px] md:text-[9.5px] lg:text-[11px] font-sans font-bold tracking-[0.1em] uppercase active:scale-95 shadow-2xs group whitespace-nowrap"
                 >
+                  <svg
+                    className="w-3.5 h-3.5 text-[#C08A3E] group-hover:text-white transition-colors duration-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.8}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                  <span>Sign In</span>
+                </button>
+              ) : (
+                <button
+                  onClick={onOpenAccount}
+                  className="hidden md:flex items-center gap-1.5 lg:gap-2 text-[9px] md:text-[9.5px] lg:text-[11px] xl:text-[11.5px] font-sans font-medium tracking-[0.1em] uppercase text-[#1A1A1A] hover:text-[#C08A3E] transition-colors duration-300 cursor-pointer whitespace-nowrap"
+                >
+                  <div className="w-4.5 h-4.5 lg:w-5 lg:h-5 rounded-full bg-[#111111] text-white text-[9px] lg:text-[9.5px] font-serif font-black flex items-center justify-center shadow-xs" style={{ width: 20, height: 20 }}>
+                    {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || 'L'}
+                  </div>
+                  <span>Account</span>
+                </button>
+              )}
+
+              <button
+                onClick={onOpenCart}
+                className="relative flex items-center gap-1.5 px-2.5 sm:px-3 lg:px-3.5 py-1 lg:py-1.5 rounded-full bg-[#111111] hover:bg-black/80 text-white transition-all duration-300 cursor-pointer shadow-xs group active:scale-95 shrink-0"
+                aria-label="View Shopping Bag"
+              >
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#F3E5AB] group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={1.8}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
                   />
                 </svg>
-                <span>Sign In</span>
+                <span className="text-[10px] sm:text-[11px] lg:text-xs font-sans font-bold tracking-widest">{cartCount}</span>
               </button>
-            ) : (
-              <button
-                onClick={onOpenAccount}
-                className="hidden md:flex items-center gap-1.5 lg:gap-2 text-[9px] md:text-[9.5px] lg:text-[11px] xl:text-[11.5px] font-sans font-medium tracking-[0.1em] uppercase text-[#1A1A1A] hover:text-[#C08A3E] transition-colors duration-300 cursor-pointer whitespace-nowrap"
-              >
-                <div className="w-4.5 h-4.5 lg:w-5 lg:h-5 rounded-full bg-[#111111] text-white text-[9px] lg:text-[9.5px] font-serif font-black flex items-center justify-center shadow-xs" style={{ width: 20, height: 20 }}>
-                  {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || 'L'}
-                </div>
-                <span>Account</span>
-              </button>
-            )}
-
-            <button
-              onClick={onOpenCart}
-              className="relative flex items-center gap-1.5 px-2.5 sm:px-3 lg:px-3.5 py-1 lg:py-1.5 rounded-full bg-[#111111] hover:bg-black/80 text-white transition-all duration-300 cursor-pointer shadow-xs group active:scale-95 shrink-0"
-              aria-label="View Shopping Bag"
-            >
-              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#F3E5AB] group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.8}
-                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                />
-              </svg>
-              <span className="text-[10px] sm:text-[11px] lg:text-xs font-sans font-bold tracking-widest">{cartCount}</span>
-            </button>
+            </div>
           </div>
         </nav>
       </header>
@@ -309,7 +312,7 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
 
                 {/* Navigation Links */}
                 <div className="flex flex-col gap-1.5 pt-1">
-                  {navLinks.map((link, idx) => {
+                  {NAV_LINKS.map((link, idx) => {
                     const isActive = activeNavId === link.id;
                     const numStr = `0${idx + 1}`;
                     return (
