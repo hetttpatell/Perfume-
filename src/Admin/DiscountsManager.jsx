@@ -364,7 +364,7 @@ export default function DiscountsManager() {
 
             <form onSubmit={handleFormSubmit} className="space-y-4 font-sans text-xs">
               <div>
-                <label className="block text-[11px] font-extrabold uppercase text-gray-900 mb-1">
+                <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">
                   COUPON CODE (UPPERCASE) *
                 </label>
                 <input
@@ -373,13 +373,13 @@ export default function DiscountsManager() {
                   value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
                   placeholder="e.g. LUNE20"
-                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-sm font-mono font-bold text-gray-900"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 uppercase transition-all"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] font-extrabold uppercase text-gray-900 mb-1">
+                  <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">
                     DISCOUNT PERCENTAGE (%) *
                   </label>
                   <input
@@ -390,12 +390,12 @@ export default function DiscountsManager() {
                     value={formData.percentage}
                     onChange={(e) => setFormData({ ...formData, percentage: e.target.value })}
                     placeholder="15"
-                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-sm font-black text-gray-900"
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-extrabold uppercase text-gray-900 mb-1">
+                  <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">
                     MAXIMUM USAGE LIMIT
                   </label>
                   <input
@@ -403,7 +403,7 @@ export default function DiscountsManager() {
                     value={formData.maxUses}
                     onChange={(e) => setFormData({ ...formData, maxUses: e.target.value })}
                     placeholder="100"
-                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-sm font-bold text-gray-900"
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all"
                   />
                 </div>
               </div>

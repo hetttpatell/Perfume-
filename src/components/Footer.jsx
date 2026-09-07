@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import logoImg from '../assets/Logo.png';
 
 export default function Footer({ onScrollToTop }) {
   const [email, setEmail] = useState('');
@@ -97,14 +98,20 @@ export default function Footer({ onScrollToTop }) {
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 py-12 sm:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 items-start">
           
-          {/* Column 1: LUNE FRAGRANCE Brand & Newsletter */}
+          {/* Column 1: LUNE FRAGRANCE Brand Logo & Newsletter */}
           <div className="flex flex-col pr-0 lg:pr-4">
-            <h3 style={{ fontFamily: "'Cinzel', 'Cormorant Garamond', serif" }} className="font-bold uppercase text-3xl sm:text-4xl text-[#1A1A1A] tracking-[0.25em] mb-1 leading-none">
-              LUNE
-            </h3>
-            <span className="font-sans text-[10px] uppercase tracking-[0.4em] text-[#555555] font-bold mb-3">
-              FRAGRANCE
-            </span>
+            <Link
+              to="/"
+              onClick={onScrollToTop || (() => window.scrollTo({ top: 0, behavior: 'smooth' }))}
+              className="inline-block mb-3.5 group cursor-pointer"
+              title="Maison Lune Home"
+            >
+              <img
+                src={logoImg}
+                alt="LUNE Fragrance Logo"
+                className="h-8 sm:h-9 w-auto object-contain transition-opacity duration-200 group-hover:opacity-80"
+              />
+            </Link>
             <p className="font-sans text-xs sm:text-sm text-[#737373] leading-relaxed mb-6">
               Crafting luxury olfactory masterpieces. Join our Gazette for confidential updates and exclusive offers.
             </p>
@@ -142,22 +149,35 @@ export default function Footer({ onScrollToTop }) {
             </h4>
             <ul className="space-y-2.5 font-sans text-xs sm:text-sm text-[#555555]">
               <li>
-                <Link to="/" className="hover:text-black transition-colors block">
+                <Link
+                  to="/"
+                  onClick={onScrollToTop || (() => window.scrollTo({ top: 0, behavior: 'smooth' }))}
+                  className="hover:text-black transition-colors block"
+                >
                   Home
                 </Link>
               </li>
               <li>
-                <Link to="/about" className="hover:text-black transition-colors block font-semibold text-black">
+                <Link
+                  to="/about"
+                  className="hover:text-black transition-colors block"
+                >
                   About Us
                 </Link>
               </li>
               <li>
-                <Link to="/collection" className="hover:text-black transition-colors block">
+                <Link
+                  to="/collection"
+                  className="hover:text-black transition-colors block"
+                >
                   Collection & Products
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="hover:text-black transition-colors block">
+                <Link
+                  to="/contact"
+                  className="hover:text-black transition-colors block"
+                >
                   Contact & Concierge
                 </Link>
               </li>

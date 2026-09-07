@@ -4,6 +4,7 @@ import gsap from 'gsap';
 import FragranceDetails from './FragranceDetails';
 import SensoryRitual from './SensoryRitual';
 import BrandStory from './BrandStory';
+import FeaturedProducts from './FeaturedProducts';
 import OlfactoryExperience from './OlfactoryExperience';
 import Navbar from './Navbar';
 import Loader from './Loader';
@@ -805,8 +806,8 @@ export default function HeroSlider({
                   onClick={() => goToSlide(idx)}
                   aria-label={`Go to slide ${idx + 1}`}
                   className={`rounded-full transition-all duration-300 cursor-pointer ${idx === displayedSlideIndex
-                      ? 'w-6 sm:w-7 h-2 sm:h-2.5 bg-[#111111]'
-                      : 'w-2 sm:w-2.5 h-2 sm:h-2.5 bg-black/20 hover:bg-black/40'
+                    ? 'w-6 sm:w-7 h-2 sm:h-2.5 bg-[#111111]'
+                    : 'w-2 sm:w-2.5 h-2 sm:h-2.5 bg-black/20 hover:bg-black/40'
                     }`}
                 />
               ))}
@@ -826,7 +827,10 @@ export default function HeroSlider({
         </footer>
       </section>
 
-      {/* Brand Heritage & Story Section (Right after Hero) */}
+      {/* Haute Parfumerie Boutique (Featured Products — directly below hero, above BrandStory) */}
+      <FeaturedProducts />
+
+      {/* Brand Heritage & Story Section */}
       <div id="about" className="scroll-mt-24">
         <BrandStory
           onSelectNote={(idx) => {
@@ -841,7 +845,7 @@ export default function HeroSlider({
         <SensoryRitual />
       </div>
 
-      {/* Haute Parfumerie Boutique (Featured Products, Testimonials, Map & Footer) */}
+      {/* Olfactory Experience, Locations & Footer (Below BrandStory & SensoryRitual) */}
       <OlfactoryExperience
         onScrollToTop={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         cartItems={cartItems}

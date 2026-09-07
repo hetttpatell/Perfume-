@@ -875,7 +875,7 @@ export default function ProductsManager() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-[11px] font-extrabold uppercase text-gray-900 mb-1.5 tracking-wider">
+                    <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">
                       PRODUCT ID (UNIQUE SLUG)
                     </label>
                     <input
@@ -884,12 +884,12 @@ export default function ProductsManager() {
                       value={formData.id}
                       onChange={(e) => setFormData({ ...formData, id: e.target.value })}
                       placeholder="e.g. n19-extrait"
-                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl font-mono text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 disabled:bg-gray-100 disabled:text-gray-500 font-semibold"
+                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 disabled:bg-gray-100 disabled:text-gray-500 transition-all"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-extrabold uppercase text-gray-900 mb-1.5 tracking-wider">
+                    <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">
                       FULL PRODUCT NAME *
                     </label>
                     <input
@@ -898,14 +898,14 @@ export default function ProductsManager() {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="e.g. LUNE N°19 EXTRAIT DE PARFUM"
-                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-sm font-bold text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10"
+                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                   <div>
-                    <label className="block text-[11px] font-extrabold uppercase text-gray-900 mb-1.5 tracking-wider">
+                    <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">
                       FRENCH SUBTITLE
                     </label>
                     <input
@@ -913,18 +913,18 @@ export default function ProductsManager() {
                       value={formData.frenchName}
                       onChange={(e) => setFormData({ ...formData, frenchName: e.target.value })}
                       placeholder="e.g. Extrait de Parfum Pur"
-                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-xs font-semibold text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10"
+                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-extrabold uppercase text-gray-900 mb-1.5 tracking-wider">
+                    <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">
                       CATEGORY
                     </label>
                     <select
                       value={formData.category}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-xs font-bold text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 uppercase"
+                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all"
                     >
                       {categoriesList.map(catName => (
                         <option key={catName} value={catName}>{catName}</option>
@@ -933,7 +933,7 @@ export default function ProductsManager() {
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-extrabold uppercase text-gray-900 mb-1.5 tracking-wider">
+                    <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">
                       PRICE ($ USD) *
                     </label>
                     <input
@@ -942,7 +942,7 @@ export default function ProductsManager() {
                       value={formData.price}
                       onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                       placeholder="340"
-                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-sm font-black text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10"
+                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all"
                     />
                   </div>
                 </div>
@@ -1160,7 +1160,7 @@ export default function ProductsManager() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-2 border-t border-gray-200">
                   <div>
-                    <label className="block text-[11px] font-extrabold uppercase text-gray-900 mb-1.5 tracking-wider">
+                    <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">
                       HERO TITLE OVERLAY
                     </label>
                     <input
@@ -1168,12 +1168,12 @@ export default function ProductsManager() {
                       value={formData.heroTitle}
                       onChange={(e) => setFormData({ ...formData, heroTitle: e.target.value })}
                       placeholder="e.g. LUNE N°19"
-                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-xs font-bold text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10"
+                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-extrabold uppercase text-gray-900 mb-1.5 tracking-wider">
+                    <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">
                       HERO SUBTITLE OVERLAY
                     </label>
                     <input
@@ -1181,13 +1181,13 @@ export default function ProductsManager() {
                       value={formData.heroSubtitle}
                       onChange={(e) => setFormData({ ...formData, heroSubtitle: e.target.value })}
                       placeholder="e.g. EXTRAIT DE PARFUM • PURE ESSENCE"
-                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-xs font-bold text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10"
+                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-extrabold uppercase text-gray-900 mb-1.5 tracking-wider">
+                  <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">
                     HERO SLIDER QUOTE / ONE-LINER
                   </label>
                   <input
@@ -1195,39 +1195,39 @@ export default function ProductsManager() {
                     value={formData.heroQuote}
                     onChange={(e) => setFormData({ ...formData, heroQuote: e.target.value })}
                     placeholder="“An ethereal floral whisper wrapped in powdery iris and galbanum.”"
-                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-xs font-semibold text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 font-serif italic"
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-[10px] font-extrabold uppercase text-gray-900 mb-1 tracking-wider">FLOATING NOTE 1</label>
+                    <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">FLOATING NOTE 1</label>
                     <input
                       type="text"
                       value={formData.heroNote1}
                       onChange={(e) => setFormData({ ...formData, heroNote1: e.target.value })}
                       placeholder="Galbanum"
-                      className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-gray-900"
+                      className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-extrabold uppercase text-gray-900 mb-1 tracking-wider">FLOATING NOTE 2</label>
+                    <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">FLOATING NOTE 2</label>
                     <input
                       type="text"
                       value={formData.heroNote2}
                       onChange={(e) => setFormData({ ...formData, heroNote2: e.target.value })}
                       placeholder="Iris Pallida"
-                      className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-gray-900"
+                      className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-extrabold uppercase text-gray-900 mb-1 tracking-wider">FLOATING NOTE 3</label>
+                    <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">FLOATING NOTE 3</label>
                     <input
                       type="text"
                       value={formData.heroNote3}
                       onChange={(e) => setFormData({ ...formData, heroNote3: e.target.value })}
                       placeholder="Vetiver"
-                      className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-gray-900"
+                      className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all"
                     />
                   </div>
                 </div>
@@ -1243,7 +1243,7 @@ export default function ProductsManager() {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-extrabold uppercase text-gray-900 mb-1.5 tracking-wider">
+                  <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">
                     PRODUCT DESCRIPTION & HERITAGE STORY
                   </label>
                   <textarea
@@ -1251,39 +1251,39 @@ export default function ProductsManager() {
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Describe fragrance story, bouquet essence, and ingredients..."
-                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-xs font-medium text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 leading-relaxed"
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 leading-relaxed transition-all"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-[10px] font-extrabold uppercase text-[#C08A3E] mb-1 tracking-wider">TOP NOTES</label>
+                    <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">TOP NOTES</label>
                     <input
                       type="text"
                       value={formData.topNotes}
                       onChange={(e) => setFormData({ ...formData, topNotes: e.target.value })}
                       placeholder="Galbanum, Bergamot"
-                      className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-gray-900"
+                      className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-extrabold uppercase text-[#C08A3E] mb-1 tracking-wider">HEART NOTES</label>
+                    <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">HEART NOTES</label>
                     <input
                       type="text"
                       value={formData.heartNotes}
                       onChange={(e) => setFormData({ ...formData, heartNotes: e.target.value })}
                       placeholder="Iris Pallida, May Rose"
-                      className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-gray-900"
+                      className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-extrabold uppercase text-[#C08A3E] mb-1 tracking-wider">BASE NOTES</label>
+                    <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">BASE NOTES</label>
                     <input
                       type="text"
                       value={formData.baseNotes}
                       onChange={(e) => setFormData({ ...formData, baseNotes: e.target.value })}
                       placeholder="Vetiver, Cedarwood"
-                      className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-gray-900"
+                      className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all"
                     />
                   </div>
                 </div>

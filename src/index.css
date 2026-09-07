@@ -122,3 +122,12 @@ aside::-webkit-scrollbar-thumb:hover {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* Haute Luxury Typography Utilities */
+.font-cormorant {
+  font-family: 'Cormorant Garamond', Garamond, Georgia, serif;
+}
+
+.font-cinzel {
+  font-family: 'Cinzel', Georgia, serif;
+}

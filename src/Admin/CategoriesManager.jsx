@@ -407,7 +407,7 @@ export default function CategoriesManager() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[11px] font-extrabold uppercase text-gray-900 mb-1">
+                    <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">
                       CATEGORY NAME *
                     </label>
                     <input
@@ -416,12 +416,12 @@ export default function CategoriesManager() {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="e.g. DISCOVERY SETS"
-                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-sm font-bold text-gray-900"
+                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 uppercase transition-all"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-extrabold uppercase text-gray-900 mb-1">
+                    <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">
                       FRENCH SUBTITLE
                     </label>
                     <input
@@ -429,13 +429,13 @@ export default function CategoriesManager() {
                       value={formData.frenchName}
                       onChange={(e) => setFormData({ ...formData, frenchName: e.target.value })}
                       placeholder="e.g. Coffrets Découverte"
-                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-xs font-semibold text-gray-900"
+                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 transition-all"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-extrabold uppercase text-gray-900 mb-1">
+                  <label className="block text-[11px] font-sans font-bold uppercase text-gray-800 mb-1.5 tracking-wider">
                     DESCRIPTION
                   </label>
                   <textarea
@@ -443,7 +443,7 @@ export default function CategoriesManager() {
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Category collection overview..."
-                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-xs text-gray-900"
+                    className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl font-sans text-sm font-medium text-gray-900 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 leading-relaxed transition-all"
                   />
                 </div>
               </div>

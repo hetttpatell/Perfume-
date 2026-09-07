@@ -1,5 +1,5 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchProducts, fetchCategories, getCachedProducts } from '../services/api';
 import { useCart } from '../context/CartContext';
@@ -93,8 +93,14 @@ export default function Collectionproducts({
   setIsCartOpen: parentSetIsCartOpen,
 }) {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { cartItems: contextCartItems, setCartItems: contextSetCartItems, isCartOpen: contextIsCartOpen, setIsCartOpen: contextSetIsCartOpen, addItemToCart } = useCart();
-  const [activeCategory, setActiveCategory] = useState('ALL');
+
+  // Derive initial category from URL ?category= param (for navbar deep-linking)
+  const [activeCategory, setActiveCategory] = useState(() => {
+    const urlCategory = searchParams.get('category');
+    return urlCategory || 'ALL';
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('recommended');
   const [productsList, setProductsList] = useState(() => getCachedProducts());
@@ -117,6 +123,16 @@ export default function Collectionproducts({
   const setCartItems = parentSetCartItems || contextSetCartItems;
   const isCartOpen = parentIsCartOpen !== undefined ? parentIsCartOpen : contextIsCartOpen;
   const setIsCartOpen = parentSetIsCartOpen || contextSetIsCartOpen;
+
+  // Sync activeCategory when URL ?category= param changes (navbar deep-linking)
+  useEffect(() => {
+    const urlCategory = searchParams.get('category');
+    if (urlCategory) {
+      setActiveCategory(urlCategory);
+    } else {
+      setActiveCategory('ALL');
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     let isMounted = true;
@@ -243,6 +259,8 @@ export default function Collectionproducts({
     setPriceMax('');
     setAppliedPriceMin('');
     setAppliedPriceMax('');
+    // Clear URL category param so the URL stays in sync
+    setSearchParams({}, { replace: true });
   };
 
   const handleAddToBag = (e, product) => {
@@ -357,6 +375,12 @@ export default function Collectionproducts({
                 key={cat.id}
                 onClick={() => {
                   setActiveCategory(cat.id);
+                  // Keep URL in sync with the active category
+                  if (cat.id === 'ALL') {
+                    setSearchParams({}, { replace: true });
+                  } else {
+                    setSearchParams({ category: cat.id }, { replace: true });
+                  }
                   setIsMobileFilterOpen(false);
                 }}
                 className={`group flex items-center justify-between px-2.5 py-2 text-left transition-all duration-200 cursor-pointer ${

@@ -92,7 +92,7 @@ export default function BrandLocationsMap() {
 
           {/* Action CTAs */}
           <div className="pt-6 mt-6 border-t border-black/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-            <span className="text-[10px] font-sans text-[#737373] tracking-widest font-mono text-center sm:text-left">
+            <span className="text-[10px] font-sans text-[#737373] tracking-widest text-center sm:text-left">
               GPS: {primaryLocation.coordinates}
             </span>
 
