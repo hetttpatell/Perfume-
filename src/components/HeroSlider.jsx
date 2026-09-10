@@ -16,58 +16,144 @@ const HERO_SVG = '/SVGs/Perfume-SVG.png';
 
 
 // ──────────────────────────────────────────────────────────────────────────────
-// Floating Fragrance Notes Badges Subcomponent
+// Raw Fragrance Subelements Configuration (2 per product)
+// 1st Product: Bourbon Vanilla & Mysore Sandalwood
+// 2nd Product: Smoked Cambodian Oud & Roasted Cocoa Beans
 // ──────────────────────────────────────────────────────────────────────────────
-function FloatingNotes({ slideData }) {
-  if (!slideData || !slideData.keyNotes) return null;
-  const notes = slideData.keyNotes;
-  const accent = slideData.accent || '#059669';
+const HERO_SUBELEMENTS_MAP = [
+  // Product 1 (Rich Blossom): Bourbon Vanilla (airborne upper-left) & Mysore Sandalwood (grounded lower-right)
+  [
+    {
+      id: 'vanilla',
+      name: 'BOURBON VANILLA',
+      accord: 'ACCORD I',
+      origin: 'Madagascar Botanical',
+      src: '/subelements/Vanila.png',
+      alt: 'Bourbon Vanilla Orchid & Pods',
+      type: 'airborne',
+      side: 'left',
+      wrapperClass: 'top-[8%] sm:top-[10%] md:top-[12%] lg:top-[14%] right-[50%] mr-11 sm:mr-16 md:mr-20 lg:mr-24',
+      sizeClass: 'w-13 sm:w-16 md:w-20 lg:w-26 xl:w-30 max-w-[140px]',
+      imgRotation: '-rotate-12 group-hover:-rotate-6',
+      animClass: 'animate-subelement-airborne',
+    },
+    {
+      id: 'sandalwood',
+      name: 'MYSORE SANDALWOOD',
+      accord: 'ACCORD II',
+      origin: 'Sacred Woods & Incense',
+      src: '/subelements/Sandalwood.png',
+      alt: 'Mysore Sandalwood & Incense Bowl',
+      type: 'grounded',
+      side: 'right',
+      wrapperClass: 'bottom-[14%] sm:bottom-[16%] md:bottom-[18%] lg:bottom-[18%] left-[50%] ml-11 sm:ml-16 md:ml-20 lg:ml-24',
+      sizeClass: 'w-15 sm:w-18 md:w-22 lg:w-28 xl:w-32 max-w-[150px]',
+      imgRotation: 'rotate-2 group-hover:rotate-0',
+      animClass: 'animate-subelement-grounded',
+    },
+  ],
+  // Product 2 (Lune Extrait): Cambodian Smoked Oud (airborne upper-right) & Roasted Cocoa (grounded lower-left)
+  [
+    {
+      id: 'oud',
+      name: 'ROYAL SMOKED OUD',
+      accord: 'ACCORD I',
+      origin: 'Smoked Cambodian Timber',
+      src: '/subelements/Oud.png',
+      alt: 'Royal Smoked Cambodian Oud Timber',
+      type: 'airborne',
+      side: 'right',
+      wrapperClass: 'top-[8%] sm:top-[10%] md:top-[12%] lg:top-[14%] left-[50%] ml-11 sm:ml-16 md:ml-20 lg:ml-24',
+      sizeClass: 'w-13 sm:w-16 md:w-20 lg:w-26 xl:w-30 max-w-[140px]',
+      imgRotation: 'rotate-12 group-hover:rotate-6',
+      animClass: 'animate-subelement-airborne-alt',
+    },
+    {
+      id: 'cocoa',
+      name: 'ROASTED COCOA',
+      accord: 'ACCORD II',
+      origin: 'Single-Origin Cacao',
+      src: '/subelements/Cococ.png',
+      alt: 'Single-Origin Roasted Cocoa Beans',
+      type: 'grounded',
+      side: 'left',
+      wrapperClass: 'bottom-[14%] sm:bottom-[16%] md:bottom-[18%] lg:bottom-[18%] right-[50%] mr-11 sm:mr-16 md:mr-20 lg:mr-24',
+      sizeClass: 'w-14 sm:w-16 md:w-20 lg:w-26 xl:w-30 max-w-[140px]',
+      imgRotation: '-rotate-4 group-hover:-rotate-1',
+      animClass: 'animate-subelement-grounded',
+    },
+  ],
+];
+
+function HeroSubElement({ item, mouseOffset = { x: 0, y: 0 } }) {
+  const isTop = item.type === 'airborne';
+  const parallaxMultiplier = isTop ? 1.1 : -0.6;
+  const px = mouseOffset.x * parallaxMultiplier * 12;
+  const py = mouseOffset.y * parallaxMultiplier * 12;
+
+  const isGrounded = item.type === 'grounded';
 
   return (
-    <>
-      {/* Floating Note 1 - Top Left */}
-      {notes[0] && (
-        <div className="absolute top-[18%] -left-2 sm:-left-4 md:left-0 lg:left-4 z-20 animate-float-slow pointer-events-auto">
-          <div className="px-3 py-1 sm:px-4 sm:py-2 bg-white/90 backdrop-blur-xl border border-black/10 rounded-full shadow-lg shadow-black/5 flex items-center gap-1.5 sm:gap-2.5 transition-all duration-300 hover:scale-105 hover:shadow-xl">
-            <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shrink-0" style={{ backgroundColor: accent }} />
-            <span className="font-sans font-bold text-[9px] sm:text-[11px] md:text-[12px] tracking-[0.15em] uppercase text-[#111111] whitespace-nowrap">
-              {notes[0]}
-            </span>
-          </div>
-        </div>
-      )}
+    <div
+      className={`hero-subelement absolute ${item.wrapperClass} z-20 pointer-events-auto select-none group will-change-transform`}
+      style={{
+        transform: `translate3d(${px}px, ${py}px, 0)`,
+        transition: 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)',
+      }}
+    >
+      <div className={`flex flex-col items-center justify-center ${item.animClass}`}>
+        {/* Studio Photographic Cutout Presentation */}
+        <div className="relative flex flex-col items-center justify-center cursor-pointer">
+          <img
+            src={item.src}
+            alt={item.alt}
+            draggable={false}
+            className={`${item.sizeClass} h-auto object-contain transition-all duration-500 ease-out select-none drop-shadow-[0_8px_16px_rgba(0,0,0,0.10)] group-hover:drop-shadow-[0_16px_26px_rgba(0,0,0,0.18)] group-hover:scale-105 ${item.imgRotation}`}
+          />
 
-      {/* Floating Note 2 - Middle Right */}
-      {notes[1] && (
-        <div className="absolute top-[42%] -right-2 sm:-right-4 md:right-0 lg:right-4 z-20 animate-float-reverse pointer-events-auto">
-          <div className="px-3 py-1 sm:px-4 sm:py-2 bg-white/90 backdrop-blur-xl border border-black/10 rounded-full shadow-lg shadow-black/5 flex items-center gap-1.5 sm:gap-2.5 transition-all duration-300 hover:scale-105 hover:shadow-xl">
-            <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shrink-0" style={{ backgroundColor: accent }} />
-            <span className="font-sans font-bold text-[9px] sm:text-[11px] md:text-[12px] tracking-[0.15em] uppercase text-[#111111] whitespace-nowrap">
-              {notes[1]}
-            </span>
-          </div>
+          {/* Realistic Surface Contact Shadow for Grounded Elements */}
+          {isGrounded && (
+            <div className="w-3/4 h-1.5 sm:h-2 bg-black/15 rounded-[100%] blur-sm mx-auto -mt-1 pointer-events-none select-none opacity-30 group-hover:opacity-20 transition-all duration-300" />
+          )}
         </div>
-      )}
 
-      {/* Floating Note 3 - Bottom Left */}
-      {notes[2] && (
-        <div className="absolute bottom-[10%] -left-1 sm:-left-3 md:left-2 lg:left-6 z-20 animate-float-delayed pointer-events-auto">
-          <div className="px-3 py-1 sm:px-4 sm:py-2 bg-white/90 backdrop-blur-xl border border-black/10 rounded-full shadow-lg shadow-black/5 flex items-center gap-1.5 sm:gap-2.5 transition-all duration-300 hover:scale-105 hover:shadow-xl">
-            <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shrink-0" style={{ backgroundColor: accent }} />
-            <span className="font-sans font-bold text-[9px] sm:text-[11px] md:text-[12px] tracking-[0.15em] uppercase text-[#111111] whitespace-nowrap">
-              {notes[2]}
+        {/* Haute Parfumerie Editorial Nameplate — Refined luxury typography */}
+        <div className="mt-1 sm:mt-1.5 flex flex-col items-center text-center select-none pointer-events-none">
+          {/* Micro Accord Header with fine hairline */}
+          <div className="flex items-center gap-1 opacity-70">
+            <span className="w-2 sm:w-2.5 h-[0.5px] bg-black/40" />
+            <span className="font-sans text-[6.5px] sm:text-[7.5px] md:text-[8px] tracking-[0.25em] uppercase text-black/60 font-semibold whitespace-nowrap">
+              {item.accord}
             </span>
+            <span className="w-2 sm:w-2.5 h-[0.5px] bg-black/40" />
           </div>
+
+          {/* Refined Serif Fragrance Note Name */}
+          <span className="font-serif text-[8.5px] sm:text-[10px] md:text-[11.5px] lg:text-[13px] tracking-[0.16em] uppercase text-[#111111] font-semibold mt-0.5 whitespace-normal sm:whitespace-nowrap max-w-[85px] sm:max-w-none text-center leading-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">
+            {item.name}
+          </span>
+
+          {/* Subtle Botanical Origin */}
+          <span className="font-serif italic text-[7px] sm:text-[8px] md:text-[9px] text-neutral-500 tracking-wider mt-0.5 hidden sm:block whitespace-nowrap">
+            {item.origin}
+          </span>
         </div>
-      )}
-    </>
+      </div>
+    </div>
   );
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
 // SVG Product Image Hero Component - Clean Presentation with Responsive Motion
 // ──────────────────────────────────────────────────────────────────────────────
-function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirection, slidesList = SLIDES }) {
+function HeroProductImage({
+  loaderState,
+  onModelLoaded,
+  currentSlide,
+  slideDirection,
+  slidesList = SLIDES,
+  mouseOffset = { x: 0, y: 0 },
+}) {
   const currentBottleRef = useRef(null);
   const incomingBottleRef = useRef(null);
   const activeSlideRef = useRef(currentSlide);
@@ -76,7 +162,14 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
 
   const hasEntranceAnimatedRef = useRef(false);
 
-  // Initial loader entrance animation for product SVG flacon
+  const getSubElementsForSlide = (idx) => {
+    return HERO_SUBELEMENTS_MAP[idx % HERO_SUBELEMENTS_MAP.length] || HERO_SUBELEMENTS_MAP[0];
+  };
+
+  const currentSubElements = getSubElementsForSlide(currentSlideIdx);
+  const incomingSubElements = getSubElementsForSlide(incomingSlideIdx);
+
+  // Initial loader entrance animation for product SVG flacon and subelements
   useEffect(() => {
     if (loaderState === 'loading') {
       hasEntranceAnimatedRef.current = false;
@@ -88,13 +181,18 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
           rotation: -2,
           force3D: true,
         });
+        const subelements = currentBottleRef.current.querySelectorAll('.hero-subelement');
+        if (subelements.length > 0) {
+          gsap.set(subelements, { opacity: 0, scale: 0.7, y: 35 });
+        }
       }
     } else if ((loaderState === 'exiting' || loaderState === 'completed') && !hasEntranceAnimatedRef.current) {
       hasEntranceAnimatedRef.current = true;
       if (currentBottleRef.current) {
         const bottleEl = currentBottleRef.current;
         const imgEl = bottleEl.querySelector('img');
-        const shadowEl = bottleEl.querySelector('.bg-black\\/20');
+        const shadowEl = bottleEl.querySelector('.bg-black\\/20, .bg-black\\/15');
+        const subelements = bottleEl.querySelectorAll('.hero-subelement');
 
         const tl = gsap.timeline({
           delay: loaderState === 'exiting' ? 0.02 : 0,
@@ -130,6 +228,15 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
             0.1
           );
         }
+
+        if (subelements.length > 0) {
+          tl.fromTo(
+            subelements,
+            { opacity: 0, scale: 0.7, y: 30 },
+            { opacity: 1, scale: 1, y: 0, duration: 1.1, stagger: 0.15, ease: 'back.out(1.4)' },
+            0.25
+          );
+        }
       }
     }
   }, [loaderState]);
@@ -153,8 +260,6 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
 
       if (isMobile) {
         // Mobile view: horizontal transition
-        // Next product: current goes out left (-100vw), new comes from right (100vw)
-        // Prev product: current goes out right (100vw), new comes from left (-100vw)
         exitX = isNext ? '-100vw' : '100vw';
         entryX = isNext ? '100vw' : '-100vw';
       } else {
@@ -177,6 +282,11 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
         opacity: 1,
         scale: 1,
       });
+
+      const incomingSubelements = incomingEl.querySelectorAll('.hero-subelement');
+      if (incomingSubelements.length > 0) {
+        gsap.set(incomingSubelements, { opacity: 0, scale: 0.75 });
+      }
 
       const tl = gsap.timeline({
         onComplete: () => {
@@ -210,6 +320,20 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
         },
         0
       );
+
+      if (incomingSubelements.length > 0) {
+        tl.to(
+          incomingSubelements,
+          {
+            opacity: 1,
+            scale: 1,
+            duration: 0.65,
+            stagger: 0.12,
+            ease: 'back.out(1.4)',
+          },
+          0.32
+        );
+      }
     } else {
       activeSlideRef.current = currentSlide;
       setCurrentSlideIdx(currentSlide);
@@ -227,54 +351,50 @@ function HeroProductImage({ loaderState, onModelLoaded, currentSlide, slideDirec
       {/* Active Product Flacon */}
       <div
         ref={currentBottleRef}
-        className="absolute inset-0 flex flex-col items-center justify-center max-w-[320px] sm:max-w-[380px] md:max-w-[440px] lg:max-w-[500px] xl:max-w-[540px] w-full mx-auto will-change-transform"
+        className="absolute inset-0 flex flex-col items-center justify-center max-w-[340px] sm:max-w-[400px] md:max-w-[460px] lg:max-w-[520px] xl:max-w-[560px] w-full mx-auto will-change-transform"
       >
-        {/* <FloatingNotes slideData={currentData} /> */}
-        <img
-          src={currentData?.image || HERO_SVG}
-          alt={currentData?.title || "Lune Perfume Flacon"}
-          className="w-auto min-h-[280px] h-[50vh] sm:h-[52vh] md:h-[60vh] lg:h-[66vh] xl:h-[72vh] max-h-[780px] object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.14)] select-none pointer-events-none"
-          draggable={false}
-        />
-        {/* Contact Shadow */}
-        <div className="w-2/5 h-3 sm:h-4 bg-black/15 rounded-[100%] blur-md -mt-1 sm:-mt-2 pointer-events-none select-none opacity-30" />
+        <div className="relative w-fit flex flex-col items-center justify-center">
+          {/* Sub-elements for current product */}
+          {currentSubElements.map((item) => (
+            <HeroSubElement key={item.id} item={item} mouseOffset={mouseOffset} />
+          ))}
+
+          <img
+            src={currentData?.image || HERO_SVG}
+            alt={currentData?.title || "Lune Perfume Flacon"}
+            className="w-auto min-h-[280px] h-[48vh] sm:h-[52vh] md:h-[60vh] lg:h-[66vh] xl:h-[72vh] max-h-[780px] object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.16)] select-none pointer-events-none"
+            draggable={false}
+          />
+          {/* Contact Shadow */}
+          <div className="w-2/5 h-2.5 sm:h-3.5 bg-black/15 rounded-[100%] blur-md -mt-1 sm:-mt-2 pointer-events-none select-none opacity-30" />
+        </div>
       </div>
 
       {/* Incoming Product Flacon */}
       <div
         ref={incomingBottleRef}
         style={{ display: 'none' }}
-        className="absolute inset-0 flex flex-col items-center justify-center max-w-[320px] sm:max-w-[380px] md:max-w-[440px] lg:max-w-[500px] xl:max-w-[540px] w-full mx-auto will-change-transform"
+        className="absolute inset-0 flex flex-col items-center justify-center max-w-[340px] sm:max-w-[400px] md:max-w-[460px] lg:max-w-[520px] xl:max-w-[560px] w-full mx-auto will-change-transform"
       >
-        {/* <FloatingNotes slideData={incomingData} /> */}
-        <img
-          src={incomingData?.image || HERO_SVG}
-          alt={incomingData?.title || "Lune Perfume Flacon"}
-          className="w-auto min-h-[280px] h-[50vh] sm:h-[52vh] md:h-[60vh] lg:h-[66vh] xl:h-[72vh] max-h-[780px] object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.14)] select-none pointer-events-none"
-          draggable={false}
-        />
-        {/* Contact Shadow */}
-        <div className="w-2/5 h-3 sm:h-4 bg-black/15 rounded-[100%] blur-md -mt-1 sm:-mt-2 pointer-events-none select-none opacity-30" />
+        <div className="relative w-fit flex flex-col items-center justify-center">
+          {/* Sub-elements for incoming product */}
+          {incomingSubElements.map((item) => (
+            <HeroSubElement key={item.id} item={item} mouseOffset={mouseOffset} />
+          ))}
+
+          <img
+            src={incomingData?.image || HERO_SVG}
+            alt={incomingData?.title || "Lune Perfume Flacon"}
+            className="w-auto min-h-[280px] h-[48vh] sm:h-[52vh] md:h-[60vh] lg:h-[66vh] xl:h-[72vh] max-h-[780px] object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.16)] select-none pointer-events-none"
+            draggable={false}
+          />
+          {/* Contact Shadow */}
+          <div className="w-2/5 h-2.5 sm:h-3.5 bg-black/15 rounded-[100%] blur-md -mt-1 sm:-mt-2 pointer-events-none select-none opacity-30" />
+        </div>
       </div>
     </div>
   );
 }
-
-// Dynamic font scaling helper for background watermark text based on character length
-const getWatermarkFontSize = (title = '') => {
-  const len = (title || '').trim().length;
-  if (!len || len <= 4) {
-    return { fontSize: 'clamp(4.5rem, 17vw, 15rem)' };
-  } else if (len <= 7) {
-    return { fontSize: 'clamp(3.5rem, 13vw, 12rem)' };
-  } else if (len <= 10) {
-    return { fontSize: 'clamp(2.6rem, 10vw, 9.5rem)' };
-  } else if (len <= 14) {
-    return { fontSize: 'clamp(2.1rem, 7.8vw, 7.2rem)' };
-  } else {
-    return { fontSize: 'clamp(1.6rem, 5.8vw, 5.6rem)' };
-  }
-};
 
 export default function HeroSlider({
   loaderKey,
@@ -302,10 +422,21 @@ export default function HeroSlider({
   // E-commerce state shared across top Navbar and Boutique via live CartContext
   const { cartItems, setCartItems, isCartOpen, setIsCartOpen, totalCartCount } = useCart();
   const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
 
+  const handleHeroMouseMove = useCallback((e) => {
+    if (window.innerWidth < 768) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setMouseOffset({ x, y });
+  }, []);
+
+  const handleHeroMouseLeave = useCallback(() => {
+    setMouseOffset({ x: 0, y: 0 });
+  }, []);
 
   const containerRef = useRef(null);
-  const watermarkRef = useRef(null);
   const textGroupRef = useRef(null);
   const stepLabelRef = useRef(null);
   const titleRef = useRef(null);
@@ -359,7 +490,6 @@ export default function HeroSlider({
   // Unified entrance animation — single GSAP timeline for frame-locked synchronization.
   useEffect(() => {
     const allElements = [
-      watermarkRef.current,
       stepLabelRef.current,
       titleRef.current,
       subtitleRef.current,
@@ -379,9 +509,6 @@ export default function HeroSlider({
         gsap.set(containerRef.current, { y: 100, opacity: 0.8 });
       }
       gsap.set(allElements, { opacity: 0, y: 60, clearProps: 'scale,filter,letterSpacing' });
-      if (watermarkRef.current) {
-        gsap.set(watermarkRef.current, { opacity: 0, scale: 0.88, y: 50 });
-      }
     } else if ((loaderState === 'exiting' || loaderState === 'completed') && !hasAnimatedRef.current) {
       hasAnimatedRef.current = true;
 
@@ -413,17 +540,7 @@ export default function HeroSlider({
         );
       }
 
-      // 3. Background Watermark Text — scale + fade in
-      if (watermarkRef.current) {
-        tl.fromTo(
-          watermarkRef.current,
-          { opacity: 0, scale: 0.90, y: 50 },
-          { opacity: 0.35, scale: 1, y: 0, duration: 1.4, ease: 'power2.out' },
-          0.05
-        );
-      }
-
-      // 4. Main Title — dramatic rise with slight scale
+      // 3. Main Title — dramatic rise with slight scale
       if (titleRef.current) {
         tl.fromTo(
           titleRef.current,
@@ -504,28 +621,7 @@ export default function HeroSlider({
         });
       }
 
-      // 2. Background Watermark Left / Right Slide Transition
-      if (watermarkRef.current) {
-        const exitX = isNext ? -200 : 200;
-        const entryX = isNext ? 200 : -200;
-
-        gsap.timeline()
-          .to(watermarkRef.current, {
-            x: exitX,
-            opacity: 0,
-            duration: 0.4,
-            ease: 'power2.in',
-          })
-          .set(watermarkRef.current, { x: entryX, opacity: 0 })
-          .to(watermarkRef.current, {
-            x: 0,
-            opacity: 0.35,
-            duration: 0.55,
-            ease: 'power2.out',
-          });
-      }
-
-      // 3. Editorial Content — Staggered exit then rich staggered entrance
+      // 2. Editorial Content — Staggered exit then rich staggered entrance
       const outTl = gsap.timeline({
         onComplete: () => {
           setDisplayedSlideIndex(targetIndex);
@@ -700,26 +796,17 @@ export default function HeroSlider({
         ref={containerRef}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
+        onMouseMove={handleHeroMouseMove}
+        onMouseLeave={handleHeroMouseLeave}
         className="relative w-full min-h-[100dvh] md:min-h-screen flex flex-col justify-between overflow-hidden select-none transition-colors duration-300"
         style={{ backgroundColor: activeSlideData.bg || '#FFFFFF', color: activeSlideData.text || '#111111' }}
         aria-label="Lune Interactive Fragrance Showcase"
       >
-        {/* Large Background Watermark Text — Seamless centered luxury backdrop across entire Hero */}
-        <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden select-none px-4 pt-16 sm:pt-20 md:pt-12">
-          <h1
-            ref={watermarkRef}
-            style={getWatermarkFontSize(activeSlideData.shortTitle || activeSlideData.title)}
-            className="font-serif font-black leading-none text-[#E5E5E8] tracking-tighter uppercase whitespace-nowrap will-change-transform select-none text-center"
-          >
-            {activeSlideData.shortTitle || activeSlideData.title}
-          </h1>
-        </div>
-
         {/* Main Split Screen Content Area */}
-        <div className="relative z-10 w-full flex-1 max-w-7xl mx-auto px-5 sm:px-8 md:px-10 lg:px-14 flex flex-col md:flex-row items-center justify-center gap-0 md:gap-8 pt-16 sm:pt-20 md:pt-24 lg:pt-16 pb-4 sm:pb-6 md:pb-8 pointer-events-none">
+        <div className="relative z-10 w-full flex-1 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-14 flex flex-col md:flex-row items-center justify-center gap-3 sm:gap-4 md:gap-8 lg:gap-12 pt-14 sm:pt-16 md:pt-20 lg:pt-16 pb-4 sm:pb-6 md:pb-8 pointer-events-none">
 
           {/* Right Product Showcase Panel */}
-          <div className="relative w-full md:w-[50%] lg:w-[55%] h-[46vh] min-h-[300px] sm:h-[50vh] sm:min-h-[340px] md:h-[68vh] md:min-h-[420px] flex items-center justify-center pointer-events-auto order-first md:order-last shrink-0 overflow-visible">
+          <div className="relative w-full md:w-[50%] lg:w-[55%] h-[46vh] min-h-[300px] sm:h-[50vh] sm:min-h-[340px] md:h-[66vh] md:min-h-[420px] lg:h-[72vh] lg:min-h-[460px] flex items-center justify-center pointer-events-auto order-first md:order-last shrink-0 overflow-visible">
             <HeroProductImage
               loaderState={loaderState}
               onModelLoaded={onModelLoaded}
@@ -727,17 +814,18 @@ export default function HeroSlider({
               isTransitioning={isTransitioning}
               slideDirection={slideDirection}
               slidesList={slidesList}
+              mouseOffset={mouseOffset}
             />
           </div>
 
           {/* Editorial Content Panel — Name + Subtitle + CTAs */}
-          <div className="w-full md:w-[50%] lg:w-[45%] flex flex-col items-center md:items-start text-center md:text-left justify-center gap-5 sm:gap-6 md:gap-8 pointer-events-auto order-last md:order-first px-2 sm:px-4 md:px-0">
+          <div className="w-full md:w-[50%] lg:w-[45%] flex flex-col items-center md:items-start text-center md:text-left justify-center gap-4 sm:gap-5 md:gap-7 pointer-events-auto order-last md:order-first px-2 sm:px-4 md:px-0">
 
-            <div ref={textGroupRef} className="flex flex-col items-center md:items-start gap-2.5 sm:gap-3">
+            <div ref={textGroupRef} className="flex flex-col items-center md:items-start gap-2 sm:gap-2.5">
               {/* Main Display Heading — uses shortTitle for consistency */}
               <h1
                 ref={titleRef}
-                className="font-serif font-black text-[2.2rem] sm:text-5xl md:text-[3.5rem] lg:text-6xl xl:text-7xl tracking-tight leading-[1.05] text-[#111111] uppercase"
+                className="font-serif font-black text-[2.2rem] sm:text-5xl md:text-[3.2rem] lg:text-6xl xl:text-7xl tracking-tight leading-[1.05] text-[#111111] uppercase"
               >
                 {activeSlideData.shortTitle || activeSlideData.title}
               </h1>

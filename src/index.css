@@ -81,6 +81,49 @@ body {
   animation: floatDelayed 4.8s ease-in-out infinite;
 }
 
+/* Luxury Fragrance Ingredient Subelement Animations */
+@keyframes subelementAirborne {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-9px) rotate(1.2deg);
+  }
+}
+
+@keyframes subelementAirborneAlt {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-7px) rotate(-1.2deg);
+  }
+}
+
+@keyframes subelementGrounded {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-3px) scale(1.008);
+  }
+}
+
+.animate-subelement-airborne {
+  animation: subelementAirborne 6.8s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-subelement-airborne-alt {
+  animation: subelementAirborneAlt 7.4s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-subelement-grounded {
+  animation: subelementGrounded 5.6s ease-in-out infinite;
+  will-change: transform;
+}
+
 @keyframes slideInLeft {
   from { transform: translateX(-100%); }
   to { transform: translateX(0); }
