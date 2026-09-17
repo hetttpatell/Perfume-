@@ -6,7 +6,8 @@ import {
   updateProduct,
   deleteProduct,
   toggleProductStockStatus,
-  fetchCategories
+  fetchCategories,
+  clearClientCache
 } from '../services/api';
 import { useConfirm } from '../components/ConfirmModal';
 import axios from 'axios';
@@ -101,7 +102,8 @@ export default function ProductsManager() {
   const loadProducts = async (showLoader = true) => {
     if (showLoader) setLoading(true);
     try {
-      const [prodsData, catsData] = await Promise.all([fetchProducts(), fetchCategories()]);
+      clearClientCache('products');
+      const [prodsData, catsData] = await Promise.all([fetchProducts({}, true), fetchCategories()]);
       setProducts(prodsData);
       setDbCategories(catsData);
     } catch (error) {
@@ -301,11 +303,15 @@ export default function ProductsManager() {
     const updatedFeatured = flagType === 'featured' ? !product.isFeatured : product.isFeatured;
 
     try {
-      await toggleProductFlags(product.id, { isHero: updatedHero, isFeatured: updatedFeatured });
-      setProducts(prev =>
-        prev.map(p => p.id === product.id ? { ...p, isHero: updatedHero, isFeatured: updatedFeatured } : p)
-      );
-      showToast(`Updated ${flagType.toUpperCase()} flag for "${product.name}".`);
+      const res = await toggleProductFlags(product.id, { isHero: updatedHero, isFeatured: updatedFeatured });
+      if (res && res.success !== false) {
+        setProducts(prev =>
+          prev.map(p => p.id === product.id ? { ...p, isHero: updatedHero, isFeatured: updatedFeatured } : p)
+        );
+        showToast(`Updated ${flagType.toUpperCase()} flag for "${product.name}".`);
+      } else {
+        showToast(res?.error || 'Failed to update showcase flags in database', 'error');
+      }
     } catch (err) {
       showToast('Failed to update showcase flags', 'error');
     } finally {

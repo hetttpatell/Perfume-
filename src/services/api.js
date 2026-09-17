@@ -366,12 +366,20 @@ export const cachedApiCall = async (cacheKey, apiFn, ttlMs = 120000) => {
 export const clearClientCache = (keyPrefix) => {
   if (!keyPrefix) {
     apiCache.clear();
+    try {
+      localStorage.removeItem('lune_cached_products_v2');
+    } catch {}
     return;
   }
   for (const key of apiCache.keys()) {
     if (key.startsWith(keyPrefix)) {
       apiCache.delete(key);
     }
+  }
+  if (keyPrefix === 'products') {
+    try {
+      localStorage.removeItem('lune_cached_products_v2');
+    } catch {}
   }
 };
 
@@ -470,8 +478,11 @@ export const fetchProductsDirectSupabase = async (filters = {}) => {
 /**
  * Fetch all products (with optional filters) with instant local cache + fast-path Supabase
  */
-export const fetchProducts = async (filters = {}) => {
+export const fetchProducts = async (filters = {}, forceFresh = false) => {
   const cacheKey = `products_${JSON.stringify(filters)}`;
+  if (forceFresh) {
+    clearClientCache('products');
+  }
   return cachedApiCall(cacheKey, async () => {
     // 1. Try Backend API only if on localhost or configured with remote endpoint
     if (shouldAttemptBackend()) {
@@ -591,17 +602,21 @@ export const fetchProductById = async (id) => {
  */
 export const toggleProductFlags = async (productId, { isHero, isFeatured }) => {
   try {
+    const token = localStorage.getItem('lune_token');
     if (shouldAttemptBackend()) {
       try {
-        const response = await apiClient.post('/admin/product/toggle-flags', {
-          productId,
-          isHero,
-          isFeatured
-        });
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const response = await apiClient.post(
+          '/admin/product/toggle-flags',
+          { productId, isHero, isFeatured },
+          { headers }
+        );
         clearClientCache('products');
-        return response.data;
+        if (response.data && response.data.success) {
+          return response.data;
+        }
       } catch (e) {
-        // Fallback to Supabase
+        console.warn('Backend toggle-flags error, falling back:', e.message);
       }
     }
 
@@ -616,7 +631,12 @@ export const toggleProductFlags = async (productId, { isHero, isFeatured }) => {
       .select();
 
     clearClientCache('products');
-    return { success: !error, product: data?.[0] };
+    const isSuccess = !error && Array.isArray(data) && data.length > 0;
+    return { 
+      success: isSuccess, 
+      product: data?.[0], 
+      error: error?.message || (!isSuccess ? 'Database update rejected (insufficient permissions)' : null) 
+    };
   } catch (error) {
     console.error('Error toggling product flags:', error);
     throw error;
@@ -1345,15 +1365,20 @@ export const deleteProduct = async (productId) => {
 export const toggleProductStockStatus = async (productId, inStock) => {
   try {
     const token = localStorage.getItem('lune_token');
-    if (shouldAttemptBackend() && token) {
+    if (shouldAttemptBackend()) {
       try {
-        const response = await apiClient.post('/admin/product/toggle-stock', { id: productId, inStock }, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const response = await apiClient.post(
+          '/admin/product/toggle-stock',
+          { id: productId, inStock },
+          { headers }
+        );
         clearClientCache('products');
-        return response.data;
+        if (response.data && response.data.success) {
+          return response.data;
+        }
       } catch (err) {
-        // Fallback
+        console.warn('Backend toggle-stock error, falling back:', err.message);
       }
     }
 
@@ -1364,7 +1389,12 @@ export const toggleProductStockStatus = async (productId, inStock) => {
       .select();
 
     clearClientCache('products');
-    return { success: !error, product: data?.[0] };
+    const isSuccess = !error && Array.isArray(data) && data.length > 0;
+    return { 
+      success: isSuccess, 
+      product: data?.[0], 
+      error: error?.message || (!isSuccess ? 'Database update rejected (insufficient permissions)' : null) 
+    };
   } catch (error) {
     return { success: false, error: error.message || 'Failed to toggle product status' };
   }
