@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import CartDrawer from './CartDrawer';
 import OurStory from './OurStory';
-import BrandLocationsMap from './BrandLocationsMap';
+import BrandVideoFeedback from './BrandVideoFeedback';
 import Footer from './Footer';
 
 // ──────────────────────────────────────────────────────────────────────────────
 // OlfactoryExperience — Bottom-of-homepage wrapper containing OurStory,
-// BrandLocationsMap, Footer, and the global CartDrawer.
+// BrandVideoFeedback, Footer, and the global CartDrawer.
 // Product showcase has been extracted to FeaturedProducts.jsx for reusability.
 // ──────────────────────────────────────────────────────────────────────────────
 
@@ -48,9 +48,9 @@ export default function OlfactoryExperience({
         <OurStory />
       </div>
 
-      {/* Brand Locations & Interactive Google Maps Section */}
-      <div id="contact" className="w-full scroll-mt-24">
-        <BrandLocationsMap />
+      {/* Brand Video Client Testimonials & Social Proof */}
+      <div id="testimonials" className="w-full scroll-mt-24">
+        <BrandVideoFeedback />
       </div>
 
       {/* Luxury Haute Footer Section */}

@@ -192,7 +192,66 @@ export const normalizeProduct = (p) => {
   };
 
   const heroRec = (images || []).find(img => img.alt_text === 'hero_image' && img.image_url && !img.image_url.startsWith('file://'));
-  const standardImages = (images || []).filter(img => img.alt_text !== 'hero_image');
+  const standardImages = (images || []).filter(img => 
+    img.alt_text !== 'hero_image' && 
+    !img.alt_text?.includes('hero_subelement')
+  );
+
+  const sub1Rec = (images || []).find(img => img.alt_text && (
+    img.alt_text === 'hero_subelement_1' || 
+    img.alt_text.includes('hero_subelement_1') || 
+    img.alt_text.includes('"slot":1') ||
+    img.alt_text.includes('"slot": 1')
+  ));
+  const sub2Rec = (images || []).find(img => img.alt_text && (
+    img.alt_text === 'hero_subelement_2' || 
+    img.alt_text.includes('hero_subelement_2') || 
+    img.alt_text.includes('"slot":2') ||
+    img.alt_text.includes('"slot": 2')
+  ));
+
+  let parsedSub1 = p.heroSubElement1 || null;
+  let parsedSub2 = p.heroSubElement2 || null;
+
+  if (!parsedSub1 && sub1Rec) {
+    try {
+      const meta = JSON.parse(sub1Rec.alt_text);
+      parsedSub1 = {
+        ...meta,
+        src: resolveImgPath(sub1Rec.image_url),
+        name: meta.name || p.hero_note_1 || 'ACCORD I',
+        accord: meta.accord || 'ACCORD I',
+        origin: meta.origin || ''
+      };
+    } catch {
+      parsedSub1 = {
+        src: resolveImgPath(sub1Rec.image_url),
+        name: p.hero_note_1 || 'ACCORD I',
+        accord: 'ACCORD I',
+        origin: ''
+      };
+    }
+  }
+
+  if (!parsedSub2 && sub2Rec) {
+    try {
+      const meta = JSON.parse(sub2Rec.alt_text);
+      parsedSub2 = {
+        ...meta,
+        src: resolveImgPath(sub2Rec.image_url),
+        name: meta.name || p.hero_note_2 || 'ACCORD II',
+        accord: meta.accord || 'ACCORD II',
+        origin: meta.origin || ''
+      };
+    } catch {
+      parsedSub2 = {
+        src: resolveImgPath(sub2Rec.image_url),
+        name: p.hero_note_2 || 'ACCORD II',
+        accord: 'ACCORD II',
+        origin: ''
+      };
+    }
+  }
 
   const rawMain = standardImages.find(img => img.is_primary)?.image_url || p.image_url || p.image;
   const mainImage = resolveImgPath(rawMain);
@@ -229,6 +288,8 @@ export const normalizeProduct = (p) => {
       }
       return mainImage;
     })(),
+    heroSubElement1: parsedSub1,
+    heroSubElement2: parsedSub2,
     heroTitle: p.hero_title || p.name,
     heroSubtitle: p.hero_subtitle || p.french_name || p.subtitle || '',
     heroQuote: p.hero_quote || p.description || '',

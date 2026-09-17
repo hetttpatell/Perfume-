@@ -78,7 +78,19 @@ export default function ProductsManager() {
     heroQuote: '',
     heroNote1: '',
     heroNote2: '',
-    heroNote3: ''
+    heroNote3: '',
+    heroSubElement1: {
+      src: '',
+      name: '',
+      accord: 'ACCORD I',
+      origin: ''
+    },
+    heroSubElement2: {
+      src: '',
+      name: '',
+      accord: 'ACCORD II',
+      origin: ''
+    }
   });
 
   const showToast = (message, type = 'success') => {
@@ -125,7 +137,19 @@ export default function ProductsManager() {
       heroQuote: '',
       heroNote1: '',
       heroNote2: '',
-      heroNote3: ''
+      heroNote3: '',
+      heroSubElement1: {
+        src: '',
+        name: '',
+        accord: 'ACCORD I',
+        origin: ''
+      },
+      heroSubElement2: {
+        src: '',
+        name: '',
+        accord: 'ACCORD II',
+        origin: ''
+      }
     });
     setIsModalOpen(true);
   };
@@ -158,7 +182,29 @@ export default function ProductsManager() {
       heroQuote: p.heroQuote || p.description || '',
       heroNote1: p.heroNote1 || 'Galbanum',
       heroNote2: p.heroNote2 || 'Iris Pallida',
-      heroNote3: p.heroNote3 || 'Vetiver'
+      heroNote3: p.heroNote3 || 'Vetiver',
+      heroSubElement1: p.heroSubElement1 ? {
+        src: p.heroSubElement1.src || p.heroSubElement1.image_url || '',
+        name: p.heroSubElement1.name || p.heroNote1 || 'Accord I',
+        accord: p.heroSubElement1.accord || 'ACCORD I',
+        origin: p.heroSubElement1.origin || ''
+      } : {
+        src: '',
+        name: p.heroNote1 || 'Accord I',
+        accord: 'ACCORD I',
+        origin: ''
+      },
+      heroSubElement2: p.heroSubElement2 ? {
+        src: p.heroSubElement2.src || p.heroSubElement2.image_url || '',
+        name: p.heroSubElement2.name || p.heroNote2 || 'Accord II',
+        accord: p.heroSubElement2.accord || 'ACCORD II',
+        origin: p.heroSubElement2.origin || ''
+      } : {
+        src: '',
+        name: p.heroNote2 || 'Accord II',
+        accord: 'ACCORD II',
+        origin: ''
+      }
     });
     setIsModalOpen(true);
   };
@@ -170,6 +216,12 @@ export default function ProductsManager() {
       return;
     }
 
+    // Compulsory check: Both Hero Section sub-elements photos are required
+    if (!formData.heroSubElement1?.src || !formData.heroSubElement2?.src) {
+      showToast('Both Sub-Element 1 and Sub-Element 2 photos are compulsory for the Hero Section. Please upload both photos.', 'error');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const mainImageToSave = formData.imageUrl || (formData.galleryImages && formData.galleryImages[0]) || '';
@@ -178,7 +230,9 @@ export default function ProductsManager() {
       const payload = {
         ...formData,
         imageUrl: mainImageToSave,
-        galleryImages: subImagesToSave
+        galleryImages: subImagesToSave,
+        heroSubElement1: formData.heroSubElement1,
+        heroSubElement2: formData.heroSubElement2
       };
 
       if (editingProduct) {
@@ -372,6 +426,53 @@ export default function ProductsManager() {
       }
     } catch (err) {
       showToast('Hero image upload failed: ' + (err.response?.data?.error || err.message), 'error');
+    }
+  };
+
+  const handleHeroSubElementUpload = async (file, slot = 1) => {
+    if (!file) return;
+    const token = localStorage.getItem('lune_token');
+    const payload = new FormData();
+    payload.append('image', file);
+    payload.append('slot', slot);
+    payload.append('productId', editingProduct?.id || formData.id || 'temp-product');
+
+    showToast(`Converting Sub-Element ${slot} image to .webp Base64 format...`, 'info');
+
+    try {
+      let response;
+      try {
+        response = await axios.post(`${API_BASE_URL}/admin/images/upload-hero-subelement`, payload, {
+          headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` }
+        });
+      } catch (e1) {
+        try {
+          response = await axios.post(`${API_BASE_URL}/products/upload-hero-subelement`, payload, {
+            headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` }
+          });
+        } catch (e2) {
+          response = await axios.post(`${API_BASE_URL}/admin/images/upload-hero`, payload, {
+            headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` }
+          });
+        }
+      }
+
+      if (response.data.success && response.data.image) {
+        const webpBase64Url = response.data.image.public_url || response.data.image.image_url;
+        const key = slot === 1 ? 'heroSubElement1' : 'heroSubElement2';
+        setFormData(prev => ({
+          ...prev,
+          [key]: {
+            ...prev[key],
+            src: webpBase64Url,
+            name: prev[key]?.name || (slot === 1 ? (prev.heroNote1 || 'Accord I') : (prev.heroNote2 || 'Accord II')),
+            accord: prev[key]?.accord || (slot === 1 ? 'ACCORD I' : 'ACCORD II')
+          }
+        }));
+        showToast(`Sub-Element ${slot} photo converted to .WEBP Base64 and saved!`);
+      }
+    } catch (err) {
+      showToast(`Sub-Element ${slot} image upload failed: ` + (err.response?.data?.error || err.message), 'error');
     }
   };
 
@@ -1156,6 +1257,295 @@ export default function ProductsManager() {
                       </label>
                     </div>
                   )}
+                </div>
+
+                {/* COMPULSORY HERO SECTION SUB-ELEMENTS (2 REQUIRED) */}
+                <div className="space-y-4 pt-4 border-t border-gray-200">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <label className="block text-[11px] font-extrabold uppercase text-gray-900 tracking-wider">
+                          HERO SUB-ELEMENTS PHOTOS & ACCORDS (2 COMPULSORY) *
+                        </label>
+                        <span className="text-[9.5px] font-black uppercase tracking-wider bg-red-100 text-red-700 px-2 py-0.5 rounded-full border border-red-200">
+                          REQUIRED
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-gray-500 mt-0.5">
+                        Both sub-elements appear floating alongside the flacon in the Hero showcase section. Photos are auto-converted to .WEBP Base64.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    {/* SUB-ELEMENT 1 */}
+                    <div className={`p-4 rounded-2xl border-2 transition-all ${
+                      formData.heroSubElement1?.src 
+                        ? 'bg-white border-emerald-300 ring-2 ring-emerald-100' 
+                        : 'bg-white border-dashed border-red-300 hover:border-red-400'
+                    }`}>
+                      <div className="flex items-center justify-between border-b border-gray-100 pb-2.5 mb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full bg-[#111111] text-white text-[10px] font-bold flex items-center justify-center">1</span>
+                          <span className="text-xs font-bold uppercase text-gray-900 tracking-wider">
+                            SUB-ELEMENT 1 (AIRBORNE / UPPER) *
+                          </span>
+                        </div>
+                        {formData.heroSubElement1?.src ? (
+                          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+                            PHOTO READY
+                          </span>
+                        ) : (
+                          <span className="text-[9px] font-bold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-md">
+                            PHOTO REQUIRED *
+                          </span>
+                        )}
+                      </div>
+
+                      {formData.heroSubElement1?.src ? (
+                        <div className="flex items-center gap-3.5 mb-3.5 p-2 bg-gray-50 rounded-xl border border-gray-200">
+                          <img
+                            src={formData.heroSubElement1.src}
+                            alt="Sub-Element 1 Preview"
+                            className="w-16 h-16 object-contain rounded-lg bg-white p-1 border border-gray-200"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[11px] font-bold text-gray-900 truncate">
+                              {formData.heroSubElement1.name || 'Accord I'}
+                            </p>
+                            <p className="text-[9.5px] font-mono text-gray-500 truncate">
+                              .WEBP Base64 stored in database
+                            </p>
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <label className="text-[10px] font-bold text-[#111111] hover:underline cursor-pointer">
+                                Change
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(e) => e.target.files[0] && handleHeroSubElementUpload(e.target.files[0], 1)}
+                                />
+                              </label>
+                              <button
+                                type="button"
+                                onClick={() => setFormData(prev => ({
+                                  ...prev,
+                                  heroSubElement1: { ...prev.heroSubElement1, src: '' }
+                                }))}
+                                className="text-[10px] font-bold text-red-600 hover:underline cursor-pointer"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center mb-3.5 bg-gray-50/50">
+                          <label className="cursor-pointer block">
+                            <span className="text-xs font-bold text-[#111111] block mb-1">
+                              Upload Sub-Element 1 Photo *
+                            </span>
+                            <span className="text-[10px] text-gray-500 block mb-2.5">
+                              PNG with transparent background recommended (Vanilla, Oud, etc.)
+                            </span>
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#111111] text-white text-[10px] font-bold rounded-lg shadow-sm">
+                              Select Photo
+                            </span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => e.target.files[0] && handleHeroSubElementUpload(e.target.files[0], 1)}
+                            />
+                          </label>
+                        </div>
+                      )}
+
+                      <div className="space-y-2.5">
+                        <div>
+                          <label className="block text-[10px] font-bold uppercase text-gray-700 mb-1 tracking-wider">
+                            Accord Name (e.g. BOURBON VANILLA)
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.heroSubElement1?.name || ''}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              heroSubElement1: { ...prev.heroSubElement1, name: e.target.value }
+                            }))}
+                            placeholder="e.g. BOURBON VANILLA"
+                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs font-medium text-gray-900 focus:outline-none focus:border-gray-900"
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="block text-[10px] font-bold uppercase text-gray-700 mb-1 tracking-wider">
+                              Accord Header
+                            </label>
+                            <input
+                              type="text"
+                              value={formData.heroSubElement1?.accord || 'ACCORD I'}
+                              onChange={(e) => setFormData(prev => ({
+                                ...prev,
+                                heroSubElement1: { ...prev.heroSubElement1, accord: e.target.value }
+                              }))}
+                              placeholder="ACCORD I"
+                              className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs font-medium text-gray-900 focus:outline-none focus:border-gray-900"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-bold uppercase text-gray-700 mb-1 tracking-wider">
+                              Botanical Origin
+                            </label>
+                            <input
+                              type="text"
+                              value={formData.heroSubElement1?.origin || ''}
+                              onChange={(e) => setFormData(prev => ({
+                                ...prev,
+                                heroSubElement1: { ...prev.heroSubElement1, origin: e.target.value }
+                              }))}
+                              placeholder="e.g. Madagascar Botanical"
+                              className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs font-medium text-gray-900 focus:outline-none focus:border-gray-900"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* SUB-ELEMENT 2 */}
+                    <div className={`p-4 rounded-2xl border-2 transition-all ${
+                      formData.heroSubElement2?.src 
+                        ? 'bg-white border-emerald-300 ring-2 ring-emerald-100' 
+                        : 'bg-white border-dashed border-red-300 hover:border-red-400'
+                    }`}>
+                      <div className="flex items-center justify-between border-b border-gray-100 pb-2.5 mb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full bg-[#111111] text-white text-[10px] font-bold flex items-center justify-center">2</span>
+                          <span className="text-xs font-bold uppercase text-gray-900 tracking-wider">
+                            SUB-ELEMENT 2 (GROUNDED / LOWER) *
+                          </span>
+                        </div>
+                        {formData.heroSubElement2?.src ? (
+                          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+                            PHOTO READY
+                          </span>
+                        ) : (
+                          <span className="text-[9px] font-bold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-md">
+                            PHOTO REQUIRED *
+                          </span>
+                        )}
+                      </div>
+
+                      {formData.heroSubElement2?.src ? (
+                        <div className="flex items-center gap-3.5 mb-3.5 p-2 bg-gray-50 rounded-xl border border-gray-200">
+                          <img
+                            src={formData.heroSubElement2.src}
+                            alt="Sub-Element 2 Preview"
+                            className="w-16 h-16 object-contain rounded-lg bg-white p-1 border border-gray-200"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[11px] font-bold text-gray-900 truncate">
+                              {formData.heroSubElement2.name || 'Accord II'}
+                            </p>
+                            <p className="text-[9.5px] font-mono text-gray-500 truncate">
+                              .WEBP Base64 stored in database
+                            </p>
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <label className="text-[10px] font-bold text-[#111111] hover:underline cursor-pointer">
+                                Change
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(e) => e.target.files[0] && handleHeroSubElementUpload(e.target.files[0], 2)}
+                                />
+                              </label>
+                              <button
+                                type="button"
+                                onClick={() => setFormData(prev => ({
+                                  ...prev,
+                                  heroSubElement2: { ...prev.heroSubElement2, src: '' }
+                                }))}
+                                className="text-[10px] font-bold text-red-600 hover:underline cursor-pointer"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center mb-3.5 bg-gray-50/50">
+                          <label className="cursor-pointer block">
+                            <span className="text-xs font-bold text-[#111111] block mb-1">
+                              Upload Sub-Element 2 Photo *
+                            </span>
+                            <span className="text-[10px] text-gray-500 block mb-2.5">
+                              PNG with transparent background recommended (Sandalwood, Cocoa, etc.)
+                            </span>
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#111111] text-white text-[10px] font-bold rounded-lg shadow-sm">
+                              Select Photo
+                            </span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => e.target.files[0] && handleHeroSubElementUpload(e.target.files[0], 2)}
+                            />
+                          </label>
+                        </div>
+                      )}
+
+                      <div className="space-y-2.5">
+                        <div>
+                          <label className="block text-[10px] font-bold uppercase text-gray-700 mb-1 tracking-wider">
+                            Accord Name (e.g. MYSORE SANDALWOOD)
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.heroSubElement2?.name || ''}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              heroSubElement2: { ...prev.heroSubElement2, name: e.target.value }
+                            }))}
+                            placeholder="e.g. MYSORE SANDALWOOD"
+                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs font-medium text-gray-900 focus:outline-none focus:border-gray-900"
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="block text-[10px] font-bold uppercase text-gray-700 mb-1 tracking-wider">
+                              Accord Header
+                            </label>
+                            <input
+                              type="text"
+                              value={formData.heroSubElement2?.accord || 'ACCORD II'}
+                              onChange={(e) => setFormData(prev => ({
+                                ...prev,
+                                heroSubElement2: { ...prev.heroSubElement2, accord: e.target.value }
+                              }))}
+                              placeholder="ACCORD II"
+                              className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs font-medium text-gray-900 focus:outline-none focus:border-gray-900"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-bold uppercase text-gray-700 mb-1 tracking-wider">
+                              Botanical Origin
+                            </label>
+                            <input
+                              type="text"
+                              value={formData.heroSubElement2?.origin || ''}
+                              onChange={(e) => setFormData(prev => ({
+                                ...prev,
+                                heroSubElement2: { ...prev.heroSubElement2, origin: e.target.value }
+                              }))}
+                              placeholder="e.g. Sacred Woods & Incense"
+                              className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs font-medium text-gray-900 focus:outline-none focus:border-gray-900"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-2 border-t border-gray-200">

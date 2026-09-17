@@ -32,8 +32,8 @@ const HERO_SUBELEMENTS_MAP = [
       alt: 'Bourbon Vanilla Orchid & Pods',
       type: 'airborne',
       side: 'left',
-      wrapperClass: 'top-[8%] sm:top-[10%] md:top-[12%] lg:top-[14%] right-[50%] mr-11 sm:mr-16 md:mr-20 lg:mr-24',
-      sizeClass: 'w-13 sm:w-16 md:w-20 lg:w-26 xl:w-30 max-w-[140px]',
+      wrapperClass: 'top-[4%] sm:top-[6%] md:top-[8%] lg:top-[10%] right-[50%] mr-16 sm:mr-18 md:mr-20 lg:mr-24',
+      sizeClass: 'w-20 sm:w-22 md:w-24 lg:w-26 xl:w-28 max-w-[140px]',
       imgRotation: '-rotate-12 group-hover:-rotate-6',
       animClass: 'animate-subelement-airborne',
     },
@@ -46,8 +46,8 @@ const HERO_SUBELEMENTS_MAP = [
       alt: 'Mysore Sandalwood & Incense Bowl',
       type: 'grounded',
       side: 'right',
-      wrapperClass: 'bottom-[14%] sm:bottom-[16%] md:bottom-[18%] lg:bottom-[18%] left-[50%] ml-11 sm:ml-16 md:ml-20 lg:ml-24',
-      sizeClass: 'w-15 sm:w-18 md:w-22 lg:w-28 xl:w-32 max-w-[150px]',
+      wrapperClass: 'bottom-[4%] sm:bottom-[6%] md:bottom-[8%] lg:bottom-[10%] left-[50%] ml-16 sm:ml-18 md:ml-20 lg:ml-24',
+      sizeClass: 'w-22 sm:w-24 md:w-26 lg:w-28 xl:w-30 max-w-[155px]',
       imgRotation: 'rotate-2 group-hover:rotate-0',
       animClass: 'animate-subelement-grounded',
     },
@@ -63,8 +63,8 @@ const HERO_SUBELEMENTS_MAP = [
       alt: 'Royal Smoked Cambodian Oud Timber',
       type: 'airborne',
       side: 'right',
-      wrapperClass: 'top-[8%] sm:top-[10%] md:top-[12%] lg:top-[14%] left-[50%] ml-11 sm:ml-16 md:ml-20 lg:ml-24',
-      sizeClass: 'w-13 sm:w-16 md:w-20 lg:w-26 xl:w-30 max-w-[140px]',
+      wrapperClass: 'top-[4%] sm:top-[6%] md:top-[8%] lg:top-[10%] left-[50%] ml-16 sm:ml-18 md:mr-20 lg:ml-24',
+      sizeClass: 'w-20 sm:w-22 md:w-24 lg:w-26 xl:w-28 max-w-[140px]',
       imgRotation: 'rotate-12 group-hover:rotate-6',
       animClass: 'animate-subelement-airborne-alt',
     },
@@ -77,8 +77,8 @@ const HERO_SUBELEMENTS_MAP = [
       alt: 'Single-Origin Roasted Cocoa Beans',
       type: 'grounded',
       side: 'left',
-      wrapperClass: 'bottom-[14%] sm:bottom-[16%] md:bottom-[18%] lg:bottom-[18%] right-[50%] mr-11 sm:mr-16 md:mr-20 lg:mr-24',
-      sizeClass: 'w-14 sm:w-16 md:w-20 lg:w-26 xl:w-30 max-w-[140px]',
+      wrapperClass: 'bottom-[4%] sm:bottom-[6%] md:bottom-[8%] lg:bottom-[10%] right-[50%] mr-16 sm:mr-18 md:mr-20 lg:mr-24',
+      sizeClass: 'w-22 sm:w-24 md:w-26 lg:w-28 xl:w-30 max-w-[155px]',
       imgRotation: '-rotate-4 group-hover:-rotate-1',
       animClass: 'animate-subelement-grounded',
     },
@@ -118,23 +118,23 @@ function HeroSubElement({ item, mouseOffset = { x: 0, y: 0 } }) {
         </div>
 
         {/* Haute Parfumerie Editorial Nameplate — Refined luxury typography */}
-        <div className="mt-1 sm:mt-1.5 flex flex-col items-center text-center select-none pointer-events-none">
+        <div className="mt-1.5 sm:mt-2 flex flex-col items-center text-center select-none pointer-events-none">
           {/* Micro Accord Header with fine hairline */}
-          <div className="flex items-center gap-1 opacity-70">
-            <span className="w-2 sm:w-2.5 h-[0.5px] bg-black/40" />
-            <span className="font-sans text-[6.5px] sm:text-[7.5px] md:text-[8px] tracking-[0.25em] uppercase text-black/60 font-semibold whitespace-nowrap">
+          <div className="flex items-center gap-1.5 opacity-80">
+            <span className="w-3 sm:w-3.5 h-[0.5px] bg-black/50" />
+            <span className="font-sans text-[8px] sm:text-[8.5px] md:text-[9px] tracking-[0.25em] uppercase text-black/80 font-bold whitespace-nowrap">
               {item.accord}
             </span>
-            <span className="w-2 sm:w-2.5 h-[0.5px] bg-black/40" />
+            <span className="w-3 sm:w-3.5 h-[0.5px] bg-black/50" />
           </div>
 
           {/* Refined Serif Fragrance Note Name */}
-          <span className="font-serif text-[8.5px] sm:text-[10px] md:text-[11.5px] lg:text-[13px] tracking-[0.16em] uppercase text-[#111111] font-semibold mt-0.5 whitespace-normal sm:whitespace-nowrap max-w-[85px] sm:max-w-none text-center leading-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">
+          <span className="font-serif text-[11px] sm:text-[12px] md:text-[13px] lg:text-[14px] tracking-[0.16em] uppercase text-[#111111] font-bold mt-0.5 whitespace-normal sm:whitespace-nowrap max-w-[115px] sm:max-w-[130px] md:max-w-none text-center leading-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">
             {item.name}
           </span>
 
           {/* Subtle Botanical Origin */}
-          <span className="font-serif italic text-[7px] sm:text-[8px] md:text-[9px] text-neutral-500 tracking-wider mt-0.5 hidden sm:block whitespace-nowrap">
+          <span className="font-serif italic text-[8px] sm:text-[8.5px] md:text-[9px] text-neutral-500 tracking-wider mt-0.5 hidden sm:block whitespace-nowrap">
             {item.origin}
           </span>
         </div>
@@ -163,6 +163,10 @@ function HeroProductImage({
   const hasEntranceAnimatedRef = useRef(false);
 
   const getSubElementsForSlide = (idx) => {
+    const slide = slidesList[idx];
+    if (slide?.subElements && Array.isArray(slide.subElements) && slide.subElements.length >= 2) {
+      return slide.subElements;
+    }
     return HERO_SUBELEMENTS_MAP[idx % HERO_SUBELEMENTS_MAP.length] || HERO_SUBELEMENTS_MAP[0];
   };
 
@@ -250,7 +254,7 @@ function HeroProductImage({
     const incomingEl = incomingBottleRef.current;
 
     if (currentEl && incomingEl) {
-      const isMobile = window.innerWidth < 768;
+      const isMobile = window.innerWidth < 1024;
       const isNext = slideDirection === 'next';
 
       let exitX = 0;
@@ -346,12 +350,12 @@ function HeroProductImage({
   return (
     <div className="relative w-full h-full flex items-center justify-center pointer-events-none select-none">
       {/* Subtle Transparent Ambient Glow */}
-      <div className="absolute w-[280px] h-[280px] sm:w-[380px] sm:h-[380px] md:w-[460px] md:h-[460px] lg:w-[520px] lg:h-[520px] bg-radial from-black/5 to-transparent rounded-full blur-3xl opacity-25 pointer-events-none" />
+      <div className="absolute w-[360px] h-[360px] sm:w-[420px] sm:h-[420px] md:w-[480px] md:h-[480px] lg:w-[540px] lg:h-[540px] bg-radial from-black/5 to-transparent rounded-full blur-3xl opacity-25 pointer-events-none" />
 
       {/* Active Product Flacon */}
       <div
         ref={currentBottleRef}
-        className="absolute inset-0 flex flex-col items-center justify-center max-w-[340px] sm:max-w-[400px] md:max-w-[460px] lg:max-w-[520px] xl:max-w-[560px] w-full mx-auto will-change-transform"
+        className="absolute inset-0 flex flex-col items-center justify-center max-w-[380px] sm:max-w-[420px] md:max-w-[480px] lg:max-w-[520px] xl:max-w-[560px] w-full mx-auto will-change-transform"
       >
         <div className="relative w-fit flex flex-col items-center justify-center">
           {/* Sub-elements for current product */}
@@ -362,11 +366,11 @@ function HeroProductImage({
           <img
             src={currentData?.image || HERO_SVG}
             alt={currentData?.title || "Lune Perfume Flacon"}
-            className="w-auto min-h-[280px] h-[48vh] sm:h-[52vh] md:h-[60vh] lg:h-[66vh] xl:h-[72vh] max-h-[780px] object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.16)] select-none pointer-events-none"
+            className="w-auto h-[48vh] sm:h-[50vh] md:h-[52vh] lg:h-[58vh] xl:h-[64vh] min-h-[310px] sm:min-h-[350px] md:min-h-[380px] lg:min-h-[380px] max-h-[440px] sm:max-h-[480px] md:max-h-[520px] lg:max-h-[620px] object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.16)] select-none pointer-events-none"
             draggable={false}
           />
           {/* Contact Shadow */}
-          <div className="w-2/5 h-2.5 sm:h-3.5 bg-black/15 rounded-[100%] blur-md -mt-1 sm:-mt-2 pointer-events-none select-none opacity-30" />
+          <div className="w-3/5 sm:w-1/2 h-3.5 sm:h-4 bg-black/15 rounded-[100%] blur-md -mt-1 sm:-mt-2 pointer-events-none select-none opacity-30" />
         </div>
       </div>
 
@@ -374,7 +378,7 @@ function HeroProductImage({
       <div
         ref={incomingBottleRef}
         style={{ display: 'none' }}
-        className="absolute inset-0 flex flex-col items-center justify-center max-w-[340px] sm:max-w-[400px] md:max-w-[460px] lg:max-w-[520px] xl:max-w-[560px] w-full mx-auto will-change-transform"
+        className="absolute inset-0 flex flex-col items-center justify-center max-w-[380px] sm:max-w-[420px] md:max-w-[480px] lg:max-w-[520px] xl:max-w-[560px] w-full mx-auto will-change-transform"
       >
         <div className="relative w-fit flex flex-col items-center justify-center">
           {/* Sub-elements for incoming product */}
@@ -385,11 +389,11 @@ function HeroProductImage({
           <img
             src={incomingData?.image || HERO_SVG}
             alt={incomingData?.title || "Lune Perfume Flacon"}
-            className="w-auto min-h-[280px] h-[48vh] sm:h-[52vh] md:h-[60vh] lg:h-[66vh] xl:h-[72vh] max-h-[780px] object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.16)] select-none pointer-events-none"
+            className="w-auto h-[48vh] sm:h-[50vh] md:h-[52vh] lg:h-[58vh] xl:h-[64vh] min-h-[310px] sm:min-h-[350px] md:min-h-[380px] lg:min-h-[380px] max-h-[440px] sm:max-h-[480px] md:max-h-[520px] lg:max-h-[620px] object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.16)] select-none pointer-events-none"
             draggable={false}
           />
           {/* Contact Shadow */}
-          <div className="w-2/5 h-2.5 sm:h-3.5 bg-black/15 rounded-[100%] blur-md -mt-1 sm:-mt-2 pointer-events-none select-none opacity-30" />
+          <div className="w-3/5 sm:w-1/2 h-3.5 sm:h-4 bg-black/15 rounded-[100%] blur-md -mt-1 sm:-mt-2 pointer-events-none select-none opacity-30" />
         </div>
       </div>
     </div>
@@ -803,10 +807,10 @@ export default function HeroSlider({
         aria-label="Lune Interactive Fragrance Showcase"
       >
         {/* Main Split Screen Content Area */}
-        <div className="relative z-10 w-full flex-1 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-14 flex flex-col md:flex-row items-center justify-center gap-3 sm:gap-4 md:gap-8 lg:gap-12 pt-14 sm:pt-16 md:pt-20 lg:pt-16 pb-4 sm:pb-6 md:pb-8 pointer-events-none">
+        <div className="relative z-10 w-full flex-1 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-14 flex flex-col lg:flex-row items-center justify-evenly lg:justify-center gap-2 sm:gap-4 md:gap-6 lg:gap-14 pt-16 sm:pt-18 md:pt-20 lg:pt-16 pb-2 sm:pb-3 md:pb-6 pointer-events-none">
 
           {/* Right Product Showcase Panel */}
-          <div className="relative w-full md:w-[50%] lg:w-[55%] h-[46vh] min-h-[300px] sm:h-[50vh] sm:min-h-[340px] md:h-[66vh] md:min-h-[420px] lg:h-[72vh] lg:min-h-[460px] flex items-center justify-center pointer-events-auto order-first md:order-last shrink-0 overflow-visible">
+          <div className="relative w-full lg:w-[55%] h-[48vh] sm:h-[50vh] md:h-[52vh] lg:h-[64vh] min-h-[310px] sm:min-h-[350px] md:min-h-[380px] lg:min-h-[400px] max-h-[450px] sm:max-h-[490px] md:max-h-[530px] lg:max-h-[620px] flex items-center justify-center pointer-events-auto order-first lg:order-last shrink-0 overflow-visible">
             <HeroProductImage
               loaderState={loaderState}
               onModelLoaded={onModelLoaded}
@@ -819,13 +823,13 @@ export default function HeroSlider({
           </div>
 
           {/* Editorial Content Panel — Name + Subtitle + CTAs */}
-          <div className="w-full md:w-[50%] lg:w-[45%] flex flex-col items-center md:items-start text-center md:text-left justify-center gap-4 sm:gap-5 md:gap-7 pointer-events-auto order-last md:order-first px-2 sm:px-4 md:px-0">
+          <div className="w-full lg:w-[45%] flex flex-col items-center lg:items-start text-center lg:text-left justify-center gap-3.5 sm:gap-4 md:gap-5 lg:gap-7 pointer-events-auto order-last lg:order-first px-2 sm:px-4 lg:px-0">
 
-            <div ref={textGroupRef} className="flex flex-col items-center md:items-start gap-2 sm:gap-2.5">
-              {/* Main Display Heading — uses shortTitle for consistency */}
+            <div ref={textGroupRef} className="flex flex-col items-center lg:items-start gap-1.5 sm:gap-2 md:gap-2.5">
+              {/* Main Display Heading — scales gracefully across mobile, iPad and desktop */}
               <h1
                 ref={titleRef}
-                className="font-serif font-black text-[2.2rem] sm:text-5xl md:text-[3.2rem] lg:text-6xl xl:text-7xl tracking-tight leading-[1.05] text-[#111111] uppercase"
+                className="font-serif font-black text-[30px] sm:text-[34px] md:text-4xl lg:text-5xl xl:text-6xl tracking-tight leading-[1.08] text-[#111111] uppercase max-w-xl"
               >
                 {activeSlideData.shortTitle || activeSlideData.title}
               </h1>
@@ -833,7 +837,7 @@ export default function HeroSlider({
               {/* Elegant Subtitle Tagline */}
               <h2
                 ref={subtitleRef}
-                className="font-sans font-medium text-[10px] sm:text-xs md:text-sm tracking-[0.25em] uppercase text-[#888888]"
+                className="font-sans font-medium text-xs sm:text-xs md:text-sm tracking-[0.25em] uppercase text-[#666666]"
               >
                 {activeSlideData.subtitle}
               </h2>
@@ -846,10 +850,10 @@ export default function HeroSlider({
             <div ref={actionBtnRef} className="flex flex-row items-center gap-3 sm:gap-3.5">
               <button
                 onClick={handleNext}
-                className="px-5 sm:px-7 py-2.5 sm:py-3 text-[10px] sm:text-[11px] font-sans font-semibold tracking-[0.2em] uppercase text-white bg-[#111111] hover:bg-black rounded-full transition-all duration-200 cursor-pointer active:scale-[0.97] flex items-center justify-center gap-2 shadow-md hover:shadow-lg min-h-[40px] sm:min-h-[44px]"
+                className="px-7 sm:px-8 py-3.5 sm:py-4 text-xs font-sans font-semibold tracking-[0.2em] uppercase text-white bg-[#111111] hover:bg-black rounded-full transition-all duration-200 cursor-pointer active:scale-[0.97] flex items-center justify-center gap-2 shadow-md hover:shadow-lg min-h-[46px]"
               >
                 <span>{currentSlide === slidesList.length - 1 ? 'REPLAY' : 'NEXT NOTE'}</span>
-                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </button>
@@ -858,10 +862,10 @@ export default function HeroSlider({
                   const targetId = activeSlideData?.productId || activeSlideData?.id || 'p1';
                   navigate(`/product/${targetId}`);
                 }}
-                className="px-5 sm:px-7 py-2.5 sm:py-3 text-[10px] sm:text-[11px] font-sans font-semibold tracking-[0.2em] uppercase text-[#111111] hover:bg-[#111111] hover:text-white bg-white border border-black/12 rounded-full transition-all duration-200 cursor-pointer active:scale-[0.97] flex items-center justify-center gap-2 shadow-sm hover:shadow-md group min-h-[40px] sm:min-h-[44px]"
+                className="px-7 sm:px-8 py-3.5 sm:py-4 text-xs font-sans font-semibold tracking-[0.2em] uppercase text-[#111111] hover:bg-[#111111] hover:text-white bg-white border border-black/12 rounded-full transition-all duration-200 cursor-pointer active:scale-[0.97] flex items-center justify-center gap-2 shadow-sm hover:shadow-md group min-h-[46px]"
               >
                 <span>SHOP NOW</span>
-                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -872,7 +876,7 @@ export default function HeroSlider({
         {/* Minimal Bottom Navigation — Dot Indicators + Arrows */}
         <footer
           ref={stepperBarRef}
-          className="relative z-20 w-full px-4 sm:px-8 md:px-12 py-3 sm:py-4 flex items-center justify-center md:justify-end"
+          className="relative z-20 w-full px-4 sm:px-8 md:px-12 py-2 sm:py-3.5 flex items-center justify-center lg:justify-end"
         >
           <div className="flex items-center gap-3 sm:gap-4 shrink-0">
             {/* Prev Arrow */}
