@@ -18,14 +18,14 @@ export default function FeaturedProducts() {
   const [loading, setLoading] = useState(() => getCachedProducts().length === 0);
   const [addedProductId, setAddedProductId] = useState(null);
 
-  // Fetch live products from database on mount
+  // Fetch live products from database on mount (force fresh to stay in sync with admin toggles)
   useEffect(() => {
     let isMounted = true;
     if (productsList.length === 0) setLoading(true);
 
-    fetchProducts()
+    fetchProducts({}, true)
       .then((prods) => {
-        if (isMounted && Array.isArray(prods) && prods.length > 0) {
+        if (isMounted && Array.isArray(prods)) {
           setProductsList(prods);
         }
       })
@@ -39,10 +39,15 @@ export default function FeaturedProducts() {
     return () => { isMounted = false; };
   }, []);
 
-  // Show all active in-stock products
+  // Show ONLY active in-stock products that have the FEATURED toggle enabled in Admin
   const allProducts = productsList.filter(
-    (p) => p.inStock !== false && p.in_stock !== false
+    (p) => (p.inStock !== false && p.in_stock !== false) && (p.isFeatured === true || p.is_featured === true)
   );
+
+  // If no products have the FEATURED toggle turned ON, hide the entire section on the home screen
+  if (!loading && allProducts.length === 0) {
+    return null;
+  }
 
   const handleAddToBag = (e, product) => {
     e.stopPropagation();

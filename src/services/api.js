@@ -298,8 +298,9 @@ export const normalizeProduct = (p) => {
     heroNote3: p.hero_note_3 || scent.base_notes?.split(',')[0] || 'Vetiver',
     engravingAvailable: p.engraving_available !== false,
     giftBoxIncluded: p.gift_box_included !== false,
-    isHero: p.is_hero || false,
-    isFeatured: p.is_featured || false,
+    isHero: p.is_hero === true || p.isHero === true || p.is_hero === 'true',
+    isFeatured: p.is_featured === true || p.isFeatured === true || p.is_featured === 'true',
+    is_featured: p.is_featured === true || p.isFeatured === true || p.is_featured === 'true',
     description: p.description || '',
     scentDetails: scent,
     sizes: sizes.length > 0 ? sizes.map(s => ({
