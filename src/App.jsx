@@ -11,6 +11,7 @@ import AccountModal from './components/AccountModal';
 import CartDrawer from './components/CartDrawer';
 import AdminLayout from './Admin/AdminLayout';
 import DiscountOfferModal from './components/DiscountOfferModal';
+import ComingSoon from './components/ComingSoon';
 import { ConfirmProvider } from './components/ConfirmModal';
 import { useCart } from './context/CartContext';
 import { useAuth } from './context/AuthContext';
@@ -45,9 +46,41 @@ function ProtectedAdminRoute({ children }) {
 function MainApp() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
+  const isDedicatedComingSoonRoute = location.pathname === '/coming-soon';
+
+  // Method 1: Coming Soon Toggle via Environment Variable
+  const isComingSoonMode = import.meta.env.VITE_COMING_SOON === 'true';
+
+  // Preview Unlock state (persisted per session, triggered by code or ?preview=)
+  const [isPreviewUnlocked, setIsPreviewUnlocked] = useState(() => {
+    try {
+      const searchParams = new URLSearchParams(window.location.search);
+      const previewParam = searchParams.get('preview');
+      const expectedCode = (import.meta.env.VITE_PREVIEW_PASSCODE || 'lune2026').toLowerCase();
+      if (
+        previewParam &&
+        (previewParam.toLowerCase() === expectedCode ||
+          previewParam === 'true' ||
+          previewParam.toLowerCase() === 'lune' ||
+          previewParam.toLowerCase() === 'preview')
+      ) {
+        sessionStorage.setItem('lune_preview_unlocked', 'true');
+        return true;
+      }
+      return sessionStorage.getItem('lune_preview_unlocked') === 'true';
+    } catch (e) {
+      return false;
+    }
+  });
+
+  const handleExitPreview = () => {
+    try {
+      sessionStorage.removeItem('lune_preview_unlocked');
+    } catch (e) {}
+    setIsPreviewUnlocked(false);
+  };
 
   const { cartItems, setCartItems, totalCartCount, isCartOpen, setIsCartOpen, updateQuantity, removeItem } = useCart();
-
 
   const [loaderKey, setLoaderKey] = useState(0);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
@@ -76,7 +109,7 @@ function MainApp() {
   const handleLoaderStartExit = useCallback(() => {
     try {
       sessionStorage.setItem('perfume_has_visited', 'true');
-    } catch (e) {
+    } catch {
       // ignore storage errors
     }
     setLoaderState('exiting');
@@ -85,7 +118,7 @@ function MainApp() {
   const handleLoaderComplete = useCallback(() => {
     try {
       sessionStorage.setItem('perfume_has_visited', 'true');
-    } catch (e) {
+    } catch {
       // ignore storage errors
     }
     requestAnimationFrame(() => {
@@ -101,6 +134,11 @@ function MainApp() {
     }
     setIsAccountOpen(true);
   };
+
+  // If in Coming Soon mode (or direct /coming-soon route), render Coming Soon
+  if (isDedicatedComingSoonRoute || (isComingSoonMode && !isAdminRoute && !isPreviewUnlocked)) {
+    return <ComingSoon onUnlockPreview={() => setIsPreviewUnlocked(true)} />;
+  }
 
   return (
     <main className="relative min-h-screen w-full bg-white flex flex-col justify-between overflow-x-clip">
@@ -223,6 +261,10 @@ function MainApp() {
             }
           />
           <Route
+            path="/coming-soon"
+            element={<ComingSoon onUnlockPreview={() => setIsPreviewUnlocked(true)} />}
+          />
+          <Route
             path="/admin/*"
             element={
               <ProtectedAdminRoute>
@@ -233,6 +275,28 @@ function MainApp() {
 
         </Routes>
         {!isAdminRoute && <DiscountOfferModal />}
+
+        {/* Client & Team Live Preview Floating Indicator */}
+        {isComingSoonMode && isPreviewUnlocked && !isAdminRoute && (
+          <aside
+            aria-label="Preview Mode Notice"
+            className="fixed bottom-5 left-5 z-50 flex items-center gap-3 px-4 py-2.5 rounded-full bg-[#111111]/95 text-white border border-[#C5A880]/40 backdrop-blur-xl shadow-2xl text-[11px]"
+          >
+            <span className="flex h-2 w-2 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C5A880] opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#C5A880]" />
+            </span>
+            <span className="font-mono text-white/90 tracking-wide">
+              Preview Mode Active
+            </span>
+            <button
+              onClick={handleExitPreview}
+              className="ml-1 px-2.5 py-1 rounded-full bg-white/10 hover:bg-[#C5A880] hover:text-black text-white font-medium text-[10px] uppercase tracking-wider transition-all cursor-pointer"
+            >
+              Lock Site
+            </button>
+          </aside>
+        )}
       </div>
     </main>
   );
