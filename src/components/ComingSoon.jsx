@@ -162,7 +162,7 @@ export default function ComingSoon({ onUnlockPreview }) {
                 />
               </div>
               {/* Separation line beneath logo */}
-              <div className="mt-5 sm:mt-6 ml-3 sm:ml-6 w-36 sm:w-52 h-[1px] bg-gradient-to-r from-[#BFA15F] via-[#D5D0C5] to-transparent" />
+              <div className="mt-5 sm:mt-6 ml-3 sm:ml-6 w-36 sm:w-52 h-[1px] ml-65 bg-gradient-to-r from-[#BFA15F] via-[#D5D0C5] to-transparent" />
             </motion.div>
 
             {/* COMING SOON */}
