@@ -102,7 +102,7 @@ export default function ComingSoon({ onUnlockPreview }) {
     const correctCode = (import.meta.env.VITE_PREVIEW_PASSCODE || DEFAULT_PASSCODE).trim().toLowerCase();
     const enteredCode = passcode.trim().toLowerCase();
     if (enteredCode === correctCode || enteredCode === 'lune' || enteredCode === 'preview') {
-      try { sessionStorage.setItem('lune_preview_unlocked', 'true'); } catch {}
+      try { sessionStorage.setItem('lune_preview_unlocked', 'true'); } catch { }
       setShowUnlockModal(false);
       if (onUnlockPreview) onUnlockPreview(); else window.location.reload();
     } else {
@@ -157,7 +157,7 @@ export default function ComingSoon({ onUnlockPreview }) {
                 <img
                   src="/assets/Logo.png"
                   alt="LUNE FRAGRANCE"
-                  className="h-14 sm:h-18 md:h-22 lg:h-26 xl:h-28 w-auto object-contain"
+                  className="h-14 sm:h-18 md:h-22 lg:h-26 xl:h-28 w-auto ml-65 object-contain"
                   style={{ filter: 'contrast(1.1)' }}
                 />
               </div>
@@ -356,9 +356,8 @@ export default function ComingSoon({ onUnlockPreview }) {
                   onChange={(e) => setPasscode(e.target.value)}
                   placeholder="Enter preview passcode..."
                   autoFocus
-                  className={`w-full h-11 px-4 rounded-xl bg-white border text-[#111] placeholder-[#BBB] text-sm outline-none transition-colors ${
-                    passcodeError ? 'border-rose-500' : 'border-[#E0DBD0] focus:border-[#C5A880]'
-                  }`}
+                  className={`w-full h-11 px-4 rounded-xl bg-white border text-[#111] placeholder-[#BBB] text-sm outline-none transition-colors ${passcodeError ? 'border-rose-500' : 'border-[#E0DBD0] focus:border-[#C5A880]'
+                    }`}
                   style={{ fontFamily: "'Inter', sans-serif" }}
                 />
                 {passcodeError && <p className="text-xs text-rose-500 font-light">Incorrect passcode.</p>}
