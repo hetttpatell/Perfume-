@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import comingSoonHero from '../assets/coming_soon_hero.jpg';
 import luneEditorialBg from '../assets/lune_editorial_bg.jpg';
-import luneEditorialMobileBg from '../assets/lune_mobile_open_center.jpg';
+import luneEditorialMobileBg from '../assets/lune_mobile_rich_edges.jpg';
 import logoGold from '../assets/Logo_Gold_Exact.png';
 
 const DEFAULT_PASSCODE = 'lune2026';
@@ -156,7 +156,7 @@ export default function ComingSoon({ onUnlockPreview }) {
             variants={stagger}
             initial="hidden"
             animate="visible"
-            className="my-auto w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto flex flex-col items-center text-center relative z-10 py-3 sm:py-5 px-3 space-y-3.5 sm:space-y-5 shrink-0 translate-y-7 sm:translate-y-0"
+            className="my-auto w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto flex flex-col items-center text-center relative z-10 py-3 sm:py-5 px-3 space-y-3.5 sm:space-y-5 shrink-0 translate-y-12 sm:translate-y-0"
           >
             {/* LUNE New Gold Logo — Majestic, Prominent, Centered in open space */}
             <motion.div variants={fadeUp} className="flex flex-col items-center w-full">
