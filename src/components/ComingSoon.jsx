@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import comingSoonHero from '../assets/coming_soon_hero.jpg';
 import luneEditorialBg from '../assets/lune_editorial_bg.jpg';
+import luneEditorialMobileBg from '../assets/lune_editorial_mobile_bg.jpg';
 import logoGold from '../assets/Logo_Gold_Exact.png';
 
 const DEFAULT_PASSCODE = 'lune2026';
@@ -132,12 +133,19 @@ export default function ComingSoon({ onUnlockPreview }) {
 
         {/* ════ LEFT PANEL (Haute Parfumerie Editorial Section) ════ */}
         <div className="relative flex-1 flex flex-col justify-between px-6 sm:px-10 lg:px-12 xl:px-14 py-8 sm:py-10 text-center items-center w-full lg:w-1/2 lg:max-w-[50%] overflow-hidden bg-[#F5F0E8]">
-          {/* Full-bleed botanical background properly positioned without clipping */}
+          {/* Full-bleed botanical background: mobile-tailored (9:16) & desktop-tailored (1:1) */}
           <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+            {/* Mobile-tailored 9:16 background for mobile & tablet (<1024px) */}
+            <img
+              src={luneEditorialMobileBg}
+              alt=""
+              className="lg:hidden w-full h-full object-cover object-center select-none"
+            />
+            {/* Desktop-tailored 1:1 background for split screen (>=1024px) */}
             <img
               src={luneEditorialBg}
               alt=""
-              className="w-full h-full object-cover object-center select-none"
+              className="hidden lg:block w-full h-full object-cover object-center select-none"
             />
             {/* Soft subtle tint for optimal text contrast */}
             <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-white/15 pointer-events-none" />
