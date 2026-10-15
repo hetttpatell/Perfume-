@@ -110,7 +110,7 @@ export default function ComingSoon({ onUnlockPreview }) {
   return (
     <div
       onMouseMove={handleMouseMove}
-      className="relative min-h-screen lg:h-screen w-screen overflow-x-hidden lg:overflow-hidden select-none flex flex-col justify-between"
+      className="relative h-screen h-[100dvh] max-h-[100dvh] w-screen overflow-hidden select-none flex flex-col justify-between"
       style={{ fontFamily: "'Outfit', 'Inter', sans-serif", background: '#FAF9F7' }}
     >
       {/* Canvas Particles */}
@@ -129,17 +129,17 @@ export default function ComingSoon({ onUnlockPreview }) {
       </div>
 
       {/* ═══════ MAIN LAYOUT ═══════ */}
-      <div className="relative z-10 flex-1 flex flex-col lg:flex-row h-full w-full">
+      <div className="relative z-10 flex-1 flex flex-col lg:flex-row h-full max-h-[100dvh] w-full overflow-hidden">
 
         {/* ════ LEFT PANEL (Haute Parfumerie Editorial Section) ════ */}
-        <div className="relative flex-1 flex flex-col justify-between px-6 sm:px-10 lg:px-12 xl:px-14 py-8 sm:py-10 text-center items-center w-full lg:w-1/2 lg:max-w-[50%] overflow-hidden bg-[#F5F0E8]">
+        <div className="relative flex-1 flex flex-col justify-between px-4 sm:px-8 lg:px-12 xl:px-14 py-3 sm:py-6 lg:py-8 text-center items-center w-full lg:w-1/2 lg:max-w-[50%] h-full max-h-[100dvh] overflow-hidden bg-[#F5F0E8]">
           {/* Full-bleed botanical background: mobile-tailored (9:16) & desktop-tailored (1:1) */}
           <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
             {/* Mobile-tailored 9:16 background for mobile & tablet (<1024px) */}
             <img
               src={luneEditorialMobileBg}
               alt=""
-              className="lg:hidden w-full h-full object-cover object-center select-none"
+              className="lg:hidden w-full h-full object-cover object-top select-none"
             />
             {/* Desktop-tailored 1:1 background for split screen (>=1024px) */}
             <img
@@ -148,40 +148,40 @@ export default function ComingSoon({ onUnlockPreview }) {
               className="hidden lg:block w-full h-full object-cover object-center select-none"
             />
             {/* Soft subtle tint for optimal text contrast */}
-            <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-white/15 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-white/10 pointer-events-none" />
           </div>
 
           {/* Top breathing room */}
-          <div className="w-full h-2 sm:h-4 mb-auto relative z-10" />
+          <div className="w-full h-1 sm:h-3 mb-auto relative z-10 shrink-0" />
 
           {/* ── Main Editorial Content (Centered in the Left Section) ────── */}
           <motion.div
             variants={stagger}
             initial="hidden"
             animate="visible"
-            className="my-auto py-4 sm:py-6 flex flex-col items-center text-center w-full max-w-lg mx-auto relative z-10"
+            className="my-auto py-1 sm:py-3 flex flex-col items-center text-center w-full max-w-lg mx-auto relative z-10 shrink-0"
           >
-            {/* LUNE New Gold Logo — Centered, Majestic Scale */}
-            <motion.div variants={fadeUp} className="mb-4 sm:mb-5 flex flex-col items-center w-full">
+            {/* LUNE New Gold Logo — Centered, Fit inside circle frame */}
+            <motion.div variants={fadeUp} className="mb-2 sm:mb-4 flex flex-col items-center w-full">
               <img
                 src={logoGold}
                 alt="LUNE FRAGRANCE"
-                className="w-[72%] max-w-[320px] sm:max-w-[380px] md:max-w-[420px] lg:max-w-[460px] h-auto object-contain mx-auto filter drop-shadow-[0_8px_24px_rgba(180,140,70,0.32)] hover:scale-[1.02] transition-transform duration-500"
+                className="w-[62%] sm:w-[70%] max-w-[210px] sm:max-w-[320px] md:max-w-[380px] lg:max-w-[440px] h-auto object-contain mx-auto filter drop-shadow-[0_6px_20px_rgba(180,140,70,0.30)] hover:scale-[1.02] transition-transform duration-500"
               />
               {/* Refined Gold Separation Line */}
-              <div className="mt-3 sm:mt-4 mx-auto w-24 sm:w-32 h-[1px] bg-gradient-to-r from-transparent via-[#C2A263] to-transparent opacity-60" />
+              <div className="mt-2 sm:mt-3 mx-auto w-20 sm:w-28 h-[1px] bg-gradient-to-r from-transparent via-[#C2A263] to-transparent opacity-60" />
             </motion.div>
 
             {/* COMING SOON Heading — Centered */}
-            <motion.div variants={fadeUp} className="space-y-2">
+            <motion.div variants={fadeUp} className="space-y-1 sm:space-y-2">
               <p
-                className="text-xs sm:text-sm text-[#948A7B] font-light tracking-[0.24em] uppercase"
+                className="text-[9.5px] sm:text-xs text-[#948A7B] font-light tracking-[0.24em] uppercase"
                 style={{ fontFamily: "'Inter', sans-serif" }}
               >
                 Our New Website Is
               </p>
               <h1
-                className="text-[clamp(2.5rem,5.2vw,4.4rem)] font-extralight tracking-[0.14em] text-[#111] leading-[1.08]"
+                className="text-[clamp(1.75rem,4.5vw,3.8rem)] font-extralight tracking-[0.14em] text-[#111] leading-[1.08]"
                 style={{ fontFamily: "'Outfit', sans-serif" }}
               >
                 COMING SOON
@@ -191,7 +191,7 @@ export default function ComingSoon({ onUnlockPreview }) {
             {/* Editorial Description — Centered */}
             <motion.p
               variants={fadeUp}
-              className="text-[13px] sm:text-[14px] text-[#766F65] font-light leading-[1.75] max-w-md mx-auto mt-5 sm:mt-6"
+              className="text-[11.5px] sm:text-[13.5px] text-[#766F65] font-light leading-[1.55] max-w-[280px] sm:max-w-md mx-auto mt-2 sm:mt-4"
               style={{ fontFamily: "'Inter', sans-serif" }}
             >
               We are crafting an extraordinary haute fragrance experience.
@@ -199,11 +199,11 @@ export default function ComingSoon({ onUnlockPreview }) {
             </motion.p>
 
             {/* ── ELEGANT LUXURY INSTAGRAM SECTION — Centered ───────────── */}
-            <motion.div variants={fadeUp} className="mt-8 sm:mt-10 w-full flex flex-col items-center">
-              <div className="flex items-center gap-2 mb-3">
+            <motion.div variants={fadeUp} className="mt-3 sm:mt-6 w-full flex flex-col items-center">
+              <div className="flex items-center gap-2 mb-2 sm:mb-2.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#BFA15F]" />
                 <span
-                  className="text-[9.5px] sm:text-[10px] tracking-[0.28em] uppercase text-[#998E7D] font-medium"
+                  className="text-[9px] sm:text-[10px] tracking-[0.28em] uppercase text-[#998E7D] font-medium"
                   style={{ fontFamily: "'Inter', sans-serif" }}
                 >
                   Connect With Us
@@ -215,12 +215,12 @@ export default function ComingSoon({ onUnlockPreview }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Follow Lune Fragrances on Instagram"
-                className="group relative inline-flex items-center gap-4 px-5 sm:px-6 py-3.5 sm:py-4 rounded-2xl border border-[#DFD7CA] hover:border-[#BFA15F] bg-white/85 hover:bg-white backdrop-blur-md transition-all duration-400 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_12px_32px_-6px_rgba(191,161,95,0.25)] hover:-translate-y-0.5 cursor-pointer max-w-sm w-full sm:w-auto"
+                className="group relative inline-flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-2.5 sm:py-3.5 rounded-xl sm:rounded-2xl border border-[#DFD7CA] hover:border-[#BFA15F] bg-white/90 hover:bg-white backdrop-blur-md transition-all duration-400 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_12px_32px_-6px_rgba(191,161,95,0.25)] hover:-translate-y-0.5 cursor-pointer max-w-xs sm:max-w-sm w-full sm:w-auto"
               >
                 {/* Haute Parfumerie Gold & Obsidian Emblem */}
-                <div className="relative flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-[#FAF7F2] to-[#ECE4D6] border border-[#DFD6C6] group-hover:bg-[#111] group-hover:border-[#111] transition-all duration-300 shadow-sm shrink-0">
+                <div className="relative flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[#FAF7F2] to-[#ECE4D6] border border-[#DFD6C6] group-hover:bg-[#111] group-hover:border-[#111] transition-all duration-300 shadow-sm shrink-0">
                   <svg
-                    className="w-5 h-5 text-[#8E7340] group-hover:text-[#D4AF37] transition-colors duration-300"
+                    className="w-4 h-4 sm:w-5 sm:h-5 text-[#8E7340] group-hover:text-[#D4AF37] transition-colors duration-300"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -237,13 +237,13 @@ export default function ComingSoon({ onUnlockPreview }) {
                 {/* Account Details */}
                 <div className="flex flex-col text-left">
                   <span
-                    className="text-[14px] sm:text-[15px] font-normal text-[#1A1A1A] group-hover:text-[#000] tracking-[0.04em] transition-colors"
+                    className="text-[13px] sm:text-[15px] font-normal text-[#1A1A1A] group-hover:text-[#000] tracking-[0.04em] transition-colors"
                     style={{ fontFamily: "'Outfit', sans-serif" }}
                   >
                     @lune.fragrances
                   </span>
                   <span
-                    className="text-[10px] text-[#9A9184] group-hover:text-[#8E7340] transition-colors tracking-[0.16em] uppercase font-light"
+                    className="text-[9px] sm:text-[10px] text-[#9A9184] group-hover:text-[#8E7340] transition-colors tracking-[0.16em] uppercase font-light"
                     style={{ fontFamily: "'Inter', sans-serif" }}
                   >
                     Follow on Instagram
@@ -252,9 +252,9 @@ export default function ComingSoon({ onUnlockPreview }) {
 
                 {/* Subtle Luxury Arrow */}
                 <div className="ml-auto pl-2">
-                  <span className="w-7 h-7 rounded-full flex items-center justify-center bg-[#FAF8F5] border border-[#E8E2D6] group-hover:bg-[#BFA15F] group-hover:border-[#BFA15F] transition-all duration-300">
+                  <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center bg-[#FAF8F5] border border-[#E8E2D6] group-hover:bg-[#BFA15F] group-hover:border-[#BFA15F] transition-all duration-300">
                     <svg
-                      className="w-3.5 h-3.5 text-[#8E7E6A] group-hover:text-white group-hover:translate-x-0.5 transition-all duration-300"
+                      className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#8E7E6A] group-hover:text-white group-hover:translate-x-0.5 transition-all duration-300"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -272,7 +272,7 @@ export default function ComingSoon({ onUnlockPreview }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.9, duration: 0.8 }}
-            className="w-full pt-4 pb-2 flex items-center justify-center relative z-10 text-[11px] text-[#8E8478] tracking-wider"
+            className="w-full pt-1 pb-1 sm:pt-3 sm:pb-2 flex items-center justify-center relative z-10 text-[10px] sm:text-[11px] text-[#8E8478] tracking-wider shrink-0"
           >
             <span>© {new Date().getFullYear()} LUNE Fragrance. All rights reserved.</span>
 
