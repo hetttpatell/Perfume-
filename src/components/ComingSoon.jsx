@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import comingSoonHero from '../assets/coming_soon_hero.jpg';
+import luneEditorialBg from '../assets/lune_editorial_bg.jpg';
+import logoGold from '../assets/Logo_Gold_Exact.png';
 
 const DEFAULT_PASSCODE = 'lune2026';
 const INSTAGRAM_URL = 'https://www.instagram.com/lune.fragrances?utm_source=ig_web_button_share_sheet&rpxt=ZDNlZDc0MzIxNw==';
@@ -128,29 +130,38 @@ export default function ComingSoon({ onUnlockPreview }) {
       {/* ═══════ MAIN LAYOUT ═══════ */}
       <div className="relative z-10 flex-1 flex flex-col lg:flex-row h-full w-full">
 
-        {/* ════ LEFT PANEL (Editorial Content — Centered) ════ */}
-        <div className="relative flex-1 flex flex-col justify-between px-6 sm:px-12 lg:px-14 xl:px-16 py-8 sm:py-10 lg:py-12 text-center items-center max-w-full lg:max-w-[50%] xl:max-w-[52%]">
+        {/* ════ LEFT PANEL (Haute Parfumerie Editorial Section) ════ */}
+        <div className="relative flex-1 flex flex-col justify-between px-6 sm:px-10 lg:px-12 xl:px-14 py-8 sm:py-10 text-center items-center w-full lg:w-1/2 lg:max-w-[50%] overflow-hidden bg-[#F5F0E8]">
+          {/* Full-bleed botanical background properly positioned without clipping */}
+          <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+            <img
+              src={luneEditorialBg}
+              alt=""
+              className="w-full h-full object-cover object-center select-none"
+            />
+            {/* Soft subtle tint for optimal text contrast */}
+            <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-white/15 pointer-events-none" />
+          </div>
 
           {/* Top breathing room */}
-          <div className="w-full h-2 sm:h-4 mb-auto" />
+          <div className="w-full h-2 sm:h-4 mb-auto relative z-10" />
 
           {/* ── Main Editorial Content (Centered in the Left Section) ────── */}
           <motion.div
             variants={stagger}
             initial="hidden"
             animate="visible"
-            className="my-auto py-6 sm:py-8 flex flex-col items-center text-center w-full max-w-lg mx-auto"
+            className="my-auto py-4 sm:py-6 flex flex-col items-center text-center w-full max-w-lg mx-auto relative z-10"
           >
-            {/* LUNE Logo — Centered in the middle of left section */}
-            <motion.div variants={fadeUp} className="mb-6 sm:mb-8 flex flex-col items-center">
+            {/* LUNE New Gold Logo — Centered, Majestic Scale */}
+            <motion.div variants={fadeUp} className="mb-4 sm:mb-5 flex flex-col items-center w-full">
               <img
-                src="/assets/Logo.png"
+                src={logoGold}
                 alt="LUNE FRAGRANCE"
-                className="h-16 sm:h-20 md:h-22 lg:h-24 w-auto object-contain mx-auto"
-                style={{ filter: 'contrast(1.08)' }}
+                className="w-[72%] max-w-[320px] sm:max-w-[380px] md:max-w-[420px] lg:max-w-[460px] h-auto object-contain mx-auto filter drop-shadow-[0_8px_24px_rgba(180,140,70,0.32)] hover:scale-[1.02] transition-transform duration-500"
               />
-              {/* Refined Gold Separation Line — Centered */}
-              <div className="mt-4 sm:mt-5 mx-auto w-32 sm:w-44 h-[1px] bg-gradient-to-r from-transparent via-[#BFA15F] to-transparent" />
+              {/* Refined Gold Separation Line */}
+              <div className="mt-3 sm:mt-4 mx-auto w-24 sm:w-32 h-[1px] bg-gradient-to-r from-transparent via-[#C2A263] to-transparent opacity-60" />
             </motion.div>
 
             {/* COMING SOON Heading — Centered */}
@@ -253,7 +264,7 @@ export default function ComingSoon({ onUnlockPreview }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.9, duration: 0.8 }}
-            className="w-full pt-6 flex items-center justify-center relative text-[11px] text-[#A8A094] tracking-wider"
+            className="w-full pt-4 pb-2 flex items-center justify-center relative z-10 text-[11px] text-[#8E8478] tracking-wider"
           >
             <span>© {new Date().getFullYear()} LUNE Fragrance. All rights reserved.</span>
 
