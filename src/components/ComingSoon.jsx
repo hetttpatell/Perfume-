@@ -151,59 +151,53 @@ export default function ComingSoon({ onUnlockPreview }) {
             <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-white/10 pointer-events-none" />
           </div>
 
-          {/* Top breathing room */}
-          <div className="w-full h-1 sm:h-3 mb-auto relative z-10 shrink-0" />
-
-          {/* ── Main Editorial Content (Centered in the Left Section) ────── */}
+          {/* ── Main Editorial Content (Evenly distributed across the circle frame) ────── */}
           <motion.div
             variants={stagger}
             initial="hidden"
             animate="visible"
-            className="my-auto py-1 sm:py-3 flex flex-col items-center text-center w-full max-w-lg mx-auto relative z-10 shrink-0"
+            className="flex-1 w-full max-w-md lg:max-w-lg mx-auto flex flex-col justify-evenly items-center text-center relative z-10 py-2 sm:py-4 shrink-0"
           >
-            {/* LUNE New Gold Logo — Centered, Fit inside circle frame */}
-            <motion.div variants={fadeUp} className="mb-2 sm:mb-4 flex flex-col items-center w-full">
+            {/* LUNE New Gold Logo — Large, Majestic & Prominently positioned at the upper curve */}
+            <motion.div variants={fadeUp} className="flex flex-col items-center w-full">
               <img
                 src={logoGold}
                 alt="LUNE FRAGRANCE"
-                className="w-[62%] sm:w-[70%] max-w-[210px] sm:max-w-[320px] md:max-w-[380px] lg:max-w-[440px] h-auto object-contain mx-auto filter drop-shadow-[0_6px_20px_rgba(180,140,70,0.30)] hover:scale-[1.02] transition-transform duration-500"
+                className="w-[82%] sm:w-[85%] max-w-[280px] sm:max-w-[340px] md:max-w-[400px] lg:max-w-[460px] h-auto object-contain mx-auto filter drop-shadow-[0_8px_24px_rgba(180,140,70,0.32)] hover:scale-[1.02] transition-transform duration-500"
               />
               {/* Refined Gold Separation Line */}
-              <div className="mt-2 sm:mt-3 mx-auto w-20 sm:w-28 h-[1px] bg-gradient-to-r from-transparent via-[#C2A263] to-transparent opacity-60" />
+              <div className="mt-2.5 sm:mt-3.5 mx-auto w-24 sm:w-32 h-[1px] bg-gradient-to-r from-transparent via-[#C2A263] to-transparent opacity-70" />
             </motion.div>
 
-            {/* COMING SOON Heading — Centered */}
-            <motion.div variants={fadeUp} className="space-y-1 sm:space-y-2">
+            {/* COMING SOON Heading & Narrative — Center of circle */}
+            <motion.div variants={fadeUp} className="flex flex-col items-center space-y-2 sm:space-y-3 px-2">
               <p
-                className="text-[9.5px] sm:text-xs text-[#948A7B] font-light tracking-[0.24em] uppercase"
+                className="text-[10px] sm:text-xs text-[#948A7B] font-light tracking-[0.26em] uppercase"
                 style={{ fontFamily: "'Inter', sans-serif" }}
               >
                 Our New Website Is
               </p>
               <h1
-                className="text-[clamp(1.75rem,4.5vw,3.8rem)] font-extralight tracking-[0.14em] text-[#111] leading-[1.08]"
+                className="text-[clamp(2.1rem,5vw,4.2rem)] font-extralight tracking-[0.14em] text-[#111] leading-[1.05]"
                 style={{ fontFamily: "'Outfit', sans-serif" }}
               >
                 COMING SOON
               </h1>
+              <p
+                className="text-[12px] sm:text-[13.5px] text-[#6E675D] font-light leading-[1.65] max-w-[300px] sm:max-w-md mx-auto"
+                style={{ fontFamily: "'Inter', sans-serif" }}
+              >
+                We are crafting an extraordinary haute fragrance experience.
+                Something truly exceptional is on its way — stay connected with our maison.
+              </p>
             </motion.div>
 
-            {/* Editorial Description — Centered */}
-            <motion.p
-              variants={fadeUp}
-              className="text-[11.5px] sm:text-[13.5px] text-[#766F65] font-light leading-[1.55] max-w-[280px] sm:max-w-md mx-auto mt-2 sm:mt-4"
-              style={{ fontFamily: "'Inter', sans-serif" }}
-            >
-              We are crafting an extraordinary haute fragrance experience.
-              Something truly exceptional is on its way — stay connected with our maison.
-            </motion.p>
-
-            {/* ── ELEGANT LUXURY INSTAGRAM SECTION — Centered ───────────── */}
-            <motion.div variants={fadeUp} className="mt-3 sm:mt-6 w-full flex flex-col items-center">
+            {/* ── ELEGANT LUXURY INSTAGRAM SECTION — Lower region of circle ───────────── */}
+            <motion.div variants={fadeUp} className="w-full flex flex-col items-center">
               <div className="flex items-center gap-2 mb-2 sm:mb-2.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#BFA15F]" />
                 <span
-                  className="text-[9px] sm:text-[10px] tracking-[0.28em] uppercase text-[#998E7D] font-medium"
+                  className="text-[9.5px] sm:text-[10px] tracking-[0.28em] uppercase text-[#998E7D] font-medium"
                   style={{ fontFamily: "'Inter', sans-serif" }}
                 >
                   Connect With Us
@@ -215,12 +209,12 @@ export default function ComingSoon({ onUnlockPreview }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Follow Lune Fragrances on Instagram"
-                className="group relative inline-flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-2.5 sm:py-3.5 rounded-xl sm:rounded-2xl border border-[#DFD7CA] hover:border-[#BFA15F] bg-white/90 hover:bg-white backdrop-blur-md transition-all duration-400 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_12px_32px_-6px_rgba(191,161,95,0.25)] hover:-translate-y-0.5 cursor-pointer max-w-xs sm:max-w-sm w-full sm:w-auto"
+                className="group relative inline-flex items-center gap-3.5 sm:gap-4 px-5 sm:px-6 py-2.5 sm:py-3.5 rounded-2xl border border-[#DFD7CA] hover:border-[#BFA15F] bg-white/92 hover:bg-white backdrop-blur-md transition-all duration-400 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_32px_-6px_rgba(191,161,95,0.25)] hover:-translate-y-0.5 cursor-pointer max-w-xs sm:max-w-sm w-full sm:w-auto"
               >
                 {/* Haute Parfumerie Gold & Obsidian Emblem */}
-                <div className="relative flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[#FAF7F2] to-[#ECE4D6] border border-[#DFD6C6] group-hover:bg-[#111] group-hover:border-[#111] transition-all duration-300 shadow-sm shrink-0">
+                <div className="relative flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[#FAF7F2] to-[#ECE4D6] border border-[#DFD6C6] group-hover:bg-[#111] group-hover:border-[#111] transition-all duration-300 shadow-sm shrink-0">
                   <svg
-                    className="w-4 h-4 sm:w-5 sm:h-5 text-[#8E7340] group-hover:text-[#D4AF37] transition-colors duration-300"
+                    className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-[#8E7340] group-hover:text-[#D4AF37] transition-colors duration-300"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -237,13 +231,13 @@ export default function ComingSoon({ onUnlockPreview }) {
                 {/* Account Details */}
                 <div className="flex flex-col text-left">
                   <span
-                    className="text-[13px] sm:text-[15px] font-normal text-[#1A1A1A] group-hover:text-[#000] tracking-[0.04em] transition-colors"
+                    className="text-[13.5px] sm:text-[15px] font-normal text-[#1A1A1A] group-hover:text-[#000] tracking-[0.04em] transition-colors"
                     style={{ fontFamily: "'Outfit', sans-serif" }}
                   >
                     @lune.fragrances
                   </span>
                   <span
-                    className="text-[9px] sm:text-[10px] text-[#9A9184] group-hover:text-[#8E7340] transition-colors tracking-[0.16em] uppercase font-light"
+                    className="text-[9.5px] sm:text-[10px] text-[#9A9184] group-hover:text-[#8E7340] transition-colors tracking-[0.16em] uppercase font-light"
                     style={{ fontFamily: "'Inter', sans-serif" }}
                   >
                     Follow on Instagram
@@ -272,7 +266,7 @@ export default function ComingSoon({ onUnlockPreview }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.9, duration: 0.8 }}
-            className="w-full pt-1 pb-1 sm:pt-3 sm:pb-2 flex items-center justify-center relative z-10 text-[10px] sm:text-[11px] text-[#8E8478] tracking-wider shrink-0"
+            className="w-full pt-1 pb-1 sm:pt-2 sm:pb-2 flex items-center justify-center relative z-10 text-[10px] sm:text-[11px] text-[#8E8478] tracking-wider shrink-0"
           >
             <span>© {new Date().getFullYear()} LUNE Fragrance. All rights reserved.</span>
 
