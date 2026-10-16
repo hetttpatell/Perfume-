@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import comingSoonHero from '../assets/coming_soon_hero.jpg';
-import luneEditorialBg from '../assets/lune_editorial_bg.jpg';
-import luneEditorialMobileBg from '../assets/lune_mobile_rich_edges.jpg';
+import luneEditorialBg from '../assets/lune_natural_botanical_desktop.jpg';
+import luneEditorialMobileBg from '../assets/lune_natural_botanical_mobile.jpg';
 import logoGold from '../assets/Logo_Gold_Exact.png';
 
 const DEFAULT_PASSCODE = 'lune2026';
@@ -87,7 +87,7 @@ export default function ComingSoon({ onUnlockPreview }) {
     if (enteredCode === correctCode || enteredCode === 'lune' || enteredCode === 'preview') {
       try {
         sessionStorage.setItem('lune_preview_unlocked', 'true');
-      } catch {}
+      } catch { }
       setShowUnlockModal(false);
       if (onUnlockPreview) onUnlockPreview();
       else window.location.reload();
@@ -184,7 +184,7 @@ export default function ComingSoon({ onUnlockPreview }) {
             variants={stagger}
             initial="hidden"
             animate="visible"
-            className="my-auto w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto flex flex-col items-center text-center relative z-10 py-1 sm:py-5 px-3 space-y-2 sm:space-y-4 md:space-y-5 shrink-0 translate-y-1 sm:translate-y-0"
+            className="my-auto w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto flex flex-col items-center text-center relative z-10 py-1 sm:py-4 px-3 space-y-2 sm:space-y-3.5 md:space-y-4 shrink-0 translate-y-1 sm:translate-y-0 lg:-translate-y-5"
           >
             {/* LUNE New Gold Logo — Majestic, Prominent, Centered in open space */}
             <motion.div variants={fadeUp} className="flex flex-col items-center w-full">
@@ -215,8 +215,9 @@ export default function ComingSoon({ onUnlockPreview }) {
                 className="text-[11px] sm:text-[13px] text-[#6E675D] font-light leading-[1.5] max-w-[270px] sm:max-w-md mx-auto pt-0.5"
                 style={{ fontFamily: "'Inter', sans-serif" }}
               >
-                We are crafting an extraordinary haute fragrance experience.
-                Something truly exceptional is on its way — stay connected with our maison.
+                We've been working on something close to our hearts.
+                Inspired by nature, made with care and love.
+                Thoughtfully crafted fragrances, made for everyday living. Stay with us. The best is yet to come.
               </p>
             </motion.div>
 
@@ -398,9 +399,8 @@ export default function ComingSoon({ onUnlockPreview }) {
                   onChange={(e) => setPasscode(e.target.value)}
                   placeholder="Enter preview passcode..."
                   autoFocus
-                  className={`w-full h-11 px-4 rounded-xl bg-white border text-[#111] placeholder-[#BBB] text-sm outline-none transition-colors ${
-                    passcodeError ? 'border-rose-500' : 'border-[#E0DBD0] focus:border-[#C5A880]'
-                  }`}
+                  className={`w-full h-11 px-4 rounded-xl bg-white border text-[#111] placeholder-[#BBB] text-sm outline-none transition-colors ${passcodeError ? 'border-rose-500' : 'border-[#E0DBD0] focus:border-[#C5A880]'
+                    }`}
                   style={{ fontFamily: "'Inter', sans-serif" }}
                 />
                 {passcodeError && <p className="text-xs text-rose-500 font-light">Incorrect passcode.</p>}
