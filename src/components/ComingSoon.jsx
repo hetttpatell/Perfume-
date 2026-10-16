@@ -199,12 +199,7 @@ export default function ComingSoon({ onUnlockPreview }) {
 
             {/* COMING SOON Heading & Narrative — Center of screen */}
             <motion.div variants={fadeUp} className="flex flex-col items-center space-y-1 sm:space-y-2 px-2">
-              <p
-                className="text-[9.5px] sm:text-xs text-[#948A7B] font-light tracking-[0.24em] uppercase"
-                style={{ fontFamily: "'Inter', sans-serif" }}
-              >
-                Our New Website Is
-              </p>
+
               <h1
                 className="text-[clamp(1.9rem,5.2vw,4.2rem)] font-extralight tracking-[0.14em] text-[#111] leading-[1.05]"
                 style={{ fontFamily: "'Outfit', sans-serif" }}
@@ -212,7 +207,7 @@ export default function ComingSoon({ onUnlockPreview }) {
                 COMING SOON
               </h1>
               <p
-                className="text-[11px] sm:text-[13px] text-[#6E675D] font-light leading-[1.5] max-w-[270px] sm:max-w-md mx-auto pt-0.5"
+                className="text-[11px] sm:text-[13px] text-[#6E675D] font-bold leading-[1.5] max-w-[270px] sm:max-w-md mx-auto pt-0.5"
                 style={{ fontFamily: "'Inter', sans-serif" }}
               >
                 We've been working on something close to our hearts.
