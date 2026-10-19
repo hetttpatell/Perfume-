@@ -85,7 +85,7 @@ export default function AdminLayout() {
               {/* Drawer Top Header */}
               <div className="pb-6 border-b border-white/10 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <img src={logoImg} alt="Lune Logo" className="h-9 w-auto invert" />
+                  <img src={logoImg} alt="Lune Logo" className="h-9 w-auto object-contain" />
                   <div>
                     <h2 className="font-serif font-black text-base tracking-tight uppercase leading-none">LUNE</h2>
                     <span className="text-[8px] font-sans font-extrabold tracking-[0.25em] text-[#C08A3E] uppercase block mt-1">
@@ -176,7 +176,7 @@ export default function AdminLayout() {
         <div>
           {/* Top Logo & Title */}
           <div className="p-6 border-b border-white/10 flex items-center gap-3">
-            <img src={logoImg} alt="Lune Logo" className="h-10 w-auto invert" />
+            <img src={logoImg} alt="Lune Logo" className="h-10 w-auto object-contain" />
             <div>
               <h2 className="font-serif font-black text-lg tracking-tight uppercase">LUNE</h2>
               <span className="text-[8.5px] font-sans font-extrabold tracking-[0.25em] text-[#C08A3E] uppercase block">

@@ -269,7 +269,7 @@ export default function Navbar({ loaderState = 'completed', cartCount = 0, onOpe
                     <img
                       src={logoImg}
                       alt="LUNE Logo"
-                      className="h-6 w-auto object-contain"
+                      className="h-7 sm:h-8 w-auto object-contain"
                     />
                   </div>
 

@@ -109,7 +109,7 @@ export default function Footer({ onScrollToTop }) {
               <img
                 src={logoImg}
                 alt="LUNE Fragrance Logo"
-                className="h-8 sm:h-9 w-auto object-contain transition-opacity duration-200 group-hover:opacity-80"
+                className="h-9 sm:h-10 w-auto object-contain transition-opacity duration-200 group-hover:opacity-85"
               />
             </Link>
             <p className="font-sans text-xs sm:text-sm text-[#737373] leading-relaxed mb-6">

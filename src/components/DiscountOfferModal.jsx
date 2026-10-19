@@ -126,7 +126,7 @@ export default function DiscountOfferModal() {
                   <img
                     src={logoImg}
                     alt="LUNE Fragrance Logo"
-                    className="h-8 sm:h-14 md:h-18 max-h-[75px] w-auto object-contain mix-blend-multiply scale-110 sm:scale-135 origin-left"
+                    className="h-8 sm:h-12 md:h-14 max-h-[65px] w-auto object-contain scale-105 sm:scale-115 origin-left"
                   />
                   <div className="h-5 sm:h-6 w-[1px] bg-black/20" />
                   <span className="font-sans font-extrabold text-[8.5px] sm:text-[10.5px] tracking-[0.2em] sm:tracking-[0.25em] uppercase text-[#111111]">
