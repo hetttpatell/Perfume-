@@ -101,42 +101,45 @@ function HeroSubElement({ item, mouseOffset = { x: 0, y: 0 } }) {
         transition: 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)',
       }}
     >
-      <div className={`flex flex-col items-center justify-center ${item.animClass}`}>
-        {/* Studio Photographic Cutout Presentation */}
-        <div className="relative flex flex-col items-center justify-center cursor-pointer">
-          <img
-            src={item.src}
-            alt={item.alt}
-            draggable={false}
-            className={`${item.sizeClass} h-auto object-contain transition-all duration-500 ease-out select-none drop-shadow-[0_8px_16px_rgba(0,0,0,0.10)] group-hover:drop-shadow-[0_16px_26px_rgba(0,0,0,0.18)] group-hover:scale-105 ${item.imgRotation}`}
-          />
+      {/* Intermediate container for GSAP stagger scale & opacity to prevent collision with parallax transform & CSS animation */}
+      <div className="hero-subelement-anim will-change-transform">
+        <div className={`flex flex-col items-center justify-center ${item.animClass}`}>
+          {/* Studio Photographic Cutout Presentation */}
+          <div className="relative flex flex-col items-center justify-center cursor-pointer">
+            <img
+              src={item.src}
+              alt={item.alt}
+              draggable={false}
+              className={`${item.sizeClass} h-auto object-contain transition-all duration-500 ease-out select-none drop-shadow-[0_8px_16px_rgba(0,0,0,0.10)] group-hover:drop-shadow-[0_16px_26px_rgba(0,0,0,0.18)] group-hover:scale-105 ${item.imgRotation}`}
+            />
 
-          {/* Realistic Surface Contact Shadow for Grounded Elements */}
-          {isGrounded && (
-            <div className="w-3/4 h-1.5 sm:h-2 bg-black/15 rounded-[100%] blur-sm mx-auto -mt-1 pointer-events-none select-none opacity-30 group-hover:opacity-20 transition-all duration-300" />
-          )}
-        </div>
-
-        {/* Haute Parfumerie Editorial Nameplate — Refined luxury typography */}
-        <div className="mt-1.5 sm:mt-2 flex flex-col items-center text-center select-none pointer-events-none">
-          {/* Micro Accord Header with fine hairline */}
-          <div className="flex items-center gap-1.5 opacity-80">
-            <span className="w-3 sm:w-3.5 h-[0.5px] bg-black/50" />
-            <span className="font-sans text-[8px] sm:text-[8.5px] md:text-[9px] tracking-[0.25em] uppercase text-black/80 font-bold whitespace-nowrap">
-              {item.accord}
-            </span>
-            <span className="w-3 sm:w-3.5 h-[0.5px] bg-black/50" />
+            {/* Realistic Surface Contact Shadow for Grounded Elements */}
+            {isGrounded && (
+              <div className="w-3/4 h-1.5 sm:h-2 bg-black/15 rounded-[100%] blur-sm mx-auto -mt-1 pointer-events-none select-none opacity-30 group-hover:opacity-20 transition-all duration-300" />
+            )}
           </div>
 
-          {/* Refined Serif Fragrance Note Name */}
-          <span className="font-serif text-[11px] sm:text-[12px] md:text-[13px] lg:text-[14px] tracking-[0.16em] uppercase text-[#111111] font-bold mt-0.5 whitespace-normal sm:whitespace-nowrap max-w-[115px] sm:max-w-[130px] md:max-w-none text-center leading-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">
-            {item.name}
-          </span>
+          {/* Haute Parfumerie Editorial Nameplate — Refined luxury typography */}
+          <div className="mt-1.5 sm:mt-2 flex flex-col items-center text-center select-none pointer-events-none">
+            {/* Micro Accord Header with fine hairline */}
+            <div className="flex items-center gap-1.5 opacity-80">
+              <span className="w-3 sm:w-3.5 h-[0.5px] bg-black/50" />
+              <span className="font-sans text-[8px] sm:text-[8.5px] md:text-[9px] tracking-[0.25em] uppercase text-black/80 font-bold whitespace-nowrap">
+                {item.accord}
+              </span>
+              <span className="w-3 sm:w-3.5 h-[0.5px] bg-black/50" />
+            </div>
 
-          {/* Subtle Botanical Origin */}
-          <span className="font-serif italic text-[8px] sm:text-[8.5px] md:text-[9px] text-neutral-500 tracking-wider mt-0.5 hidden sm:block whitespace-nowrap">
-            {item.origin}
-          </span>
+            {/* Refined Serif Fragrance Note Name */}
+            <span className="font-serif text-[11px] sm:text-[12px] md:text-[13px] lg:text-[14px] tracking-[0.16em] uppercase text-[#111111] font-bold mt-0.5 whitespace-normal sm:whitespace-nowrap max-w-[115px] sm:max-w-[130px] md:max-w-none text-center leading-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">
+              {item.name}
+            </span>
+
+            {/* Subtle Botanical Origin */}
+            <span className="font-serif italic text-[8px] sm:text-[8.5px] md:text-[9px] text-neutral-500 tracking-wider mt-0.5 hidden sm:block whitespace-nowrap">
+              {item.origin}
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -144,7 +147,7 @@ function HeroSubElement({ item, mouseOffset = { x: 0, y: 0 } }) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
-// SVG Product Image Hero Component - Clean Presentation with Responsive Motion
+// SVG Product Image Hero Component - Clean Presentation with Dual-Slot Motion
 // ──────────────────────────────────────────────────────────────────────────────
 function HeroProductImage({
   loaderState,
@@ -154,13 +157,15 @@ function HeroProductImage({
   slidesList = SLIDES,
   mouseOffset = { x: 0, y: 0 },
 }) {
-  const currentBottleRef = useRef(null);
-  const incomingBottleRef = useRef(null);
-  const activeSlideRef = useRef(currentSlide);
-  const [currentSlideIdx, setCurrentSlideIdx] = useState(currentSlide);
-  const [incomingSlideIdx, setIncomingSlideIdx] = useState(currentSlide);
+  // Dual-slot alternating architecture eliminates DOM flash, image-swap jitter, and position snapping
+  const [activeSlot, setActiveSlot] = useState(0); // 0 or 1
+  const [slotSlides, setSlotSlides] = useState([currentSlide, currentSlide]);
 
+  const slot0Ref = useRef(null);
+  const slot1Ref = useRef(null);
+  const activeSlideRef = useRef(currentSlide);
   const hasEntranceAnimatedRef = useRef(false);
+  const transitionTimelineRef = useRef(null);
 
   const getSubElementsForSlide = (idx) => {
     const slide = slidesList[idx];
@@ -170,202 +175,217 @@ function HeroProductImage({
     return HERO_SUBELEMENTS_MAP[idx % HERO_SUBELEMENTS_MAP.length] || HERO_SUBELEMENTS_MAP[0];
   };
 
-  const currentSubElements = getSubElementsForSlide(currentSlideIdx);
-  const incomingSubElements = getSubElementsForSlide(incomingSlideIdx);
-
-  // Initial loader entrance animation for product SVG flacon and subelements
+  // Initial loader entrance animation
   useEffect(() => {
+    const currentEl = activeSlot === 0 ? slot0Ref.current : slot1Ref.current;
+    if (!currentEl) return;
+
     if (loaderState === 'loading') {
       hasEntranceAnimatedRef.current = false;
-      if (currentBottleRef.current) {
-        gsap.set(currentBottleRef.current, {
-          y: 110,
-          opacity: 0,
-          scale: 0.85,
-          rotation: -2,
-          force3D: true,
-        });
-        const subelements = currentBottleRef.current.querySelectorAll('.hero-subelement');
-        if (subelements.length > 0) {
-          gsap.set(subelements, { opacity: 0, scale: 0.7, y: 35 });
-        }
+      gsap.set(currentEl, {
+        y: 110,
+        opacity: 0,
+        scale: 0.85,
+        rotation: -2,
+        force3D: true,
+      });
+      const subelements = currentEl.querySelectorAll('.hero-subelement-anim');
+      if (subelements.length > 0) {
+        gsap.set(subelements, { opacity: 0, scale: 0.7, y: 35 });
       }
     } else if ((loaderState === 'exiting' || loaderState === 'completed') && !hasEntranceAnimatedRef.current) {
       hasEntranceAnimatedRef.current = true;
-      if (currentBottleRef.current) {
-        const bottleEl = currentBottleRef.current;
-        const imgEl = bottleEl.querySelector('img');
-        const shadowEl = bottleEl.querySelector('.bg-black\\/20, .bg-black\\/15');
-        const subelements = bottleEl.querySelectorAll('.hero-subelement');
-
-        const tl = gsap.timeline({
-          delay: loaderState === 'exiting' ? 0.02 : 0,
-          defaults: { ease: 'power4.out', force3D: true },
-        });
-
-        tl.to(
-          bottleEl,
-          {
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            rotation: 0,
-            duration: 1.35,
-          },
-          0
-        );
-
-        if (imgEl) {
-          tl.fromTo(
-            imgEl,
-            { filter: 'drop-shadow(0px 5px 10px rgba(0,0,0,0.05))' },
-            { filter: 'drop-shadow(0px 25px 35px rgba(0,0,0,0.18))', duration: 1.35 },
-            0
-          );
-        }
-
-        if (shadowEl) {
-          tl.fromTo(
-            shadowEl,
-            { opacity: 0, scale: 0.5 },
-            { opacity: 0.3, scale: 1, duration: 1.2 },
-            0.1
-          );
-        }
-
-        if (subelements.length > 0) {
-          tl.fromTo(
-            subelements,
-            { opacity: 0, scale: 0.7, y: 30 },
-            { opacity: 1, scale: 1, y: 0, duration: 1.1, stagger: 0.15, ease: 'back.out(1.4)' },
-            0.25
-          );
-        }
-      }
-    }
-  }, [loaderState]);
-
-  useEffect(() => {
-    if (activeSlideRef.current === currentSlide) return;
-
-    setIncomingSlideIdx(currentSlide);
-
-    const currentEl = currentBottleRef.current;
-    const incomingEl = incomingBottleRef.current;
-
-    if (currentEl && incomingEl) {
-      const isMobile = window.innerWidth < 1024;
-      const isNext = slideDirection === 'next';
-
-      let exitX = 0;
-      let exitY = 0;
-      let entryX = 0;
-      let entryY = 0;
-
-      if (isMobile) {
-        // Mobile view: horizontal transition
-        exitX = isNext ? '-100vw' : '100vw';
-        entryX = isNext ? '100vw' : '-100vw';
-      } else {
-        // Desktop view: vertical transition
-        exitY = isNext ? '-110vh' : '110vh';
-        entryY = isNext ? '110vh' : '-110vh';
-      }
-
-      gsap.set(incomingEl, {
-        x: entryX,
-        y: entryY,
-        opacity: 1,
-        scale: 1,
-        display: 'flex',
-      });
-
-      gsap.set(currentEl, {
-        x: 0,
-        y: 0,
-        opacity: 1,
-        scale: 1,
-      });
-
-      const incomingSubelements = incomingEl.querySelectorAll('.hero-subelement');
-      if (incomingSubelements.length > 0) {
-        gsap.set(incomingSubelements, { opacity: 0, scale: 0.75 });
-      }
+      const imgEl = currentEl.querySelector('img');
+      const shadowEl = currentEl.querySelector('.bg-black\\/20, .bg-black\\/15');
+      const subelements = currentEl.querySelectorAll('.hero-subelement-anim');
 
       const tl = gsap.timeline({
-        onComplete: () => {
-          activeSlideRef.current = currentSlide;
-          setCurrentSlideIdx(currentSlide);
-          gsap.set(currentEl, { x: 0, y: 0, opacity: 1, scale: 1 });
-          gsap.set(incomingEl, { display: 'none', x: entryX, y: entryY });
-        },
+        delay: loaderState === 'exiting' ? 0.02 : 0,
+        defaults: { ease: 'power4.out', force3D: true },
       });
 
       tl.to(
         currentEl,
         {
-          x: exitX,
-          y: exitY,
-          duration: 0.8,
-          ease: 'power2.inOut',
-          force3D: true,
-        },
-        0
-      );
-
-      tl.to(
-        incomingEl,
-        {
-          x: 0,
           y: 0,
-          duration: 0.8,
-          ease: 'power2.inOut',
-          force3D: true,
+          opacity: 1,
+          scale: 1,
+          rotation: 0,
+          duration: 1.35,
         },
         0
       );
 
-      if (incomingSubelements.length > 0) {
-        tl.to(
-          incomingSubelements,
-          {
-            opacity: 1,
-            scale: 1,
-            duration: 0.65,
-            stagger: 0.12,
-            ease: 'back.out(1.4)',
-          },
-          0.32
+      if (imgEl) {
+        tl.fromTo(
+          imgEl,
+          { filter: 'drop-shadow(0px 5px 10px rgba(0,0,0,0.05))' },
+          { filter: 'drop-shadow(0px 25px 35px rgba(0,0,0,0.18))', duration: 1.35 },
+          0
         );
       }
-    } else {
-      activeSlideRef.current = currentSlide;
-      setCurrentSlideIdx(currentSlide);
-    }
-  }, [currentSlide, slideDirection]);
 
-  const currentData = slidesList[currentSlideIdx] || slidesList[0];
-  const incomingData = slidesList[incomingSlideIdx] || slidesList[0];
+      if (shadowEl) {
+        tl.fromTo(
+          shadowEl,
+          { opacity: 0, scale: 0.5 },
+          { opacity: 0.3, scale: 1, duration: 1.2 },
+          0.1
+        );
+      }
+
+      if (subelements.length > 0) {
+        tl.fromTo(
+          subelements,
+          { opacity: 0, scale: 0.7, y: 30 },
+          { opacity: 1, scale: 1, y: 0, duration: 1.1, stagger: 0.15, ease: 'back.out(1.4)' },
+          0.25
+        );
+      }
+    }
+  }, [loaderState, activeSlot]);
+
+  // Seamless slide transitions with dual-slot alternating animation
+  useEffect(() => {
+    if (activeSlideRef.current === currentSlide) return;
+
+    const fromSlot = activeSlot;
+    const toSlot = 1 - activeSlot;
+
+    // Immediately render incoming product into the inactive slot
+    setSlotSlides(prev => {
+      const updated = [...prev];
+      updated[toSlot] = currentSlide;
+      return updated;
+    });
+
+    const fromEl = fromSlot === 0 ? slot0Ref.current : slot1Ref.current;
+    const toEl = toSlot === 0 ? slot0Ref.current : slot1Ref.current;
+
+    if (!fromEl || !toEl) {
+      activeSlideRef.current = currentSlide;
+      setActiveSlot(toSlot);
+      return;
+    }
+
+    if (transitionTimelineRef.current) {
+      transitionTimelineRef.current.kill();
+    }
+
+    const isMobile = window.innerWidth < 1024;
+    const isNext = slideDirection === 'next';
+
+    let exitX = 0;
+    let exitY = 0;
+    let entryX = 0;
+    let entryY = 0;
+
+    if (isMobile) {
+      exitX = isNext ? '-100vw' : '100vw';
+      entryX = isNext ? '100vw' : '-100vw';
+    } else {
+      exitY = isNext ? '-110vh' : '110vh';
+      entryY = isNext ? '110vh' : '-110vh';
+    }
+
+    // Prepare incoming slot position
+    gsap.set(toEl, {
+      x: entryX,
+      y: entryY,
+      opacity: 1,
+      scale: 1,
+      display: 'flex',
+    });
+
+    // Ensure active slot is at 0, 0
+    gsap.set(fromEl, {
+      x: 0,
+      y: 0,
+      opacity: 1,
+      scale: 1,
+      display: 'flex',
+    });
+
+    const toSubelements = toEl.querySelectorAll('.hero-subelement-anim');
+    if (toSubelements.length > 0) {
+      gsap.set(toSubelements, { opacity: 0, scale: 0.75 });
+    }
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        activeSlideRef.current = currentSlide;
+        setActiveSlot(toSlot);
+        // Hide the exited slot
+        gsap.set(fromEl, { display: 'none', x: entryX, y: entryY });
+        // Keep incoming slot rock solid at 0, 0 without any jump or snap
+        gsap.set(toEl, { x: 0, y: 0, opacity: 1, scale: 1, display: 'flex' });
+      },
+    });
+    transitionTimelineRef.current = tl;
+
+    tl.to(
+      fromEl,
+      {
+        x: exitX,
+        y: exitY,
+        duration: 0.8,
+        ease: 'power2.inOut',
+        force3D: true,
+      },
+      0
+    );
+
+    tl.to(
+      toEl,
+      {
+        x: 0,
+        y: 0,
+        duration: 0.8,
+        ease: 'power2.inOut',
+        force3D: true,
+      },
+      0
+    );
+
+    if (toSubelements.length > 0) {
+      tl.to(
+        toSubelements,
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.65,
+          stagger: 0.12,
+          ease: 'back.out(1.4)',
+        },
+        0.32
+      );
+    }
+  }, [currentSlide, slideDirection, activeSlot]);
+
+  const slot0Data = slidesList[slotSlides[0]] || slidesList[0];
+  const slot1Data = slidesList[slotSlides[1]] || slidesList[0];
+  const slot0SubElements = getSubElementsForSlide(slotSlides[0]);
+  const slot1SubElements = getSubElementsForSlide(slotSlides[1]);
 
   return (
     <div className="relative w-full h-full flex items-center justify-center pointer-events-none select-none">
       {/* Subtle Transparent Ambient Glow */}
       <div className="absolute w-[360px] h-[360px] sm:w-[420px] sm:h-[420px] md:w-[480px] md:h-[480px] lg:w-[540px] lg:h-[540px] bg-radial from-black/5 to-transparent rounded-full blur-3xl opacity-25 pointer-events-none" />
 
-      {/* Active Product Flacon */}
+      {/* Slot 0 Flacon */}
       <div
-        ref={currentBottleRef}
+        ref={slot0Ref}
+        style={{ display: activeSlot === 0 ? 'flex' : 'none' }}
         className="absolute inset-0 flex flex-col items-center justify-center max-w-[380px] sm:max-w-[420px] md:max-w-[480px] lg:max-w-[520px] xl:max-w-[560px] w-full mx-auto will-change-transform"
       >
         <div className="relative w-fit flex flex-col items-center justify-center">
-          {/* Sub-elements for current product */}
-          {currentSubElements.map((item) => (
+          {slot0SubElements.map((item) => (
             <HeroSubElement key={item.id} item={item} mouseOffset={mouseOffset} />
           ))}
 
           <img
-            src={currentData?.image || HERO_SVG}
-            alt={currentData?.title || "Lune Perfume Flacon"}
+            src={slot0Data?.image || HERO_SVG}
+            alt={slot0Data?.title || "Lune Perfume Flacon"}
             className="w-auto h-[48vh] sm:h-[50vh] md:h-[52vh] lg:h-[58vh] xl:h-[64vh] min-h-[310px] sm:min-h-[350px] md:min-h-[380px] lg:min-h-[380px] max-h-[440px] sm:max-h-[480px] md:max-h-[520px] lg:max-h-[620px] object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.16)] select-none pointer-events-none"
             draggable={false}
           />
@@ -374,21 +394,20 @@ function HeroProductImage({
         </div>
       </div>
 
-      {/* Incoming Product Flacon */}
+      {/* Slot 1 Flacon */}
       <div
-        ref={incomingBottleRef}
-        style={{ display: 'none' }}
+        ref={slot1Ref}
+        style={{ display: activeSlot === 1 ? 'flex' : 'none' }}
         className="absolute inset-0 flex flex-col items-center justify-center max-w-[380px] sm:max-w-[420px] md:max-w-[480px] lg:max-w-[520px] xl:max-w-[560px] w-full mx-auto will-change-transform"
       >
         <div className="relative w-fit flex flex-col items-center justify-center">
-          {/* Sub-elements for incoming product */}
-          {incomingSubElements.map((item) => (
+          {slot1SubElements.map((item) => (
             <HeroSubElement key={item.id} item={item} mouseOffset={mouseOffset} />
           ))}
 
           <img
-            src={incomingData?.image || HERO_SVG}
-            alt={incomingData?.title || "Lune Perfume Flacon"}
+            src={slot1Data?.image || HERO_SVG}
+            alt={slot1Data?.title || "Lune Perfume Flacon"}
             className="w-auto h-[48vh] sm:h-[50vh] md:h-[52vh] lg:h-[58vh] xl:h-[64vh] min-h-[310px] sm:min-h-[350px] md:min-h-[380px] lg:min-h-[380px] max-h-[440px] sm:max-h-[480px] md:max-h-[520px] lg:max-h-[620px] object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.16)] select-none pointer-events-none"
             draggable={false}
           />
