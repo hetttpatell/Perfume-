@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 // ─── Client-finalized product categories (scalable — add/remove here) ────────
 const PRODUCT_CATEGORIES = [
   { id: 'body-rollon',      label: 'Body Rollon',      categoryKey: 'Body Rollon' },
-  { id: 'air-freshner',     label: 'Air Freshner',     categoryKey: 'Air Freshner' },
+  { id: 'air-freshener',    label: 'Air Freshener',    categoryKey: 'Air Freshener' },
   { id: 'luxurious-combo',  label: 'Luxurious Combo',  categoryKey: 'Luxurious Combo' },
 ];
 

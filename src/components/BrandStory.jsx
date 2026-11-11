@@ -65,11 +65,11 @@ export default function BrandStory() {
 
           {/* Floating Caption Badge */}
           <div className="absolute bottom-6 left-6 right-6 md:bottom-10 md:left-10 text-white pointer-events-none">
-            <span className="inline-block px-3 py-1 mb-2 bg-white/30 backdrop-blur-md border border-white/40 font-sans text-[10px] uppercase tracking-[0.3em] text-white font-medium shadow-sm">
-              PARIS, 1970 • ARCHIVE
+            <span className="inline-block px-3 py-1 mb-2 bg-[#C08A3E]/90 backdrop-blur-md border border-[#C08A3E] font-sans text-[10px] uppercase tracking-[0.3em] text-white font-semibold shadow-sm">
+              ALL-INDIA TERROIR EXPEDITION • RAW HARVEST
             </span>
             <p className="font-serif text-lg md:text-xl font-light text-white tracking-wide drop-shadow-sm">
-              Maison Lune & Master Perfumers
+              Every Region’s Most Potent Secret, Extracted Without Apology
             </p>
           </div>
         </div>
@@ -81,33 +81,69 @@ export default function BrandStory() {
           className="p-6 sm:p-8 md:p-10 lg:p-16 flex flex-col justify-center bg-white border-b border-black/5"
         >
           <div className="max-w-xl">
-            <span className="font-sans text-xs uppercase tracking-[0.35em] text-[#555555] mb-4 block font-semibold">
-              THE HERITAGE & VISION
+            <span className="font-sans text-xs uppercase tracking-[0.35em] text-[#C08A3E] mb-4 block font-bold">
+              THE INGREDIENT CONQUEST • STATE BY STATE
             </span>
 
             <h2 className="font-serif font-light text-3xl sm:text-4xl lg:text-5xl tracking-tight leading-[1.08] text-[#111111] mb-4 uppercase">
-              THE AUDACIOUS SIGNATURE
+              INDIA’S WILDEST EARTH IN ONE BOTTLE.
             </h2>
 
             <h3 className="font-sans font-medium text-xs sm:text-sm tracking-[0.25em] uppercase text-[#555555] mb-6">
-              BORN FROM UNCOMPROMISING COURAGE
+              WE SCOURED THE SUB-CONTINENT SO YOU DON'T COMPROMISE
             </h3>
 
-            <p className="font-sans font-light text-xs sm:text-sm md:text-base leading-relaxed text-[#333333] mb-8">
-              In 1970, Maison Lune commissioned master perfumers to craft a signature fragrance statement. Refusing sweet conformist florals, the house demanded a scent with bite—an unexpected contrast between sharp galbanum green freshness and rich iris nobility.
+            <p className="font-sans font-light text-xs sm:text-sm md:text-base leading-relaxed text-[#333333] mb-6">
+              We didn’t sit in a lab synthesizing shortcuts. We took the road less traveled — hunting the absolute richest botanical treasures across India's microclimates. Pure, potent, and unapologetically alive.
             </p>
 
-            <div className="pt-6 border-t border-black/5 flex items-center justify-between">
+            {/* Grid of State Ingredients */}
+            <div className="grid grid-cols-2 gap-3 pb-6 border-b border-black/5">
+              <div className="p-3 bg-[#faf9f7] border-l-2 border-[#C08A3E]">
+                <span className="block font-sans text-[9px] uppercase tracking-[0.2em] text-[#C08A3E] font-bold">
+                  KASHMIR VALLEYS
+                </span>
+                <span className="block font-sans text-xs font-semibold text-[#111111] mt-0.5">
+                  Hand-Plucked Crimson Saffron
+                </span>
+              </div>
+              <div className="p-3 bg-[#faf9f7] border-l-2 border-[#C08A3E]">
+                <span className="block font-sans text-[9px] uppercase tracking-[0.2em] text-[#C08A3E] font-bold">
+                  KANNAUJ, UP
+                </span>
+                <span className="block font-sans text-xs font-semibold text-[#111111] mt-0.5">
+                  Dawn-Distilled Damask Gulab
+                </span>
+              </div>
+              <div className="p-3 bg-[#faf9f7] border-l-2 border-[#C08A3E]">
+                <span className="block font-sans text-[9px] uppercase tracking-[0.2em] text-[#C08A3E] font-bold">
+                  MYSORE, KARNATAKA
+                </span>
+                <span className="block font-sans text-xs font-semibold text-[#111111] mt-0.5">
+                  Aged Royal Chandan Wood
+                </span>
+              </div>
+              <div className="p-3 bg-[#faf9f7] border-l-2 border-[#C08A3E]">
+                <span className="block font-sans text-[9px] uppercase tracking-[0.2em] text-[#C08A3E] font-bold">
+                  ASSAM RAINFORESTS
+                </span>
+                <span className="block font-sans text-xs font-semibold text-[#111111] mt-0.5">
+                  Dense Wild Oudh Resin
+                </span>
+              </div>
+            </div>
+
+            <div className="pt-5 flex items-center justify-between">
               <div>
-                <span className="font-sans text-[10px] uppercase tracking-[0.25em] text-[#555555] block mb-1">
-                  HERITAGE MILESTONE
+                <span className="font-sans text-[10px] uppercase tracking-[0.25em] text-[#C08A3E] block mb-1 font-semibold">
+                  SOURCING CRITERIA
                 </span>
                 <span className="font-serif text-xl sm:text-2xl font-light text-[#111111]">
-                  19 AUGUST 1883
+                  ZERO DILUTION • SINGLE-ORIGIN PURITY
                 </span>
               </div>
 
-              <span className="font-sans text-xs uppercase tracking-[0.2em] font-semibold text-[#555555]">
+              <span className="font-sans text-xs uppercase tracking-[0.2em] font-bold text-[#111111]">
                 01 / 02
               </span>
             </div>
@@ -121,33 +157,53 @@ export default function BrandStory() {
           className="p-6 sm:p-8 md:p-10 lg:p-16 flex flex-col justify-center bg-white border-b md:border-b-0 md:border-r border-black/5 order-2 md:order-1"
         >
           <div className="max-w-xl">
-            <span className="font-sans text-xs uppercase tracking-[0.35em] text-[#555555] mb-4 block font-semibold">
-              THE BOTANICAL ALCHEMY
+            <span className="font-sans text-xs uppercase tracking-[0.35em] text-[#C08A3E] mb-4 block font-bold">
+              THE NEWCOMER STANDARD • UNFILTERED POWER
             </span>
 
             <h2 className="font-serif font-light text-3xl sm:text-4xl lg:text-5xl tracking-tight leading-[1.08] text-[#111111] mb-4 uppercase">
-              THE SIX-YEAR IRIS RITUAL
+              RICH BY NATURE. HONEST BY DESIGN.
             </h2>
 
             <h3 className="font-sans font-medium text-xs sm:text-sm tracking-[0.25em] uppercase text-[#555555] mb-6">
-              FLORENTINE IRIS PALLIDA HARVEST
+              CRAFTED FOR YOUR PULSE • ACCESSIBLE TO ALL
             </h3>
 
-            <p className="font-sans font-light text-xs sm:text-sm md:text-base leading-relaxed text-[#333333] mb-8">
-              The soul of Lune rests upon Iris Pallida, cultivated in the historic fields of Florence and Grasse. Maturing the rhizomes requires six years of unhurried patience—three years growing in the soil and three years drying in quiet darkness before slow steam distillation yields the precious powdery iris butter.
+            <p className="font-sans font-light text-xs sm:text-sm md:text-base leading-relaxed text-[#333333] mb-6">
+              Traditional fragrance houses charge 10x markups for watered-down blends and legacy logos. We blew that open. By pairing wild spices from Malabar with the coastal florals of Tamil Nadu and high-concentration maceration, we deliver intoxicating, long-lasting extrait density at honest prices. Luxury shouldn't be exclusive — it should be undeniable.
             </p>
 
-            <div className="pt-6 border-t border-black/5 flex items-center justify-between">
+            {/* Additional Regional Alignment */}
+            <div className="grid grid-cols-2 gap-3 pb-6 border-b border-black/5">
+              <div className="p-3 bg-[#faf9f7] border-l-2 border-[#111111]">
+                <span className="block font-sans text-[9px] uppercase tracking-[0.2em] text-[#555555] font-bold">
+                  MALABAR COAST, KERALA
+                </span>
+                <span className="block font-sans text-xs font-semibold text-[#111111] mt-0.5">
+                  Black Tellicherry Peppercorn
+                </span>
+              </div>
+              <div className="p-3 bg-[#faf9f7] border-l-2 border-[#111111]">
+                <span className="block font-sans text-[9px] uppercase tracking-[0.2em] text-[#555555] font-bold">
+                  MADURAI, TAMIL NADU
+                </span>
+                <span className="block font-sans text-xs font-semibold text-[#111111] mt-0.5">
+                  Midnight Sambac Jasmine
+                </span>
+              </div>
+            </div>
+
+            <div className="pt-5 flex items-center justify-between">
               <div>
-                <span className="font-sans text-[10px] uppercase tracking-[0.25em] text-[#555555] block mb-1">
-                  MATURATION RITUAL
+                <span className="font-sans text-[10px] uppercase tracking-[0.25em] text-[#C08A3E] block mb-1 font-semibold">
+                  CONCENTRATION & PROJECTION
                 </span>
                 <span className="font-serif text-xl sm:text-2xl font-light text-[#111111]">
-                  6 YEARS PATIENCE
+                  BEAST MODE EXTRAIT DE PARFUM
                 </span>
               </div>
 
-              <span className="font-sans text-xs uppercase tracking-[0.2em] font-semibold text-[#555555]">
+              <span className="font-sans text-xs uppercase tracking-[0.2em] font-bold text-[#111111]">
                 02 / 02
               </span>
             </div>
@@ -168,11 +224,11 @@ export default function BrandStory() {
 
           {/* Floating Caption Badge */}
           <div className="absolute bottom-6 left-6 right-6 md:bottom-10 md:left-10 text-white pointer-events-none">
-            <span className="inline-block px-3 py-1 mb-2 bg-white/20 backdrop-blur-md border border-white/30 font-sans text-[10px] uppercase tracking-[0.3em] text-white font-medium">
-              GRASSE, FRANCE // HARVEST
+            <span className="inline-block px-3 py-1 mb-2 bg-[#C08A3E]/90 backdrop-blur-md border border-[#C08A3E] font-sans text-[10px] uppercase tracking-[0.3em] text-white font-semibold">
+              UNCOMPROMISED EXTRACTION // ZERO MIDDLEMEN
             </span>
             <p className="font-serif text-lg md:text-xl font-light text-white tracking-wide">
-              Florentine Iris Pallida & Artisanal Distillation
+              Rare Earth Botanicals Direct From Origin To Your Skin
             </p>
           </div>
         </div>

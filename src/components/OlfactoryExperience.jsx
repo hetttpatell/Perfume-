@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import CartDrawer from './CartDrawer';
-import OurStory from './OurStory';
 import BrandVideoFeedback from './BrandVideoFeedback';
 import Footer from './Footer';
 
 // ──────────────────────────────────────────────────────────────────────────────
-// OlfactoryExperience — Bottom-of-homepage wrapper containing OurStory,
+// OlfactoryExperience — Bottom-of-homepage wrapper containing
 // BrandVideoFeedback, Footer, and the global CartDrawer.
 // Product showcase has been extracted to FeaturedProducts.jsx for reusability.
 // ──────────────────────────────────────────────────────────────────────────────
@@ -43,11 +42,6 @@ export default function OlfactoryExperience({
 
   return (
     <section className="w-full bg-white text-[#111111] font-sans">
-      {/* Our Story — Pre-Launch Brand Journey */}
-      <div id="gallery" className="w-full scroll-mt-24">
-        <OurStory />
-      </div>
-
       {/* Brand Video Client Testimonials & Social Proof */}
       <div id="testimonials" className="w-full scroll-mt-24">
         <BrandVideoFeedback />

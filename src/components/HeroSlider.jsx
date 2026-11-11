@@ -6,6 +6,7 @@ import SensoryRitual from './SensoryRitual';
 import BrandStory from './BrandStory';
 import FeaturedProducts from './FeaturedProducts';
 import OlfactoryExperience from './OlfactoryExperience';
+import OurStory from './OurStory';
 import Navbar from './Navbar';
 import Loader from './Loader';
 import AccountModal from './AccountModal';
@@ -940,6 +941,9 @@ export default function HeroSlider({
 
       {/* Haute Parfumerie Boutique (Featured Products — directly below hero, above BrandStory) */}
       <FeaturedProducts />
+
+      {/* Our Story — Between Featured Products & Brand Story */}
+      <OurStory />
 
       {/* Brand Heritage & Story Section */}
       <div id="about" className="scroll-mt-24">
